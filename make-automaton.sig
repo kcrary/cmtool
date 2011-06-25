@@ -17,9 +17,10 @@ signature MAKE_AUTOMATON =
                finals = [ action(1) .. action(lastfinal) ]
                NB: finals is missing entry 0
                redundancies is the list of all arms that were not used
+               b iff Rs is inexhaustive
                and
-               return ((count, q_init, lastfinal, finals, trans), redundancies)
+               return ((count, q_init, lastfinal, finals, trans), redundancies, b)
       *)
-      val makeAutomaton : int -> int -> (Regexp.regexp * action) list -> Automata.automaton * int list
+      val makeAutomaton : int -> int -> (Regexp.regexp * action) list -> Automata.automaton * int list * bool
 
    end

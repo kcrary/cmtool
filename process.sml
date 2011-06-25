@@ -546,7 +546,7 @@ structure Process
                        let
                           val () = print name
                           val () = print ": "
-                          val (auto as (states, _, _, _, _, _, _), redundancies) =
+                          val (auto as (states, _, _, _, _, _, _), redundancies, inexhaustive) =
                              MakeAutomaton.makeAutomaton symbolLimit armcount arms
 
                           val () = print (Int.toString states)
@@ -563,6 +563,16 @@ structure Process
                                  print " is redundant.\n"
                                  ))
                              redundancies
+
+                          val () =
+                             if inexhaustive then
+                                (
+                                print "Warning: function ";
+                                print name;
+                                print " is inexhaustive.\n"
+                                )
+                             else
+                                ()
 
                           val () =
                              if states > stateCountMax then

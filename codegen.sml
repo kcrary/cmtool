@@ -195,7 +195,14 @@ structure CodeGen
             write ", ";
             write (Int.toString lastFinal);
             write ", Vector.fromList [";
-            appArraySeparated write (fn () => write ",") final;
+            appArraySeparated
+               (fn name =>
+                   if name = "" then
+                      write "epsilon"
+                   else
+                      write name)
+               (fn () => write ",")
+               final;
             write "], LexEngine.next";
             write minorstr;
             write "x";
@@ -281,7 +288,7 @@ structure CodeGen
                     ))
              actions;
 
-             write ")\n=\nstruct\nlocal\nstructure LexEngine = LexEngineFun (type symbol = symbol\nval ord = ord)\nstructure Tables = struct\n";
+             write ")\n=\nstruct\nlocal\nstructure LexEngine = LexEngineFun (type symbol = symbol\nval ord = ord)\nstructure Tables = struct\nfun epsilon _ = raise (Fail \"Illegal lexeme\")\n";
              app (writeTable outs symbolLimit functions) functions;
              write "end\nin\n";
 

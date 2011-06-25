@@ -48,7 +48,7 @@ structure MakeAutomaton
 
              val transArr = Array.fromList trans
 
-             val utilization = Array.array (armcount, false)
+             val utilization = Array.array (armcount+1, false)
 
              (* Place final-sink states (i.e., final states that only transition
                 to the sink state) in the permutation.
@@ -162,6 +162,11 @@ structure MakeAutomaton
                 0
                 trans
 
+             val inexhaustive =
+                Array.sub (utilization, armcount)
+
+             val () = Array.update (utilization, armcount, true)
+
              val redundancies =
                 Array.foldli
                 (fn (armnumber, used, redundancies) =>
@@ -174,14 +179,15 @@ structure MakeAutomaton
 
           in
              ((rcount, rinitial, firstNonfinalsink-1, firstNonfinal-1, rfinal, rtrans, rtransEos),
-              redundancies)
+              redundancies, inexhaustive)
           end
 
       fun compareAction ((m, _), (n, _)) = Int.compare (m, n)
 
       fun makeAutomaton symbolLimit armcount res =
           let
-             val nfaRev = MakeNFA.makeRevNfa res
+             val res' = (Regexp.Epsilon, (armcount, "")) :: res  (* add error state *)
+             val nfaRev = MakeNFA.makeRevNfa res'
              val dfaRev = Determinize.determinize compareAction (fn _ => EQUAL) nfaRev
              val nfa = ReverseDFA.reverseDfa dfaRev
              val dfa = Determinize.determinize (fn _ => EQUAL) compareAction nfa
