@@ -37,9 +37,9 @@ structure Process
 
 
       type context = { modulename : string option,
-                       types : S.set,
-                       actions : string D.dict,
-                       functions : (string * (Regexp.regexp * (int * string)) list) D.dict,
+                       types : bool ref D.dict,
+                       actions : (string * bool ref) D.dict,
+                       functions : (string * int * (Regexp.regexp * (int * string)) list) D.dict,
                        patterns : pattern D.dict,
                        alphabet : (int * SS.set) option }
 
@@ -263,7 +263,7 @@ structure Process
 
       fun processArm fnname ctx n (re, action) =
           let
-             val tp = 
+             val (tp, used) = 
                 (case D.find (#actions ctx) action of
                     NONE =>
                        (
@@ -276,8 +276,8 @@ structure Process
                        print ".\n";
                        raise Error
                        )
-                  | SOME tp =>
-                       tp)
+                  | SOME x =>
+                       x)
 
              fun errfn () =
                  (
@@ -288,6 +288,7 @@ structure Process
                  )
 
              val re' = processRegexp errfn ctx re
+             val () = used := true
           in
              (tp, re', (n, action))
           end
@@ -306,7 +307,7 @@ structure Process
                  let
                     val (tp : string, re1, action1) = processArm fnname ctx 0 arm
 
-                    val (_, rest') =
+                    val (armcount, rest') =
                        foldl
                        (fn (arm, (n, acc)) =>
                               let
@@ -330,7 +331,7 @@ structure Process
                        (1, [])
                        rest
                  in
-                    (tp, (re1, action1) :: rest')
+                    (tp, armcount, (re1, action1) :: rest')
                  end)
 
 
@@ -384,7 +385,7 @@ structure Process
                                         end)
 
                          | Type name =>
-                              if S.member (#types ctx) name then
+                              if D.member (#types ctx) name then
                                  (
                                  print "Error: multiply specified type ";
                                  print name;
@@ -392,7 +393,7 @@ structure Process
                                  raise Error
                                  )
                               else
-                                 typesUpdate ctx (S.insert (#types ctx) name)
+                                 typesUpdate ctx (D.insert (#types ctx) name (ref false))
 
                          | Action (name, tp) =>
                               if 
@@ -406,17 +407,22 @@ structure Process
                                  print ".\n";
                                  raise Error
                                  )
-                              else if S.member (#types ctx) tp then
-                                 actionsUpdate ctx (D.insert (#actions ctx) name tp)
-                              else
-                                 (
-                                 print "Error: unbound type ";
-                                 print tp;
-                                 print " in action ";
-                                 print name;
-                                 print ".\n";
-                                 raise Error
-                                 )
+                              else 
+                                 (case D.find (#types ctx) tp of
+                                     NONE =>
+                                        (
+                                        print "Error: unbound type ";
+                                        print tp;
+                                        print " in action ";
+                                        print name;
+                                        print ".\n";
+                                        raise Error
+                                        )
+                                   | SOME used =>
+                                        (
+                                        used := true;
+                                        actionsUpdate ctx (D.insert (#actions ctx) name (tp, ref false))
+                                        ))
 
                          | Function (name, arms) =>
                               if 
@@ -503,7 +509,7 @@ structure Process
           let 
              val ctx =
                 { modulename = NONE,
-                  types = S.empty,
+                  types = D.empty,
                   actions = D.empty,
                   functions = D.empty,
                   patterns = D.empty,
@@ -530,22 +536,33 @@ structure Process
                 else
                    ()
 
-             val types' = S.toList types
-             val actions' = D.toList actions
-
              val symbolLimit =
                 (* Since functions is non-empty, we have already checked that an alphabet is specified. *)
                 #1 (valOf alphabet)
 
              val functions' = 
                 map
-                (fn (name, (tp, arms)) =>
+                (fn (name, (tp, armcount, arms)) =>
                        let
                           val () = print name
                           val () = print ": "
-                          val auto as (states, _, _, _, _, _, _) = MakeAutomaton.makeAutomaton symbolLimit arms
+                          val (auto as (states, _, _, _, _, _, _), redundancies) =
+                             MakeAutomaton.makeAutomaton symbolLimit armcount arms
+
                           val () = print (Int.toString states)
                           val () = print " states\n"
+
+                          val () =
+                             app
+                             (fn armnumber =>
+                                 (
+                                 print "Warning: arm ";
+                                 print (Int.toString (armnumber+1));
+                                 print " of function ";
+                                 print name;
+                                 print " is redundant.\n"
+                                 ))
+                             redundancies
 
                           val () =
                              if states > stateCountMax then
@@ -561,6 +578,40 @@ structure Process
                           (name, (tp, auto))
                        end)
                 (D.toList functions)
+
+             val types' =
+                D.foldr
+                (fn (name, used, l) =>
+                    (
+                    if !used then
+                       ()
+                    else
+                       (
+                       print "Warning: type ";
+                       print name;
+                       print " is unused.\n"
+                       );
+                    name :: l
+                    ))
+                []
+                types
+
+             val actions' =
+                D.foldr
+                (fn (name, (tp, used), l) => 
+                    (
+                    if !used then
+                       ()
+                    else
+                       (
+                       print "Warning: action ";
+                       print name;
+                       print " is unused.\n"
+                       );
+                    (name, tp) :: l
+                    ))
+                []
+                actions
 
           in
              (modulename', symbolLimit, types', actions', functions')

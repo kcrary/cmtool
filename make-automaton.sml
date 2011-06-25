@@ -39,7 +39,7 @@ structure MakeAutomaton
       (* Put the final states at the front, put a sink state at 0,
          and move everything into arrays.
       *)
-      fun rearrange symbolLimit (count, initial, final, trans) =
+      fun rearrange symbolLimit armcount (count, initial, final, trans) =
           let
              val rcount = count+1
 
@@ -48,22 +48,25 @@ structure MakeAutomaton
 
              val transArr = Array.fromList trans
 
+             val utilization = Array.array (armcount, false)
+
              (* Place final-sink states (i.e., final states that only transition
                 to the sink state) in the permutation.
              *)
              val (firstNonfinalsink, rfinalRev) =
                 foldl
-                (fn ((state, (_, action)), (n, rfinalAcc)) =>
+                (fn ((state, (armnumber, action)), (n, rfinalAcc)) =>
                        if D.isEmpty (Array.sub (transArr, state)) then
                           (* This is a final-sink state. *)
                           if Array.sub (permutation, state) = ~1 then
                              (
+                             Array.update (utilization, armnumber, true);
                              Array.update (permutation, state, n);
                              (n+1, action :: rfinalAcc)
                              )
                           else
                              (* Final state appears multiple times, violating
-                                the determinization invariant.
+                                the determinization postcondition.
                              *)
                              raise (Fail "invariant")
                        else
@@ -75,7 +78,7 @@ structure MakeAutomaton
              (* Place final states that are not final-sink states in the permutation. *)
              val (firstNonfinal, rfinalRev') =
                 foldl
-                (fn ((state, (_, action)), (n, rfinalAcc)) =>
+                (fn ((state, (armnumber, action)), (n, rfinalAcc)) =>
                        if D.isEmpty (Array.sub (transArr, state)) then
                           (* This is a final-sink state, handled in first pass. *)
                           (n, rfinalAcc)
@@ -83,6 +86,7 @@ structure MakeAutomaton
                           (* Not a final-sink state. *)
                           if Array.sub (permutation, state) = ~1 then
                              (
+                             Array.update (utilization, armnumber, true);
                              Array.update (permutation, state, n);
                              (n+1, action :: rfinalAcc)
                              )
@@ -158,13 +162,24 @@ structure MakeAutomaton
                 0
                 trans
 
+             val redundancies =
+                Array.foldli
+                (fn (armnumber, used, redundancies) =>
+                    if used then
+                       redundancies
+                    else
+                       armnumber :: redundancies)
+                []
+                utilization
+
           in
-             (rcount, rinitial, firstNonfinalsink-1, firstNonfinal-1, rfinal, rtrans, rtransEos)
+             ((rcount, rinitial, firstNonfinalsink-1, firstNonfinal-1, rfinal, rtrans, rtransEos),
+              redundancies)
           end
 
       fun compareAction ((m, _), (n, _)) = Int.compare (m, n)
 
-      fun makeAutomaton symbolLimit res =
+      fun makeAutomaton symbolLimit armcount res =
           let
              val nfaRev = MakeNFA.makeRevNfa res
              val dfaRev = Determinize.determinize compareAction (fn _ => EQUAL) nfaRev
@@ -174,7 +189,7 @@ structure MakeAutomaton
                 dfaRev is deterministic and accessible (by construction), so dfa is minimal.
              *)
           in
-             rearrange symbolLimit dfa
+             rearrange symbolLimit armcount dfa
           end
 
    end

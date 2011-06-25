@@ -4,8 +4,9 @@ signature MAKE_AUTOMATON =
 
       type action = int * string
 
-      (* makeAutomaton alphabet-size Rs
+      (* makeAutomaton alphabet-size armcount Rs
 
+         if    |Rs| = armcount
          then  (Q, q_init, Q_final, delta) is a dfa for Rs
                Q = { 0 .. count-1 }
                q_init in Q
@@ -15,9 +16,10 @@ signature MAKE_AUTOMATON =
                for i = 0 .. count-1 . a_i = [ delta(i, 0) .. delta(i, charLimit-1) ]
                finals = [ action(1) .. action(lastfinal) ]
                NB: finals is missing entry 0
+               redundancies is the list of all arms that were not used
                and
-               return (count, q_init, lastfinal, finals, trans)
+               return ((count, q_init, lastfinal, finals, trans), redundancies)
       *)
-      val makeAutomaton : int -> (Regexp.regexp * action) list -> Automata.automaton
+      val makeAutomaton : int -> int -> (Regexp.regexp * action) list -> Automata.automaton * int list
 
    end
