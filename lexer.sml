@@ -105,7 +105,8 @@ structure Lexer
 
       structure LexMain =
          LexMainFun
-         (type symbol = char
+         (structure Streamable = StreamStreamable
+          type symbol = char
           val ord = Char.ord
 
           type t = int -> token front

@@ -254,7 +254,7 @@ structure CodeGen
           in
              write "functor ";
              write functorName;
-             write " (type symbol\nval ord : symbol -> int\n";
+             write " (structure Streamable : STREAMABLE\ntype symbol\nval ord : symbol -> int\n";
 
              app 
              (fn typeName =>
@@ -270,13 +270,13 @@ structure CodeGen
                     (
                     write "val ";
                     write actionName;
-                    write " : { str : symbol list, len : int, start : symbol Stream.stream, follow : symbol Stream.stream, self : {";
+                    write " : { str : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {";
 
                     appSeparated
                     (fn (fname, (tp, _)) =>
                            (
                            write fname;
-                           write " : symbol Stream.stream -> ";
+                           write " : symbol Streamable.t -> ";
                            write tp
                            ))
                     (fn () => write ", ")
@@ -288,7 +288,7 @@ structure CodeGen
                     ))
              actions;
 
-             write ")\n=\nstruct\nlocal\nstructure LexEngine = LexEngineFun (type symbol = symbol\nval ord = ord)\nstructure Tables = struct\nfun epsilon _ = raise (Fail \"Illegal lexeme\")\n";
+             write ")\n=\nstruct\nlocal\nstructure LexEngine = LexEngineFun (structure Streamable = Streamable\ntype symbol = symbol\nval ord = ord)\nstructure Tables = struct\nfun epsilon _ = raise (Fail \"Illegal lexeme\")\n";
              app (writeTable outs symbolLimit functions) functions;
              write "end\nin\n";
 
