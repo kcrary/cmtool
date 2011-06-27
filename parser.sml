@@ -79,11 +79,15 @@ structure Parser
           [
           wrap Syntax.Name (seq (literal Name) ident),
           wrap Syntax.Alphabet (seq (literal Alphabet) number),
-          wrap Syntax.Type (seq (literal Type) ident),
-          wrap Syntax.Action (seq (literal Action) (andthen ident (seq (literal Colon) ident))),
-          wrap Syntax.Function (seq (literal Function) (andthen ident (seq (literal Equal) arms))),
           wrap Syntax.Regexp (seq (literal Regexp) (andthen ident (seq (literal Equal) regexp))),
-          wrap Syntax.Set (seq (literal Set) (andthen ident (seq (literal Equal) charset)))
+          wrap Syntax.Set (seq (literal Set) (andthen ident (seq (literal Equal) charset))),
+          wrap Syntax.Function
+             (seq 
+                 (literal Function) 
+                 (andthen3
+                     (ident,
+                      seq (literal Colon) ident,
+                      seq (literal Equal) arms)))
           ] s
 
       fun parse s =

@@ -37,8 +37,8 @@ structure Process
 
 
       type context = { modulename : string option,
-                       types : bool ref D.dict,
-                       actions : (string * bool ref) D.dict,
+                       types : S.set,
+                       actions : string D.dict,
                        functions : (string * int * (Regexp.regexp * (int * string)) list) D.dict,
                        patterns : pattern D.dict,
                        alphabet : (int * SS.set) option }
@@ -261,80 +261,6 @@ structure Process
                  Regexp.String [~1])
 
 
-      fun processArm fnname ctx n (re, action) =
-          let
-             val (tp, used) = 
-                (case D.find (#actions ctx) action of
-                    NONE =>
-                       (
-                       print "Error: unbound action ";
-                       print action;
-                       print " in arm ";
-                       print (Int.toString n);
-                       print " of function ";
-                       print fnname;
-                       print ".\n";
-                       raise Error
-                       )
-                  | SOME x =>
-                       x)
-
-             fun errfn () =
-                 (
-                 print "arm ";
-                 print (Int.toString n);
-                 print " of function ";
-                 print fnname
-                 )
-
-             val re' = processRegexp errfn ctx re
-             val () = used := true
-          in
-             (tp, re', (n, action))
-          end
-
-
-      fun processFunction fnname ctx arms =
-          (case arms of
-              [] =>
-                 (
-                 print "Error: no arms in function ";
-                 print fnname;
-                 print ".\n";
-                 raise Error
-                 )
-            | arm :: rest =>
-                 let
-                    val (tp : string, re1, action1) = processArm fnname ctx 0 arm
-
-                    val (armcount, rest') =
-                       foldl
-                       (fn (arm, (n, acc)) =>
-                              let
-                                 val (tp', re, action) = processArm fnname ctx n arm
-
-                                 val () =
-                                    if tp = tp' then
-                                       ()
-                                    else
-                                       (
-                                       print "Error: inconsistent action type in arm ";
-                                       print (Int.toString n);
-                                       print " of function ";
-                                       print fnname;
-                                       print ".\n";
-                                       raise Error
-                                       )
-                              in
-                                 (n+1, (re, action) :: acc)
-                              end)
-                       (1, [])
-                       rest
-                 in
-                    (tp, armcount, (re1, action1) :: rest')
-                 end)
-
-
       fun processMain ctx l =
           (case l of
               [] =>
@@ -384,47 +310,7 @@ structure Process
                                            alphabetUpdate ctx (SOME (n, set))
                                         end)
 
-                         | Type name =>
-                              if D.member (#types ctx) name then
-                                 (
-                                 print "Error: multiply specified type ";
-                                 print name;
-                                 print ".\n";
-                                 raise Error
-                                 )
-                              else
-                                 typesUpdate ctx (D.insert (#types ctx) name (ref false))
-
-                         | Action (name, tp) =>
-                              if 
-                                 D.member (#actions ctx) name
-                                 orelse
-                                 D.member (#functions ctx) name
-                              then
-                                 (
-                                 print "Error: multiply specified action/function ";
-                                 print name;
-                                 print ".\n";
-                                 raise Error
-                                 )
-                              else 
-                                 (case D.find (#types ctx) tp of
-                                     NONE =>
-                                        (
-                                        print "Error: unbound type ";
-                                        print tp;
-                                        print " in action ";
-                                        print name;
-                                        print ".\n";
-                                        raise Error
-                                        )
-                                   | SOME used =>
-                                        (
-                                        used := true;
-                                        actionsUpdate ctx (D.insert (#actions ctx) name (tp, ref false))
-                                        ))
-
-                         | Function (name, arms) =>
+                         | Function (name, tp, arms) =>
                               if 
                                  D.member (#functions ctx) name
                                  orelse
@@ -436,19 +322,66 @@ structure Process
                                  print ".\n";
                                  raise Error
                                  )
-                              else if isSome (#alphabet ctx) then
-                                 let
-                                    val fnspec = processFunction name ctx arms
-                                 in
-                                    functionsUpdate ctx (D.insert (#functions ctx) name fnspec)
-                                 end
-                              else
+                              else if not (isSome (#alphabet ctx)) then
                                  (
                                  print "Error: no alphabet specified for function ";
                                  print name;
                                  print ".\n";
                                  raise Error
                                  )
+                              else
+                                 (case arms of
+                                     [] =>
+                                        (
+                                        print "Error: no arms in function ";
+                                        print name;
+                                        print ".\n";
+                                        raise Error
+                                        )
+                                   | _ =>
+                                      let
+                                         val ctx = typesUpdate ctx (S.insert (#types ctx) tp)
+
+                                         val (armcount, arms', ctx) =
+                                            foldl
+                                            (fn ((re, action), (n, acc, ctx)) =>
+                                                   let
+                                                      val ctx =
+                                                         (case D.find (#actions ctx) action of
+                                                             NONE =>
+                                                                actionsUpdate ctx (D.insert (#actions ctx) action tp)
+                                                           | SOME tp' =>
+                                                                if tp = tp' then
+                                                                   ctx
+                                                                else
+                                                                   (
+                                                                   print "Error: inconsistent type for action ";
+                                                                   print action;
+                                                                   print " in arm ";
+                                                                   print (Int.toString n);
+                                                                   print " of function ";
+                                                                   print name;
+                                                                   print ".\n";
+                                                                   raise Error
+                                                                   ))
+
+                                                      fun errfn () =
+                                                         (
+                                                         print "arm ";
+                                                         print (Int.toString n);
+                                                         print " of function ";
+                                                         print name
+                                                         )
+
+                                                      val re' = processRegexp errfn ctx re
+                                                   in
+                                                      (n+1, (re', (n, action)) :: acc, ctx)
+                                                   end)
+                                            (0, [], ctx)
+                                            arms
+                                         in
+                                            functionsUpdate ctx (D.insert (#functions ctx) name (tp, armcount, arms'))
+                                         end)
 
                          | Regexp (name, re) =>
                               if D.member (#patterns ctx) name then
@@ -509,7 +442,7 @@ structure Process
           let 
              val ctx =
                 { modulename = NONE,
-                  types = D.empty,
+                  types = S.empty,
                   actions = D.empty,
                   functions = D.empty,
                   patterns = D.empty,
@@ -557,7 +490,7 @@ structure Process
                              (fn armnumber =>
                                  (
                                  print "Warning: arm ";
-                                 print (Int.toString (armnumber+1));
+                                 print (Int.toString armnumber);
                                  print " of function ";
                                  print name;
                                  print " is redundant.\n"
@@ -589,42 +522,8 @@ structure Process
                        end)
                 (D.toList functions)
 
-             val types' =
-                D.foldr
-                (fn (name, used, l) =>
-                    (
-                    if !used then
-                       ()
-                    else
-                       (
-                       print "Warning: type ";
-                       print name;
-                       print " is unused.\n"
-                       );
-                    name :: l
-                    ))
-                []
-                types
-
-             val actions' =
-                D.foldr
-                (fn (name, (tp, used), l) => 
-                    (
-                    if !used then
-                       ()
-                    else
-                       (
-                       print "Warning: action ";
-                       print name;
-                       print " is unused.\n"
-                       );
-                    (name, tp) :: l
-                    ))
-                []
-                actions
-
           in
-             (modulename', symbolLimit, types', actions', functions')
+             (modulename', symbolLimit, S.toList types, D.toList actions, functions')
           end
 
    end

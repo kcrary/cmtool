@@ -30,9 +30,7 @@ structure Syntax =
       datatype directive =
          Name of string
        | Alphabet of int
-       | Type of string
-       | Action of string * string
-       | Function of string * (regexp * string) list
+       | Function of string * string * (regexp * string) list
        | Regexp of string * regexp
        | Set of string * charset
 

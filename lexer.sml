@@ -1,5 +1,4 @@
 
-
 structure Lexer
    :> LEXER 
    =
@@ -26,7 +25,6 @@ structure Lexer
          "else",
          "end",
          "exception",
-         "Fail",
          "fn",
          "fun",
          "functor",
@@ -37,13 +35,11 @@ structure Lexer
          "infixr",
          "include",
          "let",
-         "LexEngine",
          "local",
          "nonfix",
          "of",
          "op",
          "open",
-         "ord",
          "orelse",
          "raise",
          "sharing",
@@ -51,21 +47,24 @@ structure Lexer
          "signature",
          "struct",
          "structure",
-         "symbol",
          "then",
+         "type",
          "val",
          "where",
          "while",
-         "withtype"
+         "withtype",
+
+         "Fail",
+         "ord",
+         "symbol"
          ]
 
 
-      (* Reserved words in clex. *)
+      (* Reserved words in cmlex. *)
       val () =
          List.app
          (fn (str, token) => Table.insert keywords str (SOME token))
          [
-         ("action", Action),
          ("alphabet", Alphabet),
          ("and", And),
          ("any", Any),
@@ -78,8 +77,7 @@ structure Lexer
          ("range", Range),
          ("regexp", Regexp),
          ("seq", Seq),
-         ("set", Set),
-         ("type", Type)
+         ("set", Set)
          ]
 
         

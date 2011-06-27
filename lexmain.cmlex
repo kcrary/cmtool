@@ -11,32 +11,7 @@ set not_dquote = (~ '")
 regexp ident = (seq alpha (* alphanumeric))
 regexp ws = (+ white)
 
-type t
-
-action eof : t
-action ident : t
-action number : t
-action skip : t
-action char : t
-action lcomment : t
-action string : t
-action error : t
-
-action ampersand : t
-action arrow : t
-action bar : t
-action colon : t
-action equal : t
-action lparen : t
-action minus : t
-action plus : t
-action question : t
-action rparen : t
-action slash : t
-action star : t
-action tilde : t
-
-function lexmain =
+function lexmain : t =
    eos => eof
    ident => ident
    (+ digit) => number
@@ -59,14 +34,7 @@ function lexmain =
    '~ => tilde
    epsilon => error
 
-type u
-
-action comment_open : u
-action comment_close : u
-action comment_skip : u
-action comment_error : u
-
-function skipcomment =
+function skipcomment : u =
    "/*" => comment_open
    "*/" => comment_close
    any => comment_skip

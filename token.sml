@@ -6,7 +6,6 @@ structure Token =
          Ident of string
        | Number of int
        | String of int list
-       | Action
        | Alphabet
        | And
        | Any
@@ -30,6 +29,5 @@ structure Token =
        | Set
        | Star
        | Tilde
-       | Type
 
    end
