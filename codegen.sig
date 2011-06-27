@@ -11,7 +11,7 @@ signature CODEGEN =
          *
          (string * string) list                         (* action arguments *)
          *
-         (string * (string * Automata.automaton)) list  (* lexing functions *)
+         (string * string * Automata.automaton) list    (* lexing functions *)
 
       val writeProgram : string -> lexer -> unit
 

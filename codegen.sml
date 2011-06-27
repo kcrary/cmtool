@@ -13,7 +13,7 @@ structure CodeGen
          *
          (string * string) list                         (* action arguments *)
          *
-         (string * (string * Automata.automaton)) list  (* lexing functions *)
+         (string * string * Automata.automaton) list    (* lexing functions *)
 
 
       val () =
@@ -179,7 +179,7 @@ structure CodeGen
             raise (Fail "Table too large.")
 
 
-      fun writeTable outs symbolLimit functions (name, (tp, (count, initial, lastFinalSink, lastFinal, final, trans, transEos))) =
+      fun writeTable outs symbolLimit functions (name, tp, (count, initial, lastFinalSink, lastFinal, final, trans, transEos)) =
          let
             fun write str = TextIO.output (outs, str)
             val (symbolLimit', minorstr) = tableSizeMinor symbolLimit
@@ -221,7 +221,7 @@ structure CodeGen
          end
 
 
-      fun writeFunction outs functions keyword (name, _) =
+      fun writeFunction outs functions keyword (name, _, _) =
           let
              fun write str = TextIO.output (outs, str)
           in
@@ -232,7 +232,7 @@ structure CodeGen
              write " seq = LexEngine.lex {";
 
              appSeparated 
-             (fn (fname, _) => 
+             (fn (fname, _, _) => 
                     (
                     write fname;
                     write "=";
@@ -273,7 +273,7 @@ structure CodeGen
                     write " : { str : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {";
 
                     appSeparated
-                    (fn (fname, (tp, _)) =>
+                    (fn (fname, tp, _) =>
                            (
                            write fname;
                            write " : symbol Streamable.t -> ";

@@ -19,7 +19,7 @@ structure Process
          *
          (string * string) list                         (* action arguments *)
          *
-         (string * (string * Automata.automaton)) list  (* lexing functions *)
+         (string * string * Automata.automaton) list    (* lexing functions *)
 
 
       structure S = ListSet (structure Elem = StringOrdered)
@@ -518,7 +518,7 @@ structure Process
                              else
                                 ()
                        in
-                          (name, (tp, auto))
+                          (name, tp, auto)
                        end)
                 (D.toList functions)
 

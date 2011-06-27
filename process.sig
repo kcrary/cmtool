@@ -11,7 +11,7 @@ signature PROCESS =
          *
          (string * string) list                         (* action arguments *)
          *
-         (string * (string * Automata.automaton)) list  (* lexing functions *)
+         (string * string * Automata.automaton) list    (* lexing functions *)
 
       val process : Syntax.directive list -> lexer
 
