@@ -154,7 +154,7 @@ structure MakeNFA
              val (count, initial, trans) = makeRevNfaMain res 1 [] Zero
              val trans' = Append (One (D.empty, []), trans)  (* add omitted final state *)
 
-             val transvec = Quasilist.toArray count trans'
+             val transvec = Array.fromList (Quasilist.toList trans')
           in
              (initial, [(0, ())], transvec)
           end
