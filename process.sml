@@ -262,180 +262,180 @@ structure Process
 
 
       fun processMain ctx l =
-          (case l of
-              [] =>
-                 ctx
-            | directive :: rest =>
-                 let
-                    val ctx' =
-                       (case directive of
-                           Name name =>
-                              (case (#modulename ctx) of
-                                  SOME _ =>
-                                     (
-                                     print "Error: multiple module names specified.\n";
-                                     raise Error
-                                     )
-                                | NONE =>
-                                     modulenameUpdate ctx (SOME name))
+         (case l of
+             [] =>
+                ctx
+           | directive :: rest =>
+                let
+                   val ctx' =
+                      (case directive of
+                          Name name =>
+                             (case (#modulename ctx) of
+                                 SOME _ =>
+                                    (
+                                    print "Error: multiple functor names specified.\n";
+                                    raise Error
+                                    )
+                               | NONE =>
+                                    modulenameUpdate ctx (SOME name))
 
-                         | Alphabet n =>
-                              (case #alphabet ctx of
-                                  SOME _ =>
-                                     (
-                                     print "Error: multiply specified alphabet.\n";
-                                     raise Error
-                                     )
-                                | NONE =>
-                                     if n < 1 then
-                                        (
-                                        print "Error: alphabet too small.\n";
-                                        raise Error
-                                        )
-                                     else if n > symbolLimitMax then
-                                        (
-                                        print "Error: alphabet too large.\n";
-                                        raise Error
-                                        )
-                                     else
-                                        let
-                                           fun loop i acc =
-                                               if i >= n then
-                                                  acc
-                                               else
-                                                  loop (i+1) (SS.insert acc i)
-                                                  
-                                           val set = loop 0 SS.empty
-                                        in
-                                           alphabetUpdate ctx (SOME (n, set))
-                                        end)
+                        | Alphabet n =>
+                             (case #alphabet ctx of
+                                 SOME _ =>
+                                    (
+                                    print "Error: multiply specified alphabet.\n";
+                                    raise Error
+                                    )
+                               | NONE =>
+                                    if n < 1 then
+                                       (
+                                       print "Error: alphabet too small.\n";
+                                       raise Error
+                                       )
+                                    else if n > symbolLimitMax then
+                                       (
+                                       print "Error: alphabet too large.\n";
+                                       raise Error
+                                       )
+                                    else
+                                       let
+                                          fun loop i acc =
+                                              if i >= n then
+                                                 acc
+                                              else
+                                                 loop (i+1) (SS.insert acc i)
+                                                 
+                                          val set = loop 0 SS.empty
+                                       in
+                                          alphabetUpdate ctx (SOME (n, set))
+                                       end)
 
-                         | Function (name, tp, arms) =>
-                              if 
-                                 D.member (#functions ctx) name
-                                 orelse
-                                 D.member (#actions ctx) name
-                              then
-                                 (
-                                 print "Error: multiply specified action/function ";
-                                 print name;
-                                 print ".\n";
-                                 raise Error
-                                 )
-                              else if not (isSome (#alphabet ctx)) then
-                                 (
-                                 print "Error: no alphabet specified for function ";
-                                 print name;
-                                 print ".\n";
-                                 raise Error
-                                 )
-                              else
-                                 (case arms of
-                                     [] =>
-                                        (
-                                        print "Error: no arms in function ";
-                                        print name;
-                                        print ".\n";
-                                        raise Error
-                                        )
-                                   | _ =>
-                                      let
-                                         val ctx = typesUpdate ctx (S.insert (#types ctx) tp)
+                        | Function (name, tp, arms) =>
+                             if 
+                                D.member (#functions ctx) name
+                                orelse
+                                D.member (#actions ctx) name
+                             then
+                                (
+                                print "Error: multiply specified action/function ";
+                                print name;
+                                print ".\n";
+                                raise Error
+                                )
+                             else if not (isSome (#alphabet ctx)) then
+                                (
+                                print "Error: no alphabet specified for function ";
+                                print name;
+                                print ".\n";
+                                raise Error
+                                )
+                             else
+                                (case arms of
+                                    [] =>
+                                       (
+                                       print "Error: no arms in function ";
+                                       print name;
+                                       print ".\n";
+                                       raise Error
+                                       )
+                                  | _ =>
+                                       let
+                                          val ctx = typesUpdate ctx (S.insert (#types ctx) tp)
+  
+                                          val (armcount, arms', ctx) =
+                                             foldl
+                                             (fn ((re, action), (n, acc, ctx)) =>
+                                                    let
+                                                       val ctx =
+                                                          (case D.find (#actions ctx) action of
+                                                              NONE =>
+                                                                 actionsUpdate ctx (D.insert (#actions ctx) action tp)
+                                                            | SOME tp' =>
+                                                                 if tp = tp' then
+                                                                    ctx
+                                                                 else
+                                                                    (
+                                                                    print "Error: inconsistent type for action ";
+                                                                    print action;
+                                                                    print " in arm ";
+                                                                    print (Int.toString n);
+                                                                    print " of function ";
+                                                                    print name;
+                                                                    print ".\n";
+                                                                    raise Error
+                                                                    ))
+  
+                                                       fun errfn () =
+                                                          (
+                                                          print "arm ";
+                                                          print (Int.toString n);
+                                                          print " of function ";
+                                                          print name
+                                                          )
+  
+                                                       val re' = processRegexp errfn ctx re
+                                                    in
+                                                       (n+1, (re', (n, action)) :: acc, ctx)
+                                                    end)
+                                             (0, [], ctx)
+                                             arms
+                                          in
+                                             functionsUpdate ctx (D.insert (#functions ctx) name (tp, armcount, arms'))
+                                          end)
 
-                                         val (armcount, arms', ctx) =
-                                            foldl
-                                            (fn ((re, action), (n, acc, ctx)) =>
-                                                   let
-                                                      val ctx =
-                                                         (case D.find (#actions ctx) action of
-                                                             NONE =>
-                                                                actionsUpdate ctx (D.insert (#actions ctx) action tp)
-                                                           | SOME tp' =>
-                                                                if tp = tp' then
-                                                                   ctx
-                                                                else
-                                                                   (
-                                                                   print "Error: inconsistent type for action ";
-                                                                   print action;
-                                                                   print " in arm ";
-                                                                   print (Int.toString n);
-                                                                   print " of function ";
-                                                                   print name;
-                                                                   print ".\n";
-                                                                   raise Error
-                                                                   ))
+                        | Regexp (name, re) =>
+                             if D.member (#patterns ctx) name then
+                                (
+                                print "Error: multiply specified regexp/charset ";
+                                print name;
+                                print ".\n";
+                                raise Error
+                                )
+                             else if isSome (#alphabet ctx) then
+                                let
+                                   fun errfn () =
+                                       (
+                                       print "regexp ";
+                                       print name
+                                       )
+                                       
+                                   val re' = processRegexp errfn ctx re
+                                in
+                                   patternsUpdate ctx (D.insert (#patterns ctx) name (RePattern re'))
+                                end
+                             else
+                                (
+                                print "Error: no alphabet specified for regexp ";
+                                print name;
+                                print ".\n";
+                                raise Error
+                                )
 
-                                                      fun errfn () =
-                                                         (
-                                                         print "arm ";
-                                                         print (Int.toString n);
-                                                         print " of function ";
-                                                         print name
-                                                         )
+                        | Set (name, set) =>
+                             if D.member (#patterns ctx) name then
+                                (
+                                print "Error: multiply specified regexp/charset ";
+                                print name;
+                                print ".\n";
+                                raise Error
+                                )
+                             else if isSome (#alphabet ctx) then
+                                let
+                                   val set' = processSet name ctx set
+                                in
+                                   patternsUpdate ctx (D.insert (#patterns ctx) name (ReCharset set'))
+                                end
+                             else
+                                (
+                                print "Error: no alphabet specified for charset ";
+                                print name;
+                                print ".\n";
+                                raise Error
+                                ))
 
-                                                      val re' = processRegexp errfn ctx re
-                                                   in
-                                                      (n+1, (re', (n, action)) :: acc, ctx)
-                                                   end)
-                                            (0, [], ctx)
-                                            arms
-                                         in
-                                            functionsUpdate ctx (D.insert (#functions ctx) name (tp, armcount, arms'))
-                                         end)
-
-                         | Regexp (name, re) =>
-                              if D.member (#patterns ctx) name then
-                                 (
-                                 print "Error: multiply specified regexp/charset ";
-                                 print name;
-                                 print ".\n";
-                                 raise Error
-                                 )
-                              else if isSome (#alphabet ctx) then
-                                 let
-                                    fun errfn () =
-                                        (
-                                        print "regexp ";
-                                        print name
-                                        )
-                                        
-                                    val re' = processRegexp errfn ctx re
-                                 in
-                                    patternsUpdate ctx (D.insert (#patterns ctx) name (RePattern re'))
-                                 end
-                              else
-                                 (
-                                 print "Error: no alphabet specified for regexp ";
-                                 print name;
-                                 print ".\n";
-                                 raise Error
-                                 )
-
-                         | Set (name, set) =>
-                              if D.member (#patterns ctx) name then
-                                 (
-                                 print "Error: multiply specified regexp/charset ";
-                                 print name;
-                                 print ".\n";
-                                 raise Error
-                                 )
-                              else if isSome (#alphabet ctx) then
-                                 let
-                                    val set' = processSet name ctx set
-                                 in
-                                    patternsUpdate ctx (D.insert (#patterns ctx) name (ReCharset set'))
-                                 end
-                              else
-                                 (
-                                 print "Error: no alphabet specified for charset ";
-                                 print name;
-                                 print ".\n";
-                                 raise Error
-                                 ))
-
-                 in
-                    processMain ctx' rest
-                 end)
+                in
+                   processMain ctx' rest
+                end)
 
 
       fun process l =

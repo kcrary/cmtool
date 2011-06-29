@@ -7,7 +7,7 @@ structure Lexer
       open Token
 
       structure Table =
-         HashTable (structure Key = StringHashable)
+         HashTableFun (structure Key = StringHashable)
          
       val keywords : token option Table.table = Table.table 60
 

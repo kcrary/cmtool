@@ -10,7 +10,7 @@ structure Determinize
           structure ElemHashable = IntHashable)
 
       structure Table =
-         HashTable (structure Key = Set.Hashable)
+         HashTableFun (structure Key = Set.Hashable)
 
       structure StateDict =
          ListDict (structure Key = IntOrdered)
@@ -111,21 +111,15 @@ structure Determinize
              val queue = Q.iqueue ()
 
              fun setToRstate set =
-                 let
-                    val rstateCandidate = !rstateCountRef
-                 in
-                    (case T.lookupOrInsert table set rstateCandidate of
-                        NONE =>
-                           (* new rstate *)
-                           let
-                              val () = rstateCountRef := rstateCandidate + 1
-                              val () = Q.insert queue set
-                           in
-                              rstateCandidate
-                           end
-                      | SOME rstate =>
-                           rstate)
-                 end
+                T.lookupOrInsert table set
+                (fn () =>
+                    let
+                       val rstate = !rstateCountRef
+                       val () = rstateCountRef := rstate + 1
+                       val () = Q.insert queue set
+                    in
+                       rstate
+                    end)
 
              val rinitial =
                 map (fn (states, action) =>
