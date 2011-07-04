@@ -78,6 +78,7 @@ structure Parser
           alt
           [
           wrap Syntax.Name (seq (literal Name) ident),
+          wrap Syntax.Enable (seq (literal Enable) ident),
           wrap Syntax.Alphabet (seq (literal Alphabet) number),
           wrap Syntax.Regexp (seq (literal Regexp) (andthen ident (seq (literal Equal) regexp))),
           wrap Syntax.Set (seq (literal Set) (andthen ident (seq (literal Equal) charset))),
@@ -90,15 +91,22 @@ structure Parser
                       seq (literal Equal) arms)))
           ] s
 
+      exception Error
+          
       fun parse s =
-          let
-             val (l, s') = many directive s
-          in
-             (case Stream.front s' of
-                 Stream.Nil =>
-                    l
-               | Stream.Cons _ =>
-                    raise SyntaxError)
-          end
+          (let
+              val (l, s') = many directive (Lexer.lex s)
+           in
+              (case Stream.front s' of
+                  Stream.Nil =>
+                     l
+                | Stream.Cons _ =>
+                     raise SyntaxError)
+           end
+           handle SyntaxError =>
+                     (
+                     print "Syntax error.\n";
+                     raise Error
+                     ))
 
    end

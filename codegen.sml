@@ -4,18 +4,6 @@ structure CodeGen
    =
    struct
 
-      type lexer =
-         string                                         (* functor name *)
-         *
-         int                                            (* alphabet size *)
-         *
-         string list                                    (* type arguments *)
-         *
-         (string * string) list                         (* action arguments *)
-         *
-         (string * string * Automata.automaton) list    (* lexing functions *)
-
-
       val () =
          if Word.wordSize < 16 then
             raise (Fail "Word size too small.")
@@ -247,7 +235,7 @@ structure CodeGen
           end
 
 
-      fun writeProgram filename (functorName, symbolLimit, types, actions, functions) =
+      fun writeProgram filename (functorName, symbolLimit, types, actions, functions, options) =
           let
              val outs = TextIO.openOut filename
              fun write str = TextIO.output (outs, str)

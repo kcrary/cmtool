@@ -29,6 +29,7 @@ structure Syntax =
 
       datatype directive =
          Name of string
+       | Enable of string
        | Alphabet of int
        | Function of string * string * (regexp * string) list
        | Regexp of string * regexp

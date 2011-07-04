@@ -1,6 +1,6 @@
 
 signature PARSER =
    sig
-      exception SyntaxError
-      val parse : Token.token Stream.stream -> Syntax.directive list
+      exception Error
+      val parse : char Stream.stream -> Syntax.directive list
    end

@@ -1,25 +1,11 @@
 Group is
-	automata.sml
-	codegen.sig
+	(* SML specific *)
 	codegen.sml
-	determinize.sig
-	determinize.sml
+	glue.sml
 	lexer.sig
 	lexer.sml
 	lexmain.sml
-	main.sml
-	make-automaton.sig
-	make-automaton.sml
-	make-nfa.sig
-	make-nfa.sml
-	parser.sig
 	parser.sml
-	process.sig
-	process.sml
-	regexp.sml
-	reverse-dfa.sig
-	reverse-dfa.sml
-	syntax.sml
 	token.sml
 
-	../lib/sources.cm
+	sources-generic.cm

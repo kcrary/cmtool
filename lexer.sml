@@ -7,7 +7,7 @@ structure Lexer
       open Token
 
       structure Table =
-         HashTableFun (structure Key = StringHashable)
+         HashTable (structure Key = StringHashable)
          
       val keywords : token option Table.table = Table.table 60
 
@@ -69,6 +69,7 @@ structure Lexer
          ("and", And),
          ("any", Any),
          ("empty", Empt),
+         ("enable", Enable),
          ("eos", Eos),
          ("epsilon", Epsilon),
          ("function", Function),
@@ -91,9 +92,7 @@ structure Lexer
                    self : { lexmain : char stream -> int -> token front,
                             skipcomment : char stream -> int -> char stream * int} }
 
-      exception LexicalError of int
-      exception IllegalIdentifier of int
-      exception IllegalConstant of int
+      exception Error
 
       fun action f ({ str, len, follow, self, ... }:arg) pos =
           Cons (f (str, len, pos), lazy (fn () => #lexmain self follow (pos+len)))
@@ -122,7 +121,12 @@ structure Lexer
                            NONE =>
                               Ident str
                          | SOME NONE =>
-                              raise (IllegalIdentifier pos)
+                              (
+                              print "Illegal identifier at ";
+                              print (Int.toString pos);
+                              print ".\n";
+                              raise Error
+                              )
                          | SOME (SOME token) =>
                               token)
                     end)
@@ -135,7 +139,13 @@ structure Lexer
                             Number n
                        | NONE =>
                             raise (Fail "invariant"))
-                     handle Overflow => raise (IllegalConstant pos)))
+                     handle Overflow => 
+                               (
+                               print "Illegal constant at ";
+                               print (Int.toString pos);
+                               print ".\n";
+                               raise Error
+                               )))
 
           fun skip ({ len, follow, self, ... }:arg) pos = #lexmain self follow (pos+len)
 
@@ -163,7 +173,12 @@ structure Lexer
                     String (List.map ord (List.take (List.tl chars, len-2))))
 
           fun error _ pos =
-              raise (LexicalError pos)
+             (
+             print "Lexical error at ";
+             print (Int.toString pos);
+             print ".\n";
+             raise Error
+             )
                  
           val ampersand = simple And
           val arrow = simple Arrow
@@ -193,7 +208,12 @@ structure Lexer
               #skipcomment self follow (pos+len)
 
           fun comment_error _ pos =
-              raise (LexicalError pos)
+             (
+             print "Unclosed comment at ";
+             print (Int.toString pos);
+             print ".\n";
+             raise Error
+             )
                  
          )
 

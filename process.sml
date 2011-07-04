@@ -10,19 +10,8 @@ structure Process
       (* This number is hardcoded to correspond to tableSizeMajor in codegen.sml. *)
       val stateCountMax = 65536
 
-      type lexer =
-         string                                         (* functor name *)
-         *
-         int                                            (* alphabet size *)
-         *
-         string list                                    (* type arguments *)
-         *
-         (string * string) list                         (* action arguments *)
-         *
-         (string * string * Automata.automaton) list    (* lexing functions *)
 
-
-      structure S = ListSet (structure Elem = StringOrdered)
+      structure S = StringSet
       structure D = ListDict (structure Key = StringOrdered)
       structure SS = SymbolSet
 
@@ -36,67 +25,19 @@ structure Process
 
 
 
-      type context = { modulename : string option,
-                       types : S.set,
-                       actions : string D.dict,
-                       functions : (string * int * (Regexp.regexp * (int * string)) list) D.dict,
-                       patterns : pattern D.dict,
-                       alphabet : (int * SS.set) option }
-
-      fun modulenameUpdate { modulename, types, actions, functions, patterns, alphabet } x =
-          { modulename = x,
-            types = types,
-            actions = actions,
-            functions = functions,
-            patterns = patterns,
-            alphabet = alphabet }
-
-      fun typesUpdate { modulename, types, actions, functions, patterns, alphabet } x =
-          { modulename = modulename,
-            types = x,
-            actions = actions,
-            functions = functions,
-            patterns = patterns,
-            alphabet = alphabet }
-
-      fun actionsUpdate { modulename, types, actions, functions, patterns, alphabet } x =
-          { modulename = modulename,
-            types = types,
-            actions = x,
-            functions = functions,
-            patterns = patterns,
-            alphabet = alphabet }
-
-      fun functionsUpdate { modulename, types, actions, functions, patterns, alphabet } x =
-          { modulename = modulename,
-            types = types,
-            actions = actions,
-            functions = x,
-            patterns = patterns,
-            alphabet = alphabet }
-
-      fun patternsUpdate { modulename, types, actions, functions, patterns, alphabet } x =
-          { modulename = modulename,
-            types = types,
-            actions = actions,
-            functions = functions,
-            patterns = x,
-            alphabet = alphabet }
-
-      fun alphabetUpdate { modulename, types, actions, functions, patterns, alphabet } x =
-          { modulename = modulename,
-            types = types,
-            actions = actions,
-            functions = functions,
-            patterns = patterns,
-            alphabet = x }
+      val modulename   : string option ref               = ref NONE
+      val types        : S.set ref                       = ref S.empty
+      val actions      : string D.dict ref               = ref D.empty
+      val functions    : (string * int * (Regexp.regexp * (int * string)) list) D.dict ref = ref D.empty
+      val patterns     : pattern D.dict ref              = ref D.empty
+      val alphabet     : (int * SS.set) option ref       = ref NONE
+      val options      : S.set ref                       = ref S.empty
 
 
-
-      fun processSet setname (ctx:context) set =
+      fun processSet setname set =
           (case set of
               Svar name =>
-                 (case D.find (#patterns ctx) name of
+                 (case D.find (!patterns) name of
                      NONE =>
                         (
                         print "Error: unbound pattern ";
@@ -118,7 +59,7 @@ structure Process
                         raise Error
                         ))
             | Ssymbol sym =>
-                 if 0 <= sym andalso sym < #1 (valOf (#alphabet ctx)) then
+                 if 0 <= sym andalso sym < #1 (valOf (!alphabet)) then
                     SS.insert SS.empty sym
                  else
                     (
@@ -137,7 +78,7 @@ structure Process
                            print ".\n";
                            raise Error
                            )
-                        else if 0 <= bottom andalso top < #1 (valOf (#alphabet ctx)) then
+                        else if 0 <= bottom andalso top < #1 (valOf (!alphabet)) then
                            let
                               fun loop curr acc =
                                   if curr > top then
@@ -160,34 +101,34 @@ structure Process
                  SS.empty
             | Sunion l =>
                  foldl
-                 (fn (set1, set2) => SS.union (processSet setname ctx set1) set2)
+                 (fn (set1, set2) => SS.union (processSet setname set1) set2)
                  SS.empty
                  l
             | Sintersection [] =>
-                 #2 (valOf (#alphabet ctx))
+                 #2 (valOf (!alphabet))
             | Sintersection (set :: l) =>
                  foldl
-                 (fn (set1, set2) => SS.intersection (processSet setname ctx set1) set2)
-                 (processSet setname ctx set)
+                 (fn (set1, set2) => SS.intersection (processSet setname set1) set2)
+                 (processSet setname set)
                  l
             | Sdifference (set, l) =>
                  foldl
-                 (fn (set1, set2) => SS.difference set2 (processSet setname ctx set1))
-                 (processSet setname ctx set)
+                 (fn (set1, set2) => SS.difference set2 (processSet setname set1))
+                 (processSet setname set)
                  l
             | Scomplement l =>
                  foldl
-                 (fn (set1, set2) => SS.difference set2 (processSet setname ctx set1))
-                 (#2 (valOf (#alphabet ctx)))
+                 (fn (set1, set2) => SS.difference set2 (processSet setname set1))
+                 (#2 (valOf (!alphabet)))
                  l
             | Sany =>
-                 #2 (valOf (#alphabet ctx)))
+                 #2 (valOf (!alphabet)))
 
 
-      fun processRegexp errfn (ctx:context) re =
+      fun processRegexp errfn re =
           (case re of
               Var name =>
-                 (case D.find (#patterns ctx) name of
+                 (case D.find (!patterns) name of
                      NONE =>
                         (
                         print "Error: unbound pattern ";
@@ -202,7 +143,7 @@ structure Process
                    | SOME (RePattern re') =>
                         re')
             | Symbol sym =>
-                 if 0 <= sym andalso sym < #1 (valOf (#alphabet ctx)) then
+                 if 0 <= sym andalso sym < #1 (valOf (!alphabet)) then
                     Regexp.String [sym]
                  else
                     (
@@ -215,7 +156,7 @@ structure Process
                  (
                  app
                  (fn sym => 
-                        if 0 <= sym andalso sym < #1 (valOf (#alphabet ctx)) then
+                        if 0 <= sym andalso sym < #1 (valOf (!alphabet)) then
                            ()
                         else
                            (
@@ -229,7 +170,7 @@ structure Process
                  Regexp.String l
                  )
             | Any =>
-                 (case #alphabet ctx of
+                 (case !alphabet of
                      NONE =>
                         (
                         print "Error: no alphabet specified for universal set in ";
@@ -245,214 +186,216 @@ structure Process
                  Regexp.Empty
             | Concat res =>
                  foldr 
-                 (fn (re1, re2) => Regexp.Concat (processRegexp errfn ctx re1, re2))
+                 (fn (re1, re2) => Regexp.Concat (processRegexp errfn re1, re2))
                  Regexp.Epsilon res
             | Union res =>
                  foldr 
-                 (fn (re1, re2) => Regexp.Union (processRegexp errfn ctx re1, re2))
+                 (fn (re1, re2) => Regexp.Union (processRegexp errfn re1, re2))
                  Regexp.Empty res
             | Option re1 =>
-                 Regexp.Option (processRegexp errfn ctx re1)
+                 Regexp.Option (processRegexp errfn re1)
             | Closure re1 =>
-                 Regexp.Closure (processRegexp errfn ctx re1)
+                 Regexp.Closure (processRegexp errfn re1)
             | Plus re1 =>
-                 Regexp.Plus (processRegexp errfn ctx re1)
+                 Regexp.Plus (processRegexp errfn re1)
             | Eos =>
                  Regexp.String [~1])
 
 
-      fun processMain ctx l =
+      fun processMain l =
          (case l of
              [] =>
-                ctx
+                ()
            | directive :: rest =>
-                let
-                   val ctx' =
-                      (case directive of
-                          Name name =>
-                             (case (#modulename ctx) of
-                                 SOME _ =>
-                                    (
-                                    print "Error: multiple functor names specified.\n";
-                                    raise Error
-                                    )
-                               | NONE =>
-                                    modulenameUpdate ctx (SOME name))
+                (
+                (case directive of
+                    Name name =>
+                       (case (!modulename) of
+                           SOME _ =>
+                              (
+                              print "Error: multiple functor names specified.\n";
+                              raise Error
+                              )
+                         | NONE =>
+                              modulename := SOME name)
 
-                        | Alphabet n =>
-                             (case #alphabet ctx of
-                                 SOME _ =>
-                                    (
-                                    print "Error: multiply specified alphabet.\n";
-                                    raise Error
-                                    )
-                               | NONE =>
-                                    if n < 1 then
-                                       (
-                                       print "Error: alphabet too small.\n";
-                                       raise Error
-                                       )
-                                    else if n > symbolLimitMax then
-                                       (
-                                       print "Error: alphabet too large.\n";
-                                       raise Error
-                                       )
-                                    else
-                                       let
-                                          fun loop i acc =
-                                              if i >= n then
-                                                 acc
-                                              else
-                                                 loop (i+1) (SS.insert acc i)
-                                                 
-                                          val set = loop 0 SS.empty
-                                       in
-                                          alphabetUpdate ctx (SOME (n, set))
-                                       end)
+                  | Enable name =>
+                       options := S.insert (!options) name
 
-                        | Function (name, tp, arms) =>
-                             if 
-                                D.member (#functions ctx) name
-                                orelse
-                                D.member (#actions ctx) name
-                             then
-                                (
-                                print "Error: multiply specified action/function ";
-                                print name;
-                                print ".\n";
-                                raise Error
-                                )
-                             else if not (isSome (#alphabet ctx)) then
-                                (
-                                print "Error: no alphabet specified for function ";
-                                print name;
-                                print ".\n";
-                                raise Error
-                                )
-                             else
-                                (case arms of
-                                    [] =>
-                                       (
-                                       print "Error: no arms in function ";
-                                       print name;
-                                       print ".\n";
-                                       raise Error
-                                       )
-                                  | _ =>
-                                       let
-                                          val ctx = typesUpdate ctx (S.insert (#types ctx) tp)
-  
-                                          val (armcount, arms', ctx) =
-                                             foldl
-                                             (fn ((re, action), (n, acc, ctx)) =>
-                                                    let
-                                                       val ctx =
-                                                          (case D.find (#actions ctx) action of
-                                                              NONE =>
-                                                                 actionsUpdate ctx (D.insert (#actions ctx) action tp)
-                                                            | SOME tp' =>
-                                                                 if tp = tp' then
-                                                                    ctx
-                                                                 else
-                                                                    (
-                                                                    print "Error: inconsistent type for action ";
-                                                                    print action;
-                                                                    print " in arm ";
-                                                                    print (Int.toString n);
-                                                                    print " of function ";
-                                                                    print name;
-                                                                    print ".\n";
-                                                                    raise Error
-                                                                    ))
-  
-                                                       fun errfn () =
-                                                          (
-                                                          print "arm ";
-                                                          print (Int.toString n);
-                                                          print " of function ";
-                                                          print name
-                                                          )
-  
-                                                       val re' = processRegexp errfn ctx re
-                                                    in
-                                                       (n+1, (re', (n, action)) :: acc, ctx)
-                                                    end)
-                                             (0, [], ctx)
-                                             arms
-                                          in
-                                             functionsUpdate ctx (D.insert (#functions ctx) name (tp, armcount, arms'))
-                                          end)
+                  | Alphabet n =>
+                       (case !alphabet of
+                           SOME _ =>
+                              (
+                              print "Error: multiply specified alphabet.\n";
+                              raise Error
+                              )
+                         | NONE =>
+                              if n < 1 then
+                                 (
+                                 print "Error: alphabet too small.\n";
+                                 raise Error
+                                 )
+                              else if n > symbolLimitMax then
+                                 (
+                                 print "Error: alphabet too large.\n";
+                                 raise Error
+                                 )
+                              else
+                                 let
+                                    fun loop i acc =
+                                        if i >= n then
+                                           acc
+                                        else
+                                           loop (i+1) (SS.insert acc i)
+                                           
+                                    val set = loop 0 SS.empty
+                                 in
+                                    alphabet := SOME (n, set)
+                                 end)
 
-                        | Regexp (name, re) =>
-                             if D.member (#patterns ctx) name then
-                                (
-                                print "Error: multiply specified regexp/charset ";
-                                print name;
-                                print ".\n";
-                                raise Error
-                                )
-                             else if isSome (#alphabet ctx) then
-                                let
-                                   fun errfn () =
-                                       (
-                                       print "regexp ";
-                                       print name
-                                       )
-                                       
-                                   val re' = processRegexp errfn ctx re
-                                in
-                                   patternsUpdate ctx (D.insert (#patterns ctx) name (RePattern re'))
-                                end
-                             else
-                                (
-                                print "Error: no alphabet specified for regexp ";
-                                print name;
-                                print ".\n";
-                                raise Error
-                                )
+                  | Function (name, tp, arms) =>
+                       if 
+                          D.member (!functions) name
+                          orelse
+                          D.member (!actions) name
+                       then
+                          (
+                          print "Error: multiply specified action/function ";
+                          print name;
+                          print ".\n";
+                          raise Error
+                          )
+                       else if not (isSome (!alphabet)) then
+                          (
+                          print "Error: no alphabet specified for function ";
+                          print name;
+                          print ".\n";
+                          raise Error
+                          )
+                       else
+                          (case arms of
+                              [] =>
+                                 (
+                                 print "Error: no arms in function ";
+                                 print name;
+                                 print ".\n";
+                                 raise Error
+                                 )
+                            | _ =>
+                                 let
+                                    val () = types := S.insert (!types) tp
 
-                        | Set (name, set) =>
-                             if D.member (#patterns ctx) name then
-                                (
-                                print "Error: multiply specified regexp/charset ";
-                                print name;
-                                print ".\n";
-                                raise Error
-                                )
-                             else if isSome (#alphabet ctx) then
-                                let
-                                   val set' = processSet name ctx set
-                                in
-                                   patternsUpdate ctx (D.insert (#patterns ctx) name (ReCharset set'))
-                                end
-                             else
-                                (
-                                print "Error: no alphabet specified for charset ";
-                                print name;
-                                print ".\n";
-                                raise Error
-                                ))
+                                    val (armcount, arms') =
+                                       foldl
+                                       (fn ((re, action), (n, acc)) =>
+                                              let
+                                                 val () =
+                                                    (case D.find (!actions) action of
+                                                        NONE =>
+                                                           actions := D.insert (!actions) action tp
+                                                      | SOME tp' =>
+                                                           if tp = tp' then
+                                                              ()
+                                                           else
+                                                              (
+                                                              print "Error: inconsistent type for action ";
+                                                              print action;
+                                                              print " in arm ";
+                                                              print (Int.toString n);
+                                                              print " of function ";
+                                                              print name;
+                                                              print ".\n";
+                                                              raise Error
+                                                              ))
 
-                in
-                   processMain ctx' rest
-                end)
+                                                 fun errfn () =
+                                                    (
+                                                    print "arm ";
+                                                    print (Int.toString n);
+                                                    print " of function ";
+                                                    print name
+                                                    )
+
+                                                 val re' = processRegexp errfn re
+                                              in
+                                                 (n+1, (re', (n, action)) :: acc)
+                                              end)
+                                       (0, [])
+                                       arms
+                                    in
+                                       functions := D.insert (!functions) name (tp, armcount, arms')
+                                    end)
+
+                  | Regexp (name, re) =>
+                       if D.member (!patterns) name then
+                          (
+                          print "Error: multiply specified regexp/charset ";
+                          print name;
+                          print ".\n";
+                          raise Error
+                          )
+                       else if isSome (!alphabet) then
+                          let
+                             fun errfn () =
+                                 (
+                                 print "regexp ";
+                                 print name
+                                 )
+                                 
+                             val re' = processRegexp errfn re
+                          in
+                             patterns := D.insert (!patterns) name (RePattern re')
+                          end
+                       else
+                          (
+                          print "Error: no alphabet specified for regexp ";
+                          print name;
+                          print ".\n";
+                          raise Error
+                          )
+
+                  | Set (name, set) =>
+                       if D.member (!patterns) name then
+                          (
+                          print "Error: multiply specified regexp/charset ";
+                          print name;
+                          print ".\n";
+                          raise Error
+                          )
+                       else if isSome (!alphabet) then
+                          let
+                             val set' = processSet name set
+                          in
+                             patterns := D.insert (!patterns) name (ReCharset set')
+                          end
+                       else
+                          (
+                          print "Error: no alphabet specified for charset ";
+                          print name;
+                          print ".\n";
+                          raise Error
+                          ));
+
+                processMain rest
+                ))
 
 
       fun process l =
           let 
-             val ctx =
-                { modulename = NONE,
-                  types = S.empty,
-                  actions = D.empty,
-                  functions = D.empty,
-                  patterns = D.empty,
-                  alphabet = NONE }
+             val () =
+                (
+                modulename := NONE;
+                types := S.empty;
+                actions := D.empty;
+                functions := D.empty;
+                patterns := D.empty;
+                alphabet := NONE
+                )
 
-             val { modulename, types, actions, functions, alphabet, ... } =
-                processMain ctx l
+             val () = processMain l
 
              val modulename' =
-                (case modulename of
+                (case !modulename of
                     NONE =>
                        (
                        print "Error: no functor name specified.\n";
@@ -461,7 +404,7 @@ structure Process
                   | SOME name => name)
 
              val () =
-                if D.isEmpty functions then
+                if D.isEmpty (!functions) then
                    (
                    print "Error: no functions specified.\n";
                    raise Error
@@ -471,7 +414,7 @@ structure Process
 
              val symbolLimit =
                 (* Since functions is non-empty, we have already checked that an alphabet is specified. *)
-                #1 (valOf alphabet)
+                #1 (valOf (!alphabet))
 
              val functions' = 
                 map
@@ -520,10 +463,10 @@ structure Process
                        in
                           (name, tp, auto)
                        end)
-                (D.toList functions)
+                (D.toList (!functions))
 
           in
-             (modulename', symbolLimit, S.toList types, D.toList actions, functions')
+             (modulename', symbolLimit, S.toList (!types), D.toList (!actions), functions', !options)
           end
 
    end

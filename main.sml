@@ -1,40 +1,17 @@
 
-structure Main =
+functor MainFun (structure Parser : PARSER
+                 structure CodeGen : CODEGEN) =
    struct
+
+      exception Error = Process.Error
 
       fun main infile outfile =
           let 
              val ins = TextIO.openIn infile
 
              val program =
-                SOME (Parser.parse (Lexer.lex (Stream.fromInstream ins)))
-                handle Lexer.LexicalError pos =>
-                          (
-                          print "Lexical error at ";
-                          print (Int.toString pos);
-                          print ".\n";
-                          NONE
-                          )
-                     | Lexer.IllegalIdentifier pos =>
-                          (
-                          print "Illegal identifier at ";
-                          print (Int.toString pos);
-                          print ".\n";
-                          NONE
-                          )
-                     | Lexer.IllegalConstant pos =>
-                          (
-                          print "Illegal constant at ";
-                          print (Int.toString pos);
-                          print ".\n";
-                          NONE
-                          )
-                     | Parser.SyntaxError =>
-                          (
-                          print "Syntax error.\n";
-                          NONE
-                          )
-                     | exn =>
+                Parser.parse (Stream.fromInstream ins)
+                handle exn =>
                           (
                           TextIO.closeIn ins;
                           raise exn
@@ -42,11 +19,7 @@ structure Main =
 
              val () = TextIO.closeIn ins
           in
-             (case program of
-                 NONE =>
-                    ()
-               | SOME directives =>
-                    CodeGen.writeProgram outfile (Process.process directives))
+             CodeGen.writeProgram outfile (Process.process program)
           end
 
    end

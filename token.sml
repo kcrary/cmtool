@@ -13,6 +13,7 @@ structure Token =
        | Colon
        | Eos
        | Empt
+       | Enable
        | Epsilon
        | Equal
        | Function

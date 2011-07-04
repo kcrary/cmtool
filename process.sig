@@ -2,17 +2,8 @@
 signature PROCESS =
    sig
 
-      type lexer =
-         string                                         (* functor name *)
-         *
-         int                                            (* alphabet size *)
-         *
-         string list                                    (* type arguments *)
-         *
-         (string * string) list                         (* action arguments *)
-         *
-         (string * string * Automata.automaton) list    (* lexing functions *)
+      exception Error
 
-      val process : Syntax.directive list -> lexer
+      val process : Syntax.directive list -> Automata.lexer
 
    end

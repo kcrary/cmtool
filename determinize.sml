@@ -10,7 +10,7 @@ structure Determinize
           structure ElemHashable = IntHashable)
 
       structure Table =
-         HashTableFun (structure Key = Set.Hashable)
+         HashTable (structure Key = Set.Hashable)
 
       structure StateDict =
          ListDict (structure Key = IntOrdered)
