@@ -1,0 +1,40 @@
+name ParseMainFun
+
+terminal Ident of symbol
+terminal Arrow
+terminal Colon
+terminal Eos
+terminal Equal
+terminal Name
+terminal Nonterminal
+terminal LParen
+terminal Of
+terminal RParen
+terminal Start
+terminal Terminal
+
+nonterminal CONSTITUENT : constituent =
+   (ident:Ident) => unlabeled_item
+   (label:Ident) Colon (ident:Ident) => labeled_item
+   LParen (constituent:CONSTITUENT) RParen => paren_item
+
+nonterminal CONSTITUENTS : constituents =
+   => nil_constituents
+   (head:CONSTITUENT) (tail:CONSTITUENTS) => cons_constituents
+
+nonterminal PRODUCTIONS : productions =
+   => nil_productions
+   (constituents:CONSTITUENTS) Arrow (action:Ident) (tail:PRODUCTIONS) => cons_productions
+
+nonterminal DIRECTIVE : directive =
+   Name (ident:Ident) => name_directive
+   Terminal (ident:Ident) => terminal_directive
+   Terminal (ident:Ident) Of (tp:Ident) => terminalOf_directive
+   Nonterminal (ident:Ident) Colon (tp:Ident) Equal (arms:PRODUCTIONS) => nonterminal_directive
+   Start (ident:Ident) => start_directive
+
+nonterminal DIRECTIVES : directives =
+   => nil_directives
+   (head:DIRECTIVE) (tail:DIRECTIVES) => cons_directives
+
+start DIRECTIVES
