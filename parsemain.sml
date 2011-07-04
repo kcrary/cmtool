@@ -243,117 +243,143 @@ CONSTITUENTS => goto 24
 
 State 20:
 
-6 : PRODUCTIONS -> CONSTITUENTS . Arrow Iituent constituents  / 3
-4 : productions -> .  / 1
-5 : productions -> . constituents Arrow Ident productions  / 1
-5 : productions -> constituents Arrow Ident . productions  / 1
+6 : PRODUCTIONS -> CONSTITUENTS . Arrow Ident PRODUCTIONS  / 1
 
-$ => reduce 4
-Ident => shift 14
-Arrow => reduce 2
-Name => reduce 4
-Nonterminal => reduce 4
-Terminal => reduce 4
-Type => reduce 4
-constituent => goto 15
-constituents => goto 16
-productions => goto 24
+Arrow => shift 25
+
+-----
+
+State 21:
+
+10 : DIRECTIVE -> Nonterminal Ident Colon Ident Equal PRODUCTIONS .  / 1
+
+$ => reduce 10
+Name => reduce 10
+Nonterminal => reduce 10
+Start => reduce 10
+Terminal => reduce 10
+
+-----
+
+State 22:
+
+1 : CONSTITUENT -> Ident Colon . Ident  / 4
+
+Ident => shift 26
+
+-----
+
+State 23:
+
+2 : CONSTITUENT -> LParen CONSTITUENT . RParen  / 4
+
+RParen => shift 27
 
 -----
 
 State 24:
 
-5 : productions -> constituents Arrow Ident productions .  / 1
+4 : CONSTITUENTS -> CONSTITUENT CONSTITUENTS .  / 3
+
+Arrow => reduce 4
+
+-----
+
+State 25:
+
+6 : PRODUCTIONS -> CONSTITUENTS Arrow . Ident PRODUCTIONS  / 1
+
+Ident => shift 28
+
+-----
+
+State 26:
+
+1 : CONSTITUENT -> Ident Colon Ident .  / 4
+
+Ident => reduce 1
+Arrow => reduce 1
+LParen => reduce 1
+RParen => reduce 1
+
+-----
+
+State 27:
+
+2 : CONSTITUENT -> LParen CONSTITUENT RParen .  / 4
+
+Ident => reduce 2
+Arrow => reduce 2
+LParen => reduce 2
+RParen => reduce 2
+
+-----
+
+State 28:
+
+0 : CONSTITUENT -> . Ident  / 2
+1 : CONSTITUENT -> . Ident Colon Ident  / 2
+2 : CONSTITUENT -> . LParen CONSTITUENT RParen  / 2
+3 : CONSTITUENTS -> .  / 3
+4 : CONSTITUENTS -> . CONSTITUENT CONSTITUENTS  / 3
+5 : PRODUCTIONS -> .  / 1
+6 : PRODUCTIONS -> . CONSTITUENTS Arrow Ident PRODUCTIONS  / 1
+6 : PRODUCTIONS -> CONSTITUENTS Arrow Ident . PRODUCTIONS  / 1
 
 $ => reduce 5
+Ident => shift 17
+Arrow => reduce 3
 Name => reduce 5
 Nonterminal => reduce 5
+LParen => shift 18
+Start => reduce 5
 Terminal => reduce 5
-Type => reduce 5
+CONSTITUENT => goto 19
+CONSTITUENTS => goto 20
+PRODUCTIONS => goto 29
+
+-----
+
+State 29:
+
+6 : PRODUCTIONS -> CONSTITUENTS Arrow Ident PRODUCTIONS .  / 1
+
+$ => reduce 6
+Name => reduce 6
+Nonterminal => reduce 6
+Start => reduce 6
+Terminal => reduce 6
 
 -----
 
 lookahead 0 = $ 
-lookahead 1 = $ Name Nonterminal Terminal Type 
-lookahead 2 = Ident Arrow 
+lookahead 1 = $ Name Nonterminal Start Terminal 
+lookahead 2 = Ident Arrow LParen 
 lookahead 3 = Arrow 
+lookahead 4 = Ident Arrow LParen RParen 
+lookahead 5 = RParen 
 
 *)
 
 functor ParseMainFun (structure Streamable : STREAMABLE
-type string
-type int
+type symbol
 type constituent
 type constituents
 type productions
 type directive
 type directives
-val unlabeled_item : {ident:string} -> constituent
-val labeled_item : {label:string, ident:string} -> constituent
+val unlabeled_item : {ident:symbol} -> constituent
+val labeled_item : {label:symbol, ident:symbol} -> constituent
+val paren_item : {constituent:constituent} -> constituent
 val nil_constituents : {} -> constituents
 val cons_constituents : {head:constituent, tail:constituents} -> constituents
 val nil_productions : {} -> productions
-val cons_productions : {constituents:constituents, action:string, tail:productions} -> productions
-val name_directive : {ident:string} -> directive
-val type_directive : {ident:string} -> directive
-val terminal_directive : {ident:string} -> directive
-val terminalOf_directive : {ident:string, tp:string} -> directive
-val nonterminal_directive : {ident:string, arms:productions} -> directive
-val nil_directives : {} -> directives
-val cons_directives : {head:directive, tail:directives} -> directives
-datatype terminal =
-Ident of string
-| Number of int
-| Arrow
-| Colon
-| Eos
-| Equal
-| Name
-| Nonterminal
-| LParen
-| Of
-| RParen
-| Terminal
-| Type
-val error : terminal Streamable.t -> exn
-)
-=
-struct
-local
-structure Value = struct
-datatype nonterminal =
-DUMMY
-| string of string
-| int of int
-| constituent of constituent
-| constituents of constituents
-| productions of productions
-| directive of directive
-| directives of directives
-end
-structure ParseEngine = ParseEngineFun (structure Streamable = Streamable
-type terminal = terminal
-type value = Value.nonterminal
-val dummy = Value.DUMMY
-fun read terminal =
-(case terminal of
-Ident terminal => (1, Value.string terminal)
-| Number terminal => (2, Value.int terminal)
-| Arrow => (3, Value.DUMMY)
-| Colon => (4, Value.DUMMY)
-| Eos => (5, Value.DUMMY)
-| Equal => (6, Value.DUMMY)
-| Name => (7, Value.DUMMY)
-| Nonterminal => (8, Value.DUMMY)
-| LParen => (9, Value.DUMMY)
-| Of => (10, Value.DUMMY)
-| RParen => (11, Value.DUMMY)
-| Terminal => (12, Value.DUMMY)
-| Type => (13, Value.DUMMY)
-)
-)
-in
-val parse = ParseEngine.parse (ParseEngine.next5x1 "ective : {ident:symbol} -> directive
+val cons_productions : {constituents:constituents, action:symbol, tail:productions} -> productions
+val name_directive : {ident:symbol} -> directive
+val terminal_directive : {ident:symbol} -> directive
+val terminalOf_directive : {ident:symbol, tp:symbol} -> directive
+val nonterminal_directive : {ident:symbol, tp:symbol, arms:productions} -> directive
+val start_directive : {ident:symbol} -> directive
 val nil_directives : {} -> directives
 val cons_directives : {head:directive, tail:directives} -> directives
 datatype terminal =
