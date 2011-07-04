@@ -6,7 +6,6 @@ structure Token =
          Ident of Symbol.symbol
        | Arrow
        | Colon
-       | Eos
        | Equal
        | Name
        | Nonterminal

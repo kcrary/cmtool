@@ -3,7 +3,6 @@ name ParseMainFun
 terminal Ident of symbol
 terminal Arrow
 terminal Colon
-terminal Eos
 terminal Equal
 terminal Name
 terminal Nonterminal

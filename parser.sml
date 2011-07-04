@@ -15,6 +15,7 @@ structure Parser =
           type constituent = constituent
           fun unlabeled_item {ident} = Unlabeled ident
           fun labeled_item {label, ident} = Labeled (label, ident)
+          fun paren_item {constituent} = constituent
 
           type constituents = constituent list
           fun nil_constituents {} = []

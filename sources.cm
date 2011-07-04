@@ -10,7 +10,7 @@ Group is
 	make-automaton.sml
 	parsemain.sml
 	parser.sig
-	parser-old.sml
+	parser.sml
 	process.sig
 	process.sml
 	syntax.sml
