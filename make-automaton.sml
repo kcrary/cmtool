@@ -50,7 +50,7 @@ structure MakeAutomaton
 
 
 
-      type ctx = { nonterminals : (int list * symbol) D.dict,
+      type ctx = { nonterminals : (int list * symbol * bool ref) D.dict,
                    rules : rule Vector.vector,
                    nullableTable : bool SymbolTable.table,
                    firstTable : S.set SymbolTable.table }
@@ -67,14 +67,14 @@ structure MakeAutomaton
                     NONE =>
                        (* terminal *)
                        false
-                  | SOME (rulenums, _) =>
+                  | SOME (rulenums, _, _) =>
                        let
                           val trail' = S.insert trail symbol
                        in
                           List.exists
                           (fn rulenum =>
                               let
-                                 val (_, _, _, rhs, _, _) = Vector.sub (rules, rulenum)
+                                 val (_, _, _, rhs, _, _, _) = Vector.sub (rules, rulenum)
                               in
                                  List.all (nullableMain ctx trail') rhs
                               end)
@@ -105,14 +105,14 @@ structure MakeAutomaton
                        NONE =>
                           (* terminal *)
                           S.singleton symbol
-                     | SOME (rulenums, _) =>
+                     | SOME (rulenums, _, _) =>
                           let
                              val trail' = S.insert trail symbol
                           in
                              foldl
                              (fn (rulenum, acc) =>
                                  let
-                                    val (_, _, _, rhs, _, _) = Vector.sub (rules, rulenum)
+                                    val (_, _, _, rhs, _, _, _) = Vector.sub (rules, rulenum)
                                  in
                                     S.union
                                        acc
@@ -179,8 +179,10 @@ structure MakeAutomaton
                                 NONE =>
                                    (* terminal *)
                                    loop d
-                              | SOME (rulenums, _) =>
+                              | SOME (rulenums, _, reachable) =>
                                    let
+                                      val () = reachable := true
+
                                       val lookahead' =
                                          rhsFirst ctx following lookahead
 
@@ -188,7 +190,7 @@ structure MakeAutomaton
                                          foldl
                                          (fn (rulenum, d) =>
                                              let
-                                                val (_, _, _, rhs, _, _) = Vector.sub (rules, rulenum)
+                                                val (_, _, _, rhs, _, _, _) = Vector.sub (rules, rulenum)
    
                                                 val item = (rulenum, 0, rhs)
                                              in
@@ -236,7 +238,7 @@ structure MakeAutomaton
       val shiftConflicts = ref false
       val reduceConflicts = ref false
 
-      fun prestateToState nonterminals (ref (_, trans, items)) =
+      fun prestateToState nonterminals rules (ref (_, trans, items)) =
          let
             val action =
                ItemDict.foldr
@@ -276,6 +278,20 @@ structure MakeAutomaton
                        goto))
                (action, D.empty)
                trans
+
+            val () =
+               D.app
+               (fn (_, Reduce rulenum :: _) =>
+                      if rulenum = ~1 then
+                         ()
+                      else
+                         let
+                            val (_, _, _, _, _, _, reduced) = Vector.sub (rules, rulenum)
+                         in
+                            reduced := true
+                         end
+                 | _ => ())
+               action'
          in
             (action', goto, ItemDict.toList items)
          end
@@ -391,7 +407,7 @@ structure MakeAutomaton
 
             val () = shiftConflicts := false
             val () = reduceConflicts := false
-            val states = map (prestateToState nonterminals) (rev (!stateList))
+            val states = map (prestateToState nonterminals rules) (rev (!stateList))
 
             val () =
                if !reduceConflicts then
@@ -407,6 +423,34 @@ structure MakeAutomaton
                else
                   ()
 
+            val () =
+               Vector.app
+               (fn (_, localnum, lhs, _, _, _, reduced) =>
+                   if !reduced then
+                      ()
+                   else
+                      (
+                      print "Warning: rule ";
+                      print (Int.toString localnum);
+                      print " of nonterminal ";
+                      print (Symbol.toString lhs);
+                      print " is never reduced.\n"
+                      ))
+               rules
+
+            val () =
+               D.app
+               (fn (nonterminal, (_, _, reachable)) =>
+                   if !reachable then
+                      ()
+                   else
+                      (
+                      print "Warning: nonterminal ";
+                      print (Symbol.toString nonterminal);
+                      print " is unreachable.\n"
+                      ))
+               nonterminals
+               
          in
             (!stateCount, states, rules, start)
          end

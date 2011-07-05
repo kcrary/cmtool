@@ -18,6 +18,8 @@ structure Automaton =
          Symbol.symbol option list  (* arguments *)
          *
          Symbol.symbol              (* action *)
+         *
+         bool ref                   (* reduced? *)
 
       datatype action =
          Shift of int
@@ -47,14 +49,14 @@ structure Automaton =
          Symbol.symbol       (* start symbol *)
 
       type parser =
-         string                                       (* functor name *)
+         string                                                  (* functor name *)
          *
-         SymbolSet.set                                (* type arguments *)
+         SymbolSet.set                                           (* type arguments *)
          *
-         Symbol.symbol option SymbolDict.dict         (* terminals *)
+         (Symbol.symbol option * bool ref) SymbolDict.dict       (* terminals *)
          *
-         (int list * Symbol.symbol) SymbolDict.dict   (* nonterminals *)
+         (int list * Symbol.symbol * bool ref) SymbolDict.dict   (* nonterminals *)
          *
-         automaton                                    (* the automaton *)
+         automaton                                               (* the automaton *)
 
    end

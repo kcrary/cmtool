@@ -13,14 +13,14 @@ structure Process
 
       exception Error
 
-      val modulename   : string option ref               = ref NONE
-      val types        : S.set ref                       = ref S.empty
-      val terminals    : symbol option D.dict ref        = ref D.empty
-      val nonterminals : (int list * symbol) D.dict ref  = ref D.empty
-      val actions      : int D.dict ref                  = ref D.empty
-      val rules        : rule list ref                   = ref []
-      val start        : symbol option ref               = ref NONE
-      val ruleCount    : int ref                         = ref 0
+      val modulename   : string option ref                          = ref NONE
+      val types        : S.set ref                                  = ref S.empty
+      val terminals    : (symbol option * bool ref) D.dict ref      = ref D.empty
+      val nonterminals : (int list * symbol * bool ref) D.dict ref  = ref D.empty
+      val actions      : int D.dict ref                             = ref D.empty
+      val rules        : rule list ref                              = ref []
+      val start        : symbol option ref                          = ref NONE
+      val ruleCount    : int ref                                    = ref 0
 
       fun processMain l =
          (case l of
@@ -68,7 +68,7 @@ structure Process
                             | SOME tp =>
                                  types := S.insert (!types) tp);
 
-                          terminals := (D.insert (!terminals) name tpo)
+                          terminals := (D.insert (!terminals) name (tpo, ref false))
                           )
 
                   | Nonterminal (name, tp, productions) =>
@@ -145,7 +145,7 @@ structure Process
                                                  else
                                                     D.insert actions' action globalnumber
                                            in
-                                              ((globalnumber, localnumber, name, rev rhsrev, rev argsrev, action) :: acc,
+                                              ((globalnumber, localnumber, name, rev rhsrev, rev argsrev, action, ref false) :: acc,
                                                actions'',
                                                globalnumber :: next,
                                                localnumber + 1)
@@ -155,7 +155,7 @@ structure Process
                                  in
                                     actions := actions';
                                     rules := rules';
-                                    nonterminals := D.insert (!nonterminals) name (rev next, tp)
+                                    nonterminals := D.insert (!nonterminals) name (rev next, tp, ref false)
                                  end));
 
                 processMain rest
@@ -227,59 +227,56 @@ structure Process
             val rules' = rev (!rules)
             val () =
                app
-               (fn (globalnumber, localnumber, nonterminalName, rhs, args, _) =>
+               (fn (globalnumber, localnumber, nonterminalName, rhs, args, _, _) =>
                    ListPair.appEq
-                   (fn (symbol, NONE) =>
-                          (* unlabeled constituent *)
-                          if
-                             D.member nonterminals' symbol
-                             orelse
-                             D.member terminals' symbol
-                          then
-                             ()
-                          else
-                             (
-                             print "Error: symbol ";
-                             print (toString symbol);
-                             print " in rule ";
-                             print (Int.toString localnumber);
-                             print " of nonterminal ";
-                             print (toString nonterminalName);
-                             print " is never specified.\n";
-                             raise Error
-                             )
-                     | (symbol, SOME label) =>
-                          (* labeled constituent *)
-                          if D.member nonterminals' symbol then
-                             ()
-                          else 
-                             (case D.find terminals' symbol of
-                                 NONE =>
-                                    (
-                                    print "Error: symbol ";
-                                    print (toString symbol);
-                                    print " in rule ";
-                                    print (Int.toString localnumber);
-                                    print " of nonterminal ";
-                                    print (toString nonterminalName);
-                                    print " is never specified.\n";
-                                    raise Error
-                                    )
-                               | SOME NONE =>
-                                    (
-                                    print "Error: argument ";
-                                    print (toString label);
-                                    print " in rule ";
-                                    print (Int.toString localnumber);
-                                    print " of nonterminal ";
-                                    print (toString nonterminalName);
-                                    print " carries no data.\n";
-                                    raise Error
-                                    )
-                               | SOME (SOME _) =>
-                                    ()))
+                   (fn (symbol, argo) =>
+                          (case D.find nonterminals' symbol of
+                              SOME _ => ()
+                            | NONE =>
+                                 (case D.find terminals' symbol of
+                                     SOME (NONE, used) =>
+                                        (case argo of
+                                            NONE =>
+                                               used := true
+                                          | SOME label =>
+                                               (
+                                               print "Error: argument ";
+                                               print (toString label);
+                                               print " in rule ";
+                                               print (Int.toString localnumber);
+                                               print " of nonterminal ";
+                                               print (toString nonterminalName);
+                                               print " carries no data.\n";
+                                               raise Error
+                                               ))
+                                   | SOME (SOME _, used) =>
+                                        used := true
+                                   | NONE =>
+                                        (
+                                        print "Error: symbol ";
+                                        print (toString symbol);
+                                        print " in rule ";
+                                        print (Int.toString localnumber);
+                                        print " of nonterminal ";
+                                        print (toString nonterminalName);
+                                        print " is never specified.\n";
+                                        raise Error
+                                        ))))
                       (rhs, args))
                rules'
+
+            val () =
+               D.app
+               (fn (terminal, (_, used)) =>
+                   if !used then
+                      ()
+                   else
+                      (
+                      print "Warning: terminal ";
+                      print (Symbol.toString terminal);
+                      print " is unused.\n"
+                      ))
+               terminals'
 
          in
             (modulename', !types, terminals', nonterminals',

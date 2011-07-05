@@ -136,9 +136,9 @@ structure Codegen
                types;
 
             Vector.app
-               (fn (_, _, lhs, rhs, args, action) =>
+               (fn (_, _, lhs, rhs, args, action, _) =>
                    let
-                      val (_, lhstp) = D.lookup nonterminals lhs
+                      val (_, lhstp, _) = D.lookup nonterminals lhs
                    in
                       write "val ";
                       write (Symbol.toString action);
@@ -151,13 +151,13 @@ structure Codegen
                                 let
                                    val tp =
                                       (case D.find nonterminals symbol of
-                                          SOME (_, tp) => tp
+                                          SOME (_, tp, _) => tp
                                         | NONE =>
                                              (case D.lookup terminals symbol of
-                                                 NONE =>
+                                                 (NONE, _) =>
                                                     (* We've already generated an error in this case. *)
                                                     raise (Fail "invariant")
-                                               | SOME tp => tp))
+                                               | (SOME tp, _) => tp))
                                 in
                                    if first then
                                       ()
@@ -179,7 +179,7 @@ structure Codegen
 
             write "datatype terminal =\n";
             D.foldl
-               (fn (symbol, tpo, first) =>
+               (fn (symbol, (tpo, _), first) =>
                       (
                       if first then
                          ()
@@ -215,7 +215,7 @@ structure Codegen
             write "end\nstructure ParseEngine = ParseEngineFun (structure Streamable = Streamable\ntype terminal = terminal\ntype value = Value.nonterminal\nval dummy = Value.DUMMY\nfun read terminal =\n(case terminal of\n";
 
             D.foldl
-               (fn (terminal, tpo, first) =>
+               (fn (terminal, (tpo, _), first) =>
                    (
                    if first then
                       ()
@@ -293,7 +293,7 @@ structure Codegen
             write "\",\nVector.fromList [";
 
             Vector.foldl
-               (fn ((_, _, lhs, rhs, args, action), first) =>
+               (fn ((rulenum, _, lhs, rhs, args, action, _), first) =>
                    (
                    if first then
                       ()
@@ -312,9 +312,9 @@ structure Codegen
                              let
                                 val tp =
                                    (case D.find nonterminals symbol of
-                                       SOME (_, tp) => tp
+                                       SOME (_, tp, _) => tp
                                      | NONE =>
-                                          valOf (D.lookup terminals symbol))
+                                          valOf (#1 (D.lookup terminals symbol)))
                              in
                                 write "Value.";
                                 write (Symbol.toString tp);
@@ -330,30 +330,27 @@ structure Codegen
                    write (Symbol.toString action);
                    write " {";
 
-                   let
-                      val noargs =
-                         foldl
-                            (fn (NONE, first) => first
-                              | (SOME label, first) =>
-                                   (
-                                   if first then
-                                      ()
-                                   else
-                                      write ",";
-                                   write (Symbol.toString label);
-                                   write "=";
-                                   write (Symbol.toString label);
-                                   false
-                                   ))
-                            true
-                            args
-                   in
-                      write "})::start";
-                      if noargs then
-                         ()
-                      else
-                         write "|_=>raise (Fail \"bad parser\")"
-                   end;
+                   foldl
+                      (fn (NONE, first) => first
+                        | (SOME label, first) =>
+                             (
+                             if first then
+                                ()
+                             else
+                                write ",";
+                             write (Symbol.toString label);
+                             write "=";
+                             write (Symbol.toString label);
+                             false
+                             ))
+                      true
+                      args;
+
+                   write "})::start";
+                   if List.null rhs then
+                      ()
+                   else
+                      write "|_=>raise (Fail \"bad parser\")";
                    write "))";
                    false
                    ))
