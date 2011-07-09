@@ -71,20 +71,20 @@ structure Lexer
          List.app
          (fn (str, token) => Table.insert keywords str (SOME token))
          [
-         ("alphabet", Alphabet),
-         ("and", And),
-         ("any", Any),
-         ("empty", Empt),
-         ("enable", Enable),
-         ("eos", Eos),
-         ("epsilon", Epsilon),
-         ("function", Function),
-         ("name", Name),
-         ("or", Or),
-         ("range", Range),
-         ("regexp", Regexp),
-         ("seq", Seq),
-         ("set", Set)
+         ("alphabet", ALPHABET),
+         ("and", AND),
+         ("any", ANY),
+         ("empty", EMPT),
+         ("enable", ENABLE),
+         ("eos", EOS),
+         ("epsilon", EPSILON),
+         ("function", FUNCTION),
+         ("name", NAME),
+         ("or", OR),
+         ("range", RANGE),
+         ("regexp", REGEXP),
+         ("seq", SEQ),
+         ("set", SET)
          ]
 
         
@@ -124,7 +124,7 @@ structure Lexer
                       in
                          (case Table.find keywords str of
                              NONE =>
-                                Ident str
+                                IDENT str
                            | SOME NONE =>
                                 (
                                 print "Illegal identifier at ";
@@ -141,7 +141,7 @@ structure Lexer
                (fn (chars, _, pos) =>
                       ((case Int.fromString (implode chars) of
                            SOME n => 
-                              Number n
+                              NUMBER n
                          | NONE =>
                               raise (Fail "invariant"))
                        handle Overflow => 
@@ -160,7 +160,7 @@ structure Lexer
                       (* By construction, chars should be '<ch> . *)
                       (case chars of
                           [_, ch] =>
-                             Number (Char.ord ch)
+                             NUMBER (Char.ord ch)
                         | _ =>
                              raise (Fail "invariant")))
   
@@ -175,7 +175,7 @@ structure Lexer
                action
                (fn (chars, len, _) =>
                       (* By construction, chars should begin and end with ". *)
-                      String (List.map ord (List.take (List.tl chars, len-2))))
+                      STRING (List.map ord (List.take (List.tl chars, len-2))))
   
             fun error _ pos =
                (
@@ -185,19 +185,19 @@ structure Lexer
                raise Error
                )
                    
-            val ampersand = simple And
-            val arrow = simple Arrow
-            val bar = simple Or
-            val colon = simple Colon
-            val equal = simple Equal
-            val lparen = simple LParen
-            val minus = simple Minus
-            val plus = simple Plus
-            val question = simple Question
-            val rparen = simple RParen
-            val slash = simple Range
-            val star = simple Star
-            val tilde = simple Tilde
+            val ampersand = simple AND
+            val arrow = simple ARROW
+            val bar = simple OR
+            val colon = simple COLON
+            val equal = simple EQUAL
+            val lparen = simple LPAREN
+            val minus = simple MINUS
+            val plus = simple PLUS
+            val question = simple QUESTION
+            val rparen = simple RPAREN
+            val slash = simple RANGE
+            val star = simple STAR
+            val tilde = simple TILDE
   
             fun comment_open ({ len, follow, self, ... }:arg) pos =
                 let

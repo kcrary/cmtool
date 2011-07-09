@@ -14,27 +14,27 @@ structure Parser
 
       val ident =
          wrap
-         (fn Ident x => x
+         (fn IDENT x => x
            | _ => raise SyntaxError)
          accept
 
       val number =
          wrap
-         (fn Number x => x
+         (fn NUMBER x => x
            | _ => raise SyntaxError)
          accept
 
       val string =
          wrap
-         (fn String x => x
+         (fn STRING x => x
            | _ => raise SyntaxError)
          accept
 
       fun sexp token p =
-          seq (literal LParen)
+          seq (literal LPAREN)
              (seq (literal token)
                  (bind p
-                     (fn x => seq (literal RParen) (return x))))
+                     (fn x => seq (literal RPAREN) (return x))))
 
 
 
@@ -43,13 +43,13 @@ structure Parser
          [
          wrap Syntax.Svar ident,
          wrap Syntax.Ssymbol number,
-         wrap Syntax.Srange (sexp Range (many (andthen number number))),
-         replace Syntax.Sempty (literal Empt),
-         wrap Syntax.Sunion (sexp Or (many charset)),
-         wrap Syntax.Sintersection (sexp And (many charset)),
-         wrap Syntax.Sdifference (sexp Minus (andthen charset (many charset))),
-         wrap Syntax.Scomplement (sexp Tilde (many charset)),
-         replace Syntax.Sany (literal Any)
+         wrap Syntax.Srange (sexp RANGE (many (andthen number number))),
+         replace Syntax.Sempty (literal EMPT),
+         wrap Syntax.Sunion (sexp OR (many charset)),
+         wrap Syntax.Sintersection (sexp AND (many charset)),
+         wrap Syntax.Sdifference (sexp MINUS (andthen charset (many charset))),
+         wrap Syntax.Scomplement (sexp TILDE (many charset)),
+         replace Syntax.Sany (literal ANY)
          ] s
 
       fun regexp s =
@@ -58,37 +58,37 @@ structure Parser
           wrap Syntax.Var ident,
           wrap Syntax.Symbol number,
           wrap Syntax.String string,
-          replace Syntax.Any (literal Any),
-          replace Syntax.Epsilon (literal Epsilon),
-          replace Syntax.Empty (literal Empt),
-          wrap Syntax.Concat (sexp Colon (many regexp)),
-          wrap Syntax.Concat (sexp Seq (many regexp)),
-          wrap Syntax.Union (sexp Or (many regexp)),
-          wrap Syntax.Option (sexp Question regexp),
-          wrap Syntax.Closure (sexp Star regexp),
-          wrap Syntax.Plus (sexp Plus regexp),
-          replace Syntax.Eos (literal Eos)
+          replace Syntax.Any (literal ANY),
+          replace Syntax.Epsilon (literal EPSILON),
+          replace Syntax.Empty (literal EMPT),
+          wrap Syntax.Concat (sexp COLON (many regexp)),
+          wrap Syntax.Concat (sexp SEQ (many regexp)),
+          wrap Syntax.Union (sexp OR (many regexp)),
+          wrap Syntax.Option (sexp QUESTION regexp),
+          wrap Syntax.Closure (sexp STAR regexp),
+          wrap Syntax.Plus (sexp PLUS regexp),
+          replace Syntax.Eos (literal EOS)
           ] s
 
-      val arm = andthen regexp (seq (literal Arrow) ident)
+      val arm = andthen regexp (seq (literal ARROW) ident)
 
       val arms = manyplus arm
 
       fun directive s =
           alt
           [
-          wrap Syntax.Name (seq (literal Name) ident),
-          wrap Syntax.Enable (seq (literal Enable) ident),
-          wrap Syntax.Alphabet (seq (literal Alphabet) number),
-          wrap Syntax.Regexp (seq (literal Regexp) (andthen ident (seq (literal Equal) regexp))),
-          wrap Syntax.Set (seq (literal Set) (andthen ident (seq (literal Equal) charset))),
+          wrap Syntax.Name (seq (literal NAME) ident),
+          wrap Syntax.Enable (seq (literal ENABLE) ident),
+          wrap Syntax.Alphabet (seq (literal ALPHABET) number),
+          wrap Syntax.Regexp (seq (literal REGEXP) (andthen ident (seq (literal EQUAL) regexp))),
+          wrap Syntax.Set (seq (literal SET) (andthen ident (seq (literal EQUAL) charset))),
           wrap Syntax.Function
              (seq 
-                 (literal Function) 
+                 (literal FUNCTION) 
                  (andthen3
                      (ident,
-                      seq (literal Colon) ident,
-                      seq (literal Equal) arms)))
+                      seq (literal COLON) ident,
+                      seq (literal EQUAL) arms)))
           ] s
 
       exception Error

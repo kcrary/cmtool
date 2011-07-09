@@ -3,32 +3,32 @@ structure Token =
    struct
 
       datatype token =
-         Ident of string
-       | Number of int
-       | String of int list
-       | Alphabet
-       | And
-       | Any
-       | Arrow
-       | Colon
-       | Eos
-       | Empt
-       | Enable
-       | Epsilon
-       | Equal
-       | Function
-       | LParen
-       | Minus
-       | Name
-       | Or
-       | Plus
-       | Question
-       | Range
-       | Regexp
-       | RParen
-       | Seq
-       | Set
-       | Star
-       | Tilde
+         IDENT of string
+       | NUMBER of int
+       | STRING of int list
+       | ALPHABET
+       | AND
+       | ANY
+       | ARROW
+       | COLON
+       | EOS
+       | EMPT
+       | ENABLE
+       | EPSILON
+       | EQUAL
+       | FUNCTION
+       | LPAREN
+       | MINUS
+       | NAME
+       | OR
+       | PLUS
+       | QUESTION
+       | RANGE
+       | REGEXP
+       | RPAREN
+       | SEQ
+       | SET
+       | STAR
+       | TILDE
 
    end
