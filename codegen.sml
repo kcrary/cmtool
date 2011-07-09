@@ -188,7 +188,10 @@ structure CodeGen
                    if name = "" then
                       write "epsilon"
                    else
-                      write name)
+                      (
+                      write "Arg.";
+                      write name
+                      ))
                (fn () => write ",")
                final;
             write "], LexEngine.next";
@@ -242,7 +245,7 @@ structure CodeGen
           in
              write "functor ";
              write functorName;
-             write " (structure Streamable : STREAMABLE\ntype symbol\nval ord : symbol -> int\n";
+             write " (structure Streamable : STREAMABLE\nstructure Arg : sig\ntype symbol\nval ord : symbol -> int\n";
 
              app 
              (fn typeName =>
@@ -276,7 +279,7 @@ structure CodeGen
                     ))
              actions;
 
-             write ")\n=\nstruct\nlocal\nstructure LexEngine = LexEngineFun (structure Streamable = Streamable\ntype symbol = symbol\nval ord = ord)\nstructure Tables = struct\nfun epsilon _ = raise (Fail \"Illegal lexeme\")\n";
+             write "end)\n=\nstruct\nlocal\nstructure LexEngine = LexEngineFun (structure Streamable = Streamable\ntype symbol = Arg.symbol\nval ord = Arg.ord)\nstructure Tables = struct\nfun epsilon _ = raise (Fail \"Illegal lexeme\")\n";
              app (writeTable outs symbolLimit functions) functions;
              write "end\nin\n";
 
