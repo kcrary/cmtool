@@ -186,7 +186,7 @@ structure CodeGen
             appArraySeparated
                (fn name =>
                    if name = "" then
-                      write "epsilon"
+                      write "error"
                    else
                       (
                       write "Arg.";
@@ -218,9 +218,7 @@ structure CodeGen
           in
              write keyword;
              write name;
-
-             (* Call the stream "seq" because seq is a reserved word so there won't be any actions or functions by that name. *) 
-             write " seq = LexEngine.lex {";
+             write " s = LexEngine.lex {";
 
              appSeparated 
              (fn (fname, _, _) => 
@@ -234,7 +232,7 @@ structure CodeGen
 
              write "} Tables.";
              write name;
-             write " seq\n"
+             write " s\n"
           end
 
 
@@ -279,7 +277,7 @@ structure CodeGen
                     ))
              actions;
 
-             write "end)\n=\nstruct\nlocal\nstructure LexEngine = LexEngineFun (structure Streamable = Streamable\ntype symbol = Arg.symbol\nval ord = Arg.ord)\nstructure Tables = struct\nfun epsilon _ = raise (Fail \"Illegal lexeme\")\n";
+             write "end)\n=\nstruct\nlocal\nstructure LexEngine = LexEngineFun (structure Streamable = Streamable\ntype symbol = Arg.symbol\nval ord = Arg.ord)\nstructure Tables = struct\nfun error _ = raise (Fail \"Illegal lexeme\")\n";
              app (writeTable outs symbolLimit functions) functions;
              write "end\nin\n";
 
