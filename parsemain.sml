@@ -362,6 +362,7 @@ lookahead 5 = RPAREN
 *)
 
 functor ParseMainFun (structure Streamable : STREAMABLE
+structure Arg : sig
 type symbol
 type constituent
 type constituents
@@ -395,57 +396,57 @@ IDENT of symbol
 | TERMINAL
 | NONTERMINAL
 val error : terminal Streamable.t -> exn
-)
+end)
 =
 struct
 local
 structure Value = struct
 datatype nonterminal =
-DUMMY
-| symbol of symbol
-| constituent of constituent
-| constituents of constituents
-| productions of productions
-| directive of directive
-| directives of directives
+nonterminal
+| symbol of Arg.symbol
+| constituent of Arg.constituent
+| constituents of Arg.constituents
+| productions of Arg.productions
+| directive of Arg.directive
+| directives of Arg.directives
 end
 structure ParseEngine = ParseEngineFun (structure Streamable = Streamable
-type terminal = terminal
+type terminal = Arg.terminal
 type value = Value.nonterminal
-val dummy = Value.DUMMY
+val dummy = Value.nonterminal
 fun read terminal =
 (case terminal of
-IDENT terminal => (1, Value.symbol terminal)
-| ARROW => (2, Value.DUMMY)
-| COLON => (3, Value.DUMMY)
-| EQUAL => (4, Value.DUMMY)
-| NAME => (5, Value.DUMMY)
-| LPAREN => (6, Value.DUMMY)
-| OF => (7, Value.DUMMY)
-| RPAREN => (8, Value.DUMMY)
-| START => (9, Value.DUMMY)
-| TERMINAL => (10, Value.DUMMY)
-| NONTERMINAL => (11, Value.DUMMY)
+Arg.IDENT x => (1, Value.symbol x)
+| Arg.ARROW => (2, Value.nonterminal)
+| Arg.COLON => (3, Value.nonterminal)
+| Arg.EQUAL => (4, Value.nonterminal)
+| Arg.NAME => (5, Value.nonterminal)
+| Arg.LPAREN => (6, Value.nonterminal)
+| Arg.OF => (7, Value.nonterminal)
+| Arg.RPAREN => (8, Value.nonterminal)
+| Arg.START => (9, Value.nonterminal)
+| Arg.TERMINAL => (10, Value.nonterminal)
+| Arg.NONTERMINAL => (11, Value.nonterminal)
 )
 )
 in
 val parse = ParseEngine.parse (
 ParseEngine.next5x1 "r\128\128\128\128\130\128\128\128\131\132\135\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\136\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\137\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\138\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128r\128\128\128\128\130\128\128\128\131\132\135\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\127\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\140\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128w\128\128\128\128w\128\128\128www\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128s\128\128\128\128s\128\128\128sss\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128v\128\128\128\128v\128\141\128vvv\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128q\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\142\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\143\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\144\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128u\128\128\128\128u\128\128\128uuu\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\145\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128y\146{\128\128y\147\128\128yyy\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128~~\151\128\128~\128~\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\146\128\128\128\128\147\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\146{\128\128\128\147\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\154\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128t\128\128\128\128t\128\128\128ttt\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\155\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\156\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128z\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\157\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128}}\128\128\128}\128}\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128||\128\128\128|\128|\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128y\146{\128\128y\147\128\128yyy\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128x\128\128\128\128x\128\128\128xxx\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128",
 ParseEngine.next5x1 "\128\128\128\132\133\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\132\138\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\147\148\149\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\151\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\147\152\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\147\148\157\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128",
-Vector.fromList [(0,1,(fn Value.symbol(ident)::start => Value.constituent(unlabeled_item {ident=ident})::start|_=>raise (Fail "bad parser"))),
-(0,3,(fn Value.symbol(ident)::_::Value.symbol(label)::start => Value.constituent(labeled_item {label=label,ident=ident})::start|_=>raise (Fail "bad parser"))),
-(0,3,(fn _::Value.constituent(constituent)::_::start => Value.constituent(paren_item {constituent=constituent})::start|_=>raise (Fail "bad parser"))),
-(1,0,(fn start => Value.constituents(nil_constituents {})::start)),
-(1,2,(fn Value.constituents(tail)::Value.constituent(head)::start => Value.constituents(cons_constituents {head=head,tail=tail})::start|_=>raise (Fail "bad parser"))),
-(2,0,(fn start => Value.productions(nil_productions {})::start)),
-(2,4,(fn Value.productions(tail)::Value.symbol(action)::_::Value.constituents(constituents)::start => Value.productions(cons_productions {constituents=constituents,action=action,tail=tail})::start|_=>raise (Fail "bad parser"))),
-(3,2,(fn Value.symbol(ident)::_::start => Value.directive(name_directive {ident=ident})::start|_=>raise (Fail "bad parser"))),
-(3,2,(fn Value.symbol(ident)::_::start => Value.directive(terminal_directive {ident=ident})::start|_=>raise (Fail "bad parser"))),
-(3,4,(fn Value.symbol(tp)::_::Value.symbol(ident)::_::start => Value.directive(terminalOf_directive {ident=ident,tp=tp})::start|_=>raise (Fail "bad parser"))),
-(3,6,(fn Value.productions(arms)::_::Value.symbol(tp)::_::Value.symbol(ident)::_::start => Value.directive(nonterminal_directive {ident=ident,tp=tp,arms=arms})::start|_=>raise (Fail "bad parser"))),
-(3,2,(fn Value.symbol(ident)::_::start => Value.directive(start_directive {ident=ident})::start|_=>raise (Fail "bad parser"))),
-(4,0,(fn start => Value.directives(nil_directives {})::start)),
-(4,2,(fn Value.directives(tail)::Value.directive(head)::start => Value.directives(cons_directives {head=head,tail=tail})::start|_=>raise (Fail "bad parser")))],
-(fn Value.directives start => start | _ => raise (Fail "bad parser")), error)
+Vector.fromList [(0,1,(fn Value.symbol(arg0)::rest => Value.constituent(Arg.unlabeled_item {ident=arg0})::rest|_=>raise (Fail "bad parser"))),
+(0,3,(fn Value.symbol(arg0)::_::Value.symbol(arg1)::rest => Value.constituent(Arg.labeled_item {ident=arg0,label=arg1})::rest|_=>raise (Fail "bad parser"))),
+(0,3,(fn _::Value.constituent(arg0)::_::rest => Value.constituent(Arg.paren_item {constituent=arg0})::rest|_=>raise (Fail "bad parser"))),
+(1,0,(fn rest => Value.constituents(Arg.nil_constituents {})::rest)),
+(1,2,(fn Value.constituents(arg0)::Value.constituent(arg1)::rest => Value.constituents(Arg.cons_constituents {tail=arg0,head=arg1})::rest|_=>raise (Fail "bad parser"))),
+(2,0,(fn rest => Value.productions(Arg.nil_productions {})::rest)),
+(2,4,(fn Value.productions(arg0)::Value.symbol(arg1)::_::Value.constituents(arg2)::rest => Value.productions(Arg.cons_productions {tail=arg0,action=arg1,constituents=arg2})::rest|_=>raise (Fail "bad parser"))),
+(3,2,(fn Value.symbol(arg0)::_::rest => Value.directive(Arg.name_directive {ident=arg0})::rest|_=>raise (Fail "bad parser"))),
+(3,2,(fn Value.symbol(arg0)::_::rest => Value.directive(Arg.terminal_directive {ident=arg0})::rest|_=>raise (Fail "bad parser"))),
+(3,4,(fn Value.symbol(arg0)::_::Value.symbol(arg1)::_::rest => Value.directive(Arg.terminalOf_directive {tp=arg0,ident=arg1})::rest|_=>raise (Fail "bad parser"))),
+(3,6,(fn Value.productions(arg0)::_::Value.symbol(arg1)::_::Value.symbol(arg2)::_::rest => Value.directive(Arg.nonterminal_directive {arms=arg0,tp=arg1,ident=arg2})::rest|_=>raise (Fail "bad parser"))),
+(3,2,(fn Value.symbol(arg0)::_::rest => Value.directive(Arg.start_directive {ident=arg0})::rest|_=>raise (Fail "bad parser"))),
+(4,0,(fn rest => Value.directives(Arg.nil_directives {})::rest)),
+(4,2,(fn Value.directives(arg0)::Value.directive(arg1)::rest => Value.directives(Arg.cons_directives {tail=arg0,head=arg1})::rest|_=>raise (Fail "bad parser")))],
+(fn Value.directives x => x | _ => raise (Fail "bad parser")), Arg.error)
 end
 end

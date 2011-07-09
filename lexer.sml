@@ -59,10 +59,8 @@ structure Lexer
          "mod",
          "o",
 
-         "DUMMY",
          "error",
-         "exn",
-         "Fail"
+         "exn"
          ]
 
 

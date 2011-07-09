@@ -124,7 +124,7 @@ structure Codegen
 
             write "functor ";
             write functorName;
-            write " (structure Streamable : STREAMABLE\n";
+            write " (structure Streamable : STREAMABLE\nstructure Arg : sig\n";
 
             S.app
                (fn tp =>
@@ -199,20 +199,20 @@ structure Codegen
                true
                terminals;
 
-            write "val error : terminal Streamable.t -> exn\n)\n=\nstruct\nlocal\nstructure Value = struct\ndatatype nonterminal =\nDUMMY\n";
+            write "val error : terminal Streamable.t -> exn\nend)\n=\nstruct\nlocal\nstructure Value = struct\ndatatype nonterminal =\nnonterminal\n";
 
             S.app
                (fn tp =>
                    (
                    write "| ";
                    write (Symbol.toString tp);
-                   write " of ";
+                   write " of Arg.";
                    write (Symbol.toString tp);
                    write "\n"
                    ))
                types;
 
-            write "end\nstructure ParseEngine = ParseEngineFun (structure Streamable = Streamable\ntype terminal = terminal\ntype value = Value.nonterminal\nval dummy = Value.DUMMY\nfun read terminal =\n(case terminal of\n";
+            write "end\nstructure ParseEngine = ParseEngineFun (structure Streamable = Streamable\ntype terminal = Arg.terminal\ntype value = Value.nonterminal\nval dummy = Value.nonterminal\nfun read terminal =\n(case terminal of\n";
 
             D.foldl
                (fn (terminal, (tpo, _), first) =>
@@ -224,19 +224,21 @@ structure Codegen
                    (case tpo of
                        NONE =>
                           (
+                          write "Arg.";
                           write (Symbol.toString terminal);
                           write " => (";
                           write (Int.toString (D.lookup terminalOrdinals terminal));
-                          write ", Value.DUMMY)\n"
+                          write ", Value.nonterminal)\n"
                           )
                      | SOME tp =>
                           (
+                          write "Arg.";
                           write (Symbol.toString terminal);
-                          write " terminal => (";
+                          write " x => (";
                           write (Int.toString (D.lookup terminalOrdinals terminal));
                           write ", Value.";
                           write (Symbol.toString tp);
-                          write " terminal)\n"
+                          write " x)\n"
                           ));
                    false
                    ))
@@ -305,10 +307,13 @@ structure Codegen
                    write (Int.toString (length rhs));
                    write ",(fn ";
 
-                   ListPair.appEq
-                      (fn (_, NONE) =>
-                             write "_::"
-                        | (symbol, SOME label) =>
+                   ListPair.foldlEq
+                      (fn (_, NONE, n) =>
+                             (
+                             write "_::";
+                             n
+                             )
+                        | (symbol, SOME _, n) =>
                              let
                                 val tp =
                                    (case D.find nonterminals symbol of
@@ -318,35 +323,37 @@ structure Codegen
                              in
                                 write "Value.";
                                 write (Symbol.toString tp);
-                                write "(";
-                                write (Symbol.toString label);
-                                write ")::"
+                                write "(arg";
+                                write (Int.toString n);
+                                write ")::";
+                                n+1
                              end)
+                      0
                       (rev rhs, rev args);
 
-                   write "start => Value.";
+                   write "rest => Value.";
                    write (Symbol.toString (#2 (D.lookup nonterminals lhs)));
-                   write "(";
+                   write "(Arg.";
                    write (Symbol.toString action);
                    write " {";
 
-                   foldl
-                      (fn (NONE, first) => first
-                        | (SOME label, first) =>
+                   foldr
+                      (fn (NONE, n) => n
+                        | (SOME label, n) =>
                              (
-                             if first then
+                             if n = 0 then
                                 ()
                              else
                                 write ",";
                              write (Symbol.toString label);
-                             write "=";
-                             write (Symbol.toString label);
-                             false
+                             write "=arg";
+                             write (Int.toString n);
+                             n+1
                              ))
-                      true
+                      0
                       args;
 
-                   write "})::start";
+                   write "})::rest";
                    if List.null rhs then
                       ()
                    else
@@ -359,7 +366,7 @@ structure Codegen
 
             write "],\n(fn Value.";
             write (Symbol.toString (#2 (D.lookup nonterminals start)));
-            write " start => start | _ => raise (Fail \"bad parser\")), error)\nend\nend\n";
+            write " x => x | _ => raise (Fail \"bad parser\")), Arg.error)\nend\nend\n";
 
             TextIO.closeOut outs
          end
