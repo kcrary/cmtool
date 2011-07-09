@@ -3,16 +3,16 @@ structure Token =
    struct
 
       datatype token =
-         IDENT of Symbol.symbol
-       | ARROW
-       | COLON
-       | EQUAL
-       | NAME
-       | NONTERMINAL
-       | LPAREN
-       | OF
-       | RPAREN
-       | START
-       | TERMINAL
+         IDENT of int * Symbol.symbol
+       | ARROW of int
+       | COLON of int
+       | EQUAL of int
+       | NAME of int
+       | NONTERMINAL of int
+       | LPAREN of int
+       | OF of int
+       | RPAREN of int
+       | START of int
+       | TERMINAL of int
 
    end

@@ -8,7 +8,11 @@ structure Parser =
 
       structure Arg =
          struct
-            type symbol = Symbol.symbol
+            type pos_symbol = int * Symbol.symbol
+            type pos = int
+
+            type ident = Symbol.symbol
+            fun ident {ident=(_, sym)} = sym
   
             type constituent = constituent
             fun unlabeled_item {ident} = Unlabeled ident
@@ -36,7 +40,34 @@ structure Parser =
   
             datatype terminal = datatype Token.token
   
-            fun error _ = Error
+            fun error s =
+               (case Stream.front s of
+                   Stream.Nil =>
+                      (
+                      print "Syntax error at end of file.\n";
+                      Error
+                      )
+                 | Stream.Cons (h, _) =>
+                      let
+                         val pos =
+                            (case h of
+                                IDENT (pos, _) => pos
+                              | ARROW pos => pos
+                              | COLON pos => pos
+                              | EQUAL pos => pos
+                              | NAME pos => pos
+                              | NONTERMINAL pos => pos
+                              | LPAREN pos => pos
+                              | OF pos => pos
+                              | RPAREN pos => pos
+                              | START pos => pos
+                              | TERMINAL pos => pos)
+                         in
+                            print "Syntax error at ";
+                            print (Int.toString pos);
+                            print ".\n";
+                            Error
+                         end)
          end
 
       structure ParseMain =

@@ -1,20 +1,23 @@
 name ParseMainFun
 
-terminal IDENT of symbol
-terminal ARROW
-terminal COLON
-terminal EQUAL
-terminal NAME
-terminal NONTERMINAL
-terminal LPAREN
-terminal OF
-terminal RPAREN
-terminal START
-terminal TERMINAL
+terminal IDENT of pos_symbol
+terminal ARROW of pos
+terminal COLON of pos
+terminal EQUAL of pos
+terminal NAME of pos
+terminal NONTERMINAL of pos
+terminal LPAREN of pos
+terminal OF of pos
+terminal RPAREN of pos
+terminal START of pos
+terminal TERMINAL of pos
+
+nonterminal Ident : ident =
+   ident:IDENT => ident
 
 nonterminal Constituent : constituent =
-   (ident:IDENT) => unlabeled_item
-   (label:IDENT) COLON (ident:IDENT) => labeled_item
+   (ident:Ident) => unlabeled_item
+   (label:Ident) COLON (ident:Ident) => labeled_item
    LPAREN (constituent:Constituent) RPAREN => paren_item
 
 nonterminal Constituents : constituents =
@@ -23,14 +26,14 @@ nonterminal Constituents : constituents =
 
 nonterminal Productions : productions =
    => nil_productions
-   (constituents:Constituents) ARROW (action:IDENT) (tail:Productions) => cons_productions
+   (constituents:Constituents) ARROW (action:Ident) (tail:Productions) => cons_productions
 
 nonterminal Directive : directive =
-   NAME (ident:IDENT) => name_directive
-   TERMINAL (ident:IDENT) => terminal_directive
-   TERMINAL (ident:IDENT) OF (tp:IDENT) => terminalOf_directive
-   NONTERMINAL (ident:IDENT) COLON (tp:IDENT) EQUAL (arms:Productions) => nonterminal_directive
-   START (ident:IDENT) => start_directive
+   NAME (ident:Ident) => name_directive
+   TERMINAL (ident:Ident) => terminal_directive
+   TERMINAL (ident:Ident) OF (tp:Ident) => terminalOf_directive
+   NONTERMINAL (ident:Ident) COLON (tp:Ident) EQUAL (arms:Productions) => nonterminal_directive
+   START (ident:Ident) => start_directive
 
 nonterminal Directives : directives =
    => nil_directives

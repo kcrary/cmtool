@@ -9,7 +9,7 @@ structure Lexer
       structure Table =
          HashTable (structure Key = StringHashable)
          
-      val keywords : token option Table.table = Table.table 60
+      val keywords : (int -> token) option Table.table = Table.table 60
 
       (* Illegal identifiers (most are SML reserved words). *)
       val () =
@@ -93,7 +93,7 @@ structure Lexer
          Cons (f (str, len, pos), lazy (fn () => #lexmain self follow (pos+len)))
 
       fun simple token ({ len, follow, self, ... }:arg) pos =
-         Cons (token, lazy (fn () => #lexmain self follow (pos+len)))
+         Cons (token pos, lazy (fn () => #lexmain self follow (pos+len)))
 
       structure Arg =
          struct
@@ -113,7 +113,7 @@ structure Lexer
                       in
                          (case Table.find keywords str of
                              NONE =>
-                                IDENT (Symbol.fromString str)
+                                IDENT (pos, Symbol.fromString str)
                            | SOME NONE =>
                                 (
                                 print "Illegal identifier at ";
@@ -122,7 +122,7 @@ structure Lexer
                                 raise Error
                                 )
                            | SOME (SOME token) =>
-                                token)
+                                token pos)
                       end)
   
             fun skip ({ len, follow, self, ... }:arg) pos = #lexmain self follow (pos+len)
