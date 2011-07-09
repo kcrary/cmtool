@@ -1,39 +1,39 @@
 name ParseMainFun
 
-terminal Ident of symbol
-terminal Arrow
-terminal Colon
-terminal Equal
-terminal Name
-terminal Nonterminal
-terminal LParen
-terminal Of
-terminal RParen
-terminal Start
-terminal Terminal
+terminal IDENT of symbol
+terminal ARROW
+terminal COLON
+terminal EQUAL
+terminal NAME
+terminal NONTERMINAL
+terminal LPAREN
+terminal OF
+terminal RPAREN
+terminal START
+terminal TERMINAL
 
-nonterminal CONSTITUENT : constituent =
-   (ident:Ident) => unlabeled_item
-   (label:Ident) Colon (ident:Ident) => labeled_item
-   LParen (constituent:CONSTITUENT) RParen => paren_item
+nonterminal Constituent : constituent =
+   (ident:IDENT) => unlabeled_item
+   (label:IDENT) COLON (ident:IDENT) => labeled_item
+   LPAREN (constituent:Constituent) RPAREN => paren_item
 
-nonterminal CONSTITUENTS : constituents =
+nonterminal Constituents : constituents =
    => nil_constituents
-   (head:CONSTITUENT) (tail:CONSTITUENTS) => cons_constituents
+   (head:Constituent) (tail:Constituents) => cons_constituents
 
-nonterminal PRODUCTIONS : productions =
+nonterminal Productions : productions =
    => nil_productions
-   (constituents:CONSTITUENTS) Arrow (action:Ident) (tail:PRODUCTIONS) => cons_productions
+   (constituents:Constituents) ARROW (action:IDENT) (tail:Productions) => cons_productions
 
-nonterminal DIRECTIVE : directive =
-   Name (ident:Ident) => name_directive
-   Terminal (ident:Ident) => terminal_directive
-   Terminal (ident:Ident) Of (tp:Ident) => terminalOf_directive
-   Nonterminal (ident:Ident) Colon (tp:Ident) Equal (arms:PRODUCTIONS) => nonterminal_directive
-   Start (ident:Ident) => start_directive
+nonterminal Directive : directive =
+   NAME (ident:IDENT) => name_directive
+   TERMINAL (ident:IDENT) => terminal_directive
+   TERMINAL (ident:IDENT) OF (tp:IDENT) => terminalOf_directive
+   NONTERMINAL (ident:IDENT) COLON (tp:IDENT) EQUAL (arms:Productions) => nonterminal_directive
+   START (ident:IDENT) => start_directive
 
-nonterminal DIRECTIVES : directives =
+nonterminal Directives : directives =
    => nil_directives
-   (head:DIRECTIVE) (tail:DIRECTIVES) => cons_directives
+   (head:Directive) (tail:Directives) => cons_directives
 
-start DIRECTIVES
+start Directives

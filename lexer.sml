@@ -54,6 +54,11 @@ structure Lexer
          "withtype",
          "type",
 
+         "before",
+         "div",
+         "mod",
+         "o",
+
          "DUMMY",
          "error",
          "exn",
@@ -66,11 +71,11 @@ structure Lexer
          List.app
          (fn (str, token) => Table.insert keywords str (SOME token))
          [
-         ("name", Name),
-         ("nonterminal", Nonterminal),
-         ("of", Of),
-         ("start", Start),
-         ("terminal", Terminal)
+         ("name", NAME),
+         ("nonterminal", NONTERMINAL),
+         ("of", OF),
+         ("start", START),
+         ("terminal", TERMINAL)
          ]
 
         
@@ -111,7 +116,7 @@ structure Lexer
                     in
                        (case Table.find keywords str of
                            NONE =>
-                              Ident (Symbol.fromString str)
+                              IDENT (Symbol.fromString str)
                          | SOME NONE =>
                               (
                               print "Illegal identifier at ";
@@ -140,11 +145,11 @@ structure Lexer
              raise Error
              )
                  
-          val arrow = simple Arrow
-          val colon = simple Colon
-          val equal = simple Equal
-          val lparen = simple LParen
-          val rparen = simple RParen
+          val arrow = simple ARROW
+          val colon = simple COLON
+          val equal = simple EQUAL
+          val lparen = simple LPAREN
+          val rparen = simple RPAREN
 
           fun comment_open ({ len, follow, self, ... }:arg) pos =
               let
