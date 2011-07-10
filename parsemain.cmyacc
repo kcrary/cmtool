@@ -12,7 +12,7 @@ terminal RPAREN of pos
 terminal START of pos
 terminal TERMINAL of pos
 
-nonterminal Ident : ident =
+nonterminal Ident : symbol =
    ident:IDENT => ident
 
 nonterminal Constituent : constituent =

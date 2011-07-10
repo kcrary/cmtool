@@ -66,7 +66,15 @@ structure Process
                           (case tpo of
                               NONE => ()
                             | SOME tp =>
-                                 types := S.insert (!types) tp);
+                                 if D.member (!actions) tp then
+                                    (
+                                    print "Error: type identifier ";
+                                    print (Symbol.toString tp);
+                                    print " already used for an action.\n";
+                                    raise Error
+                                    )
+                                 else
+                                    types := S.insert (!types) tp);
 
                           terminals := (D.insert (!terminals) name (tpo, ref false))
                           )
@@ -94,7 +102,16 @@ structure Process
                                  )
                             | _ =>
                                  let
-                                    val () = types := S.insert (!types) tp
+                                    val () =
+                                       if D.member (!actions) tp then
+                                          (
+                                          print "Error: type identifier ";
+                                          print (Symbol.toString tp);
+                                          print " already used for an action.\n";
+                                          raise Error
+                                          )
+                                       else
+                                          types := S.insert (!types) tp
 
                                     val (rules', actions', next, _) =
                                        foldl
@@ -140,6 +157,13 @@ structure Process
                                                     print " of nonterminal ";
                                                     print (toString name);
                                                     print ".\n";
+                                                    raise Error
+                                                    )
+                                                 else if S.member (!types) action then
+                                                    (
+                                                    print "Error: action identifier ";
+                                                    print (Symbol.toString action);
+                                                    print " already used for a type.\n";
                                                     raise Error
                                                     )
                                                  else

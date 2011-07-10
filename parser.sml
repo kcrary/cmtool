@@ -13,7 +13,7 @@ structure Parser =
             type pos_symbol = pos * Symbol.symbol
             type pos = pos
 
-            type ident = Symbol.symbol
+            type symbol = Symbol.symbol
             fun ident {ident=(_, sym)} = sym
   
             type constituent = constituent
