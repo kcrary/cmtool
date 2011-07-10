@@ -8,11 +8,20 @@ structure Parser
 
       open Syntax
 
+      type pos = int
+
       structure Arg =
          struct
-            type string = string
-            type int = int
-            type intlist = int list
+            type pos_string = pos * string
+            type pos_int = pos * int
+            type pos_intlist = pos * int list
+            type pos = pos
+
+            type ident = string
+            fun ident {ident=(_, str)} = str
+
+            type number = int
+            fun number {num=(_, n)} = n
 
             type numpairs = (int * int) list
             fun nil_numpairs {} = []
@@ -36,7 +45,7 @@ structure Parser
             type regexp = regexp
             fun ident_regexp {ident} = Var ident
             fun number_regexp {num} = Symbol num
-            fun string_regexp {str} = String str
+            fun string_regexp {str=(_, str)} = String str
             fun any_regexp {} = Any
             fun epsilon_regexp {} = Epsilon
             fun empty_regexp {} = Empty
@@ -73,7 +82,50 @@ structure Parser
 
             datatype terminal = datatype Token.token
 
-            fun error s = Error
+            fun error s =
+               (case Stream.front s of
+                   Stream.Nil =>
+                      (
+                      print "Syntax error at end of file.\n";
+                      Error
+                      )
+                 | Stream.Cons (h, _) =>
+                      let
+                         val pos =
+                            (case h of
+                                IDENT (pos, _) => pos
+                              | NUMBER (pos, _) => pos
+                              | STRING (pos, _) => pos
+                              | ALPHABET pos => pos
+                              | AND pos => pos
+                              | ANY pos => pos
+                              | ARROW pos => pos
+                              | COLON pos => pos
+                              | EOS pos => pos
+                              | EMPT pos => pos
+                              | ENABLE pos => pos
+                              | EPSILON pos => pos
+                              | EQUAL pos => pos
+                              | FUNCTION pos => pos
+                              | LPAREN pos => pos
+                              | MINUS pos => pos
+                              | NAME pos => pos
+                              | OR pos => pos
+                              | PLUS pos => pos
+                              | QUESTION pos => pos
+                              | RANGE pos => pos
+                              | REGEXP pos => pos
+                              | RPAREN pos => pos
+                              | SEQ pos => pos
+                              | SET pos => pos
+                              | STAR pos => pos
+                              | TILDE pos => pos)
+                         in
+                            print "Syntax error at ";
+                            print (Int.toString pos);
+                            print ".\n";
+                            Error
+                         end)
          end
 
       structure ParseMain =

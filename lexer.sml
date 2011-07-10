@@ -9,7 +9,7 @@ structure Lexer
       structure Table =
          HashTable (structure Key = StringHashable)
          
-      val keywords : token option Table.table = Table.table 60
+      val keywords : (pos -> token) option Table.table = Table.table 60
 
       (* Illegal identifiers (most are SML reserved words). *)
       val () =
@@ -104,7 +104,7 @@ structure Lexer
          Cons (f (str, len, pos), lazy (fn () => #lexmain self follow (pos+len)))
 
       fun simple token ({ len, follow, self, ... }:arg) pos =
-         Cons (token, lazy (fn () => #lexmain self follow (pos+len)))
+         Cons (token pos, lazy (fn () => #lexmain self follow (pos+len)))
 
       structure Arg =
          struct
@@ -124,7 +124,7 @@ structure Lexer
                       in
                          (case Table.find keywords str of
                              NONE =>
-                                IDENT str
+                                IDENT (pos, str)
                            | SOME NONE =>
                                 (
                                 print "Illegal identifier at ";
@@ -133,7 +133,7 @@ structure Lexer
                                 raise Error
                                 )
                            | SOME (SOME token) =>
-                                token)
+                                token pos)
                       end)
   
             val number = 
@@ -141,7 +141,7 @@ structure Lexer
                (fn (chars, _, pos) =>
                       ((case Int.fromString (implode chars) of
                            SOME n => 
-                              NUMBER n
+                              NUMBER (pos, n)
                          | NONE =>
                               raise (Fail "invariant"))
                        handle Overflow => 
@@ -156,11 +156,11 @@ structure Lexer
   
             val char = 
                action
-               (fn (chars, _, _) =>
+               (fn (chars, _, pos) =>
                       (* By construction, chars should be '<ch> . *)
                       (case chars of
                           [_, ch] =>
-                             NUMBER (Char.ord ch)
+                             NUMBER (pos, Char.ord ch)
                         | _ =>
                              raise (Fail "invariant")))
   
@@ -173,9 +173,9 @@ structure Lexer
   
             val string =
                action
-               (fn (chars, len, _) =>
+               (fn (chars, len, pos) =>
                       (* By construction, chars should begin and end with ". *)
-                      STRING (List.map ord (List.take (List.tl chars, len-2))))
+                      STRING (pos, List.map ord (List.take (List.tl chars, len-2))))
   
             fun error _ pos =
                (

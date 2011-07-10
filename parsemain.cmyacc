@@ -1,40 +1,47 @@
 name ParseMainFun
 
-terminal IDENT of string
-terminal NUMBER of int
-terminal STRING of intlist
-terminal ALPHABET
-terminal AND
-terminal ANY
-terminal ARROW
-terminal COLON
-terminal EOS
-terminal EMPT
-terminal ENABLE
-terminal EPSILON
-terminal EQUAL
-terminal FUNCTION
-terminal LPAREN
-terminal MINUS
-terminal NAME
-terminal OR
-terminal PLUS
-terminal QUESTION
-terminal RANGE
-terminal REGEXP
-terminal RPAREN
-terminal SEQ
-terminal SET
-terminal STAR
-terminal TILDE
+terminal IDENT of pos_string
+terminal NUMBER of pos_int
+terminal STRING of pos_intlist
+terminal ALPHABET of pos
+terminal AND of pos
+terminal ANY of pos
+terminal ARROW of pos
+terminal COLON of pos
+terminal EOS of pos
+terminal EMPT of pos
+terminal ENABLE of pos
+terminal EPSILON of pos
+terminal EQUAL of pos
+terminal FUNCTION of pos
+terminal LPAREN of pos
+terminal MINUS of pos
+terminal NAME of pos
+terminal OR of pos
+terminal PLUS of pos
+terminal QUESTION of pos
+terminal RANGE of pos
+terminal REGEXP of pos
+terminal RPAREN of pos
+terminal SEQ of pos
+terminal SET of pos
+terminal STAR of pos
+terminal TILDE of pos
+
+
+nonterminal Ident : ident =
+   ident:IDENT => ident
+
+nonterminal Number : number =
+   num:NUMBER => number
 
 nonterminal NumPairs : numpairs =
    => nil_numpairs
-   (first:NUMBER) (last:NUMBER) (tail:NumPairs) => cons_numpairs
+   (first:Number) (last:Number) (tail:NumPairs) => cons_numpairs
 
 nonterminal Charset : charset =
-   ident:IDENT => ident_charset
-   num:NUMBER => number_charset
+   ident:Ident => ident_charset
+   num:Number => number_charset
    LPAREN RANGE (l:NumPairs) RPAREN => range_charset
    EMPT => empty_charset
    LPAREN OR (l:Charsets) RPAREN => union_charset
@@ -48,8 +55,8 @@ nonterminal Charsets : charsets =
    (head:Charset) (tail:Charsets) => cons_charsets
    
 nonterminal Regexp : regexp =
-   ident:IDENT => ident_regexp
-   num:NUMBER => number_regexp
+   ident:Ident => ident_regexp
+   num:Number => number_regexp
    str:STRING => string_regexp
    ANY => any_regexp
    EPSILON => epsilon_regexp
@@ -67,19 +74,19 @@ nonterminal Regexps : regexps =
    (head:Regexp) (tail:Regexps) => cons_regexps
    
 nonterminal Arm : arm =
-   (r:Regexp) ARROW (action:IDENT) => arm
+   (r:Regexp) ARROW (action:Ident) => arm
 
 nonterminal Arms : arms =
    arm:Arm => sing_arms
    (head:Arm) (tail:Arms) => cons_arms
 
 nonterminal Directive : directive =
-   NAME (ident:IDENT) => name_directive
-   ENABLE (ident:IDENT) => enable_directive
-   ALPHABET (num:NUMBER) => alphabet_directive
-   REGEXP (ident:IDENT) EQUAL (r:Regexp) => regexp_directive
-   SET (ident:IDENT) EQUAL (s:Charset) => set_directive
-   FUNCTION (ident:IDENT) COLON (tp:IDENT) EQUAL (arms:Arms) => function_directive
+   NAME (ident:Ident) => name_directive
+   ENABLE (ident:Ident) => enable_directive
+   ALPHABET (num:Number) => alphabet_directive
+   REGEXP (ident:Ident) EQUAL (r:Regexp) => regexp_directive
+   SET (ident:Ident) EQUAL (s:Charset) => set_directive
+   FUNCTION (ident:Ident) COLON (tp:Ident) EQUAL (arms:Arms) => function_directive
 
 nonterminal Directives : directives =
    => nil_directives
