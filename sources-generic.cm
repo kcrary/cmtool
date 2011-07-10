@@ -9,6 +9,7 @@ Group is
 	make-automaton.sml
 	make-nfa.sig
 	make-nfa.sml
+	parsemain.sml
 	parser.sig
 	process.sig
 	process.sml
@@ -18,4 +19,3 @@ Group is
 	syntax.sml
 
 	../lib/sources.cm
-

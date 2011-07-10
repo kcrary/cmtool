@@ -1,0 +1,88 @@
+name ParseMainFun
+
+terminal IDENT of string
+terminal NUMBER of int
+terminal STRING of intlist
+terminal ALPHABET
+terminal AND
+terminal ANY
+terminal ARROW
+terminal COLON
+terminal EOS
+terminal EMPT
+terminal ENABLE
+terminal EPSILON
+terminal EQUAL
+terminal FUNCTION
+terminal LPAREN
+terminal MINUS
+terminal NAME
+terminal OR
+terminal PLUS
+terminal QUESTION
+terminal RANGE
+terminal REGEXP
+terminal RPAREN
+terminal SEQ
+terminal SET
+terminal STAR
+terminal TILDE
+
+nonterminal NumPairs : numpairs =
+   => nil_numpairs
+   (first:NUMBER) (last:NUMBER) (tail:NumPairs) => cons_numpairs
+
+nonterminal Charset : charset =
+   ident:IDENT => ident_charset
+   num:NUMBER => number_charset
+   LPAREN RANGE (l:NumPairs) RPAREN => range_charset
+   EMPT => empty_charset
+   LPAREN OR (l:Charsets) RPAREN => union_charset
+   LPAREN AND (l:Charsets) RPAREN => intersect_charset
+   LPAREN MINUS (head:Charset) (l:Charsets) RPAREN => diff_charset
+   LPAREN TILDE (l:Charsets) RPAREN => comp_charset
+   ANY => any_charset
+
+nonterminal Charsets : charsets =
+   => nil_charsets
+   (head:Charset) (tail:Charsets) => cons_charsets
+   
+nonterminal Regexp : regexp =
+   ident:IDENT => ident_regexp
+   num:NUMBER => number_regexp
+   str:STRING => string_regexp
+   ANY => any_regexp
+   EPSILON => epsilon_regexp
+   EMPT => empty_regexp
+   LPAREN COLON (l:Regexps) RPAREN => concat_regexp
+   LPAREN SEQ (l:Regexps) RPAREN => seq_regexp
+   LPAREN OR (l:Regexps) RPAREN => union_regexp
+   LPAREN QUESTION (r:Regexp) RPAREN => option_regexp
+   LPAREN STAR (r:Regexp) RPAREN => closure_regexp
+   LPAREN PLUS (r:Regexp) RPAREN => plus_regexp
+   EOS => eos_regexp
+
+nonterminal Regexps : regexps =
+   => nil_regexps
+   (head:Regexp) (tail:Regexps) => cons_regexps
+   
+nonterminal Arm : arm =
+   (r:Regexp) ARROW (action:IDENT) => arm
+
+nonterminal Arms : arms =
+   arm:Arm => sing_arms
+   (head:Arm) (tail:Arms) => cons_arms
+
+nonterminal Directive : directive =
+   NAME (ident:IDENT) => name_directive
+   ENABLE (ident:IDENT) => enable_directive
+   ALPHABET (num:NUMBER) => alphabet_directive
+   REGEXP (ident:IDENT) EQUAL (r:Regexp) => regexp_directive
+   SET (ident:IDENT) EQUAL (s:Charset) => set_directive
+   FUNCTION (ident:IDENT) COLON (tp:IDENT) EQUAL (arms:Arms) => function_directive
+
+nonterminal Directives : directives =
+   => nil_directives
+   (head:Directive) (tail:Directives) => cons_directives
+
+start Directives
