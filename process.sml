@@ -254,13 +254,9 @@ structure Process
                                  end)
 
                   | Function (name, tp, arms) =>
-                       if 
-                          D.member (!functions) name
-                          orelse
-                          D.member (!actions) name
-                       then
+                       if D.member (!functions) name then
                           (
-                          print "Error: multiply specified action/function ";
+                          print "Error: multiply specified function ";
                           print name;
                           print ".\n";
                           raise Error
@@ -283,7 +279,16 @@ structure Process
                                  )
                             | _ =>
                                  let
-                                    val () = types := S.insert (!types) tp
+                                    val () =
+                                       if D.member (!actions) tp then
+                                          (
+                                          print "Error: type identifer ";
+                                          print tp;
+                                          print " already used for an action.\n";
+                                          raise Error
+                                          )
+                                       else
+                                          types := S.insert (!types) tp
 
                                     val (armcount, arms') =
                                        foldl
@@ -292,7 +297,15 @@ structure Process
                                                  val () =
                                                     (case D.find (!actions) action of
                                                         NONE =>
-                                                           actions := D.insert (!actions) action tp
+                                                           if S.member (!types) action then
+                                                              (
+                                                              print "Error: action identifier ";
+                                                              print action;
+                                                              print " already used for a type.\n";
+                                                              raise Error
+                                                              )
+                                                           else
+                                                              actions := D.insert (!actions) action tp
                                                       | SOME tp' =>
                                                            if tp = tp' then
                                                               ()
