@@ -17,10 +17,10 @@ structure Parser
             type pos_intlist = pos * int list
             type pos = pos
 
-            type ident = string
+            type string = string
             fun ident {ident=(_, str)} = str
 
-            type number = int
+            type int = int
             fun number {num=(_, n)} = n
 
             type numpairs = (int * int) list
@@ -62,7 +62,7 @@ structure Parser
             fun cons_regexps {head, tail} = head :: tail
 
             type arm = regexp * string
-            fun arm {r, action} = (r, action)
+            fun sole_arm {r, action} = (r, action)
 
             type arms = arm list
             fun sing_arms {arm} = [arm]

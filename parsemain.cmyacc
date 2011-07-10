@@ -29,10 +29,10 @@ terminal STAR of pos
 terminal TILDE of pos
 
 
-nonterminal Ident : ident =
+nonterminal Ident : string =
    ident:IDENT => ident
 
-nonterminal Number : number =
+nonterminal Number : int =
    num:NUMBER => number
 
 nonterminal NumPairs : numpairs =
@@ -74,7 +74,7 @@ nonterminal Regexps : regexps =
    (head:Regexp) (tail:Regexps) => cons_regexps
    
 nonterminal Arm : arm =
-   (r:Regexp) ARROW (action:Ident) => arm
+   (r:Regexp) ARROW (action:Ident) => sole_arm
 
 nonterminal Arms : arms =
    arm:Arm => sing_arms
