@@ -6,10 +6,12 @@ structure Parser =
 
       open Syntax
 
+      type pos = int
+
       structure Arg =
          struct
-            type pos_symbol = int * Symbol.symbol
-            type pos = int
+            type pos_symbol = pos * Symbol.symbol
+            type pos = pos
 
             type ident = Symbol.symbol
             fun ident {ident=(_, sym)} = sym

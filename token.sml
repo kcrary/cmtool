@@ -2,17 +2,19 @@
 structure Token =
    struct
 
+      type pos = int
+
       datatype token =
-         IDENT of int * Symbol.symbol
-       | ARROW of int
-       | COLON of int
-       | EQUAL of int
-       | NAME of int
-       | NONTERMINAL of int
-       | LPAREN of int
-       | OF of int
-       | RPAREN of int
-       | START of int
-       | TERMINAL of int
+         IDENT of pos * Symbol.symbol
+       | ARROW of pos
+       | COLON of pos
+       | EQUAL of pos
+       | NAME of pos
+       | NONTERMINAL of pos
+       | LPAREN of pos
+       | OF of pos
+       | RPAREN of pos
+       | START of pos
+       | TERMINAL of pos
 
    end

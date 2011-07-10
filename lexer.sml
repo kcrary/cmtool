@@ -9,7 +9,7 @@ structure Lexer
       structure Table =
          HashTable (structure Key = StringHashable)
          
-      val keywords : (int -> token) option Table.table = Table.table 60
+      val keywords : (pos -> token) option Table.table = Table.table 60
 
       (* Illegal identifiers (most are SML reserved words). *)
       val () =
