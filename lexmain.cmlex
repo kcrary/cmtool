@@ -12,6 +12,7 @@ regexp ws = (+ white)
 function lexmain : t =
    eos => eof
    ident => ident
+   (+ digit) => number
    ws => skip
    "/*" => lcomment
    "=>" => arrow

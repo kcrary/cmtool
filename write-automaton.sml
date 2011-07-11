@@ -50,7 +50,7 @@ structure WriteAutomaton
                   ("start", [start])
                else
                   let
-                     val (_, _, lhs, rhs, _, _, _) = Vector.sub (rules, rulenum)
+                     val (_, _, lhs, rhs, _, _, _, _) = Vector.sub (rules, rulenum)
                   in
                      (Symbol.toString lhs, rhs)
                   end
@@ -98,7 +98,7 @@ structure WriteAutomaton
             write "\n";
 
             D.app
-               (fn (symbol, actions) =>
+               (fn (symbol, (actions, conflict)) =>
                    (
                    write (Symbol.toString symbol);
                    write " => ";
@@ -117,12 +117,12 @@ structure WriteAutomaton
                              ))
                       (fn () => write ", ")
                       actions;
-                   (case actions of
-                       [] =>
-                          raise (Fail "invariant")
-                     | [_] =>
+                   (case conflict of
+                       NoConflict =>
                           ()
-                     | _ =>
+                     | Resolved =>
+                          write "  PRECEDENCE"
+                     | Conflict =>
                           write "  CONFLICT");
                    write "\n"
                    ))

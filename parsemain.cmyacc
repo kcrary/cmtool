@@ -1,19 +1,26 @@
 name ParseMainFun
 
 terminal IDENT of pos_symbol
+terminal NUMBER of pos_int
 terminal ARROW of pos
 terminal COLON of pos
 terminal EQUAL of pos
 terminal NAME of pos
 terminal NONTERMINAL of pos
+terminal NOPREC of pos
 terminal LPAREN of pos
 terminal OF of pos
+terminal PRECL of pos
+terminal PRECR of pos
 terminal RPAREN of pos
 terminal START of pos
 terminal TERMINAL of pos
 
 nonterminal Ident : symbol =
-   ident:IDENT => ident
+   ident:IDENT => sole_ident
+
+nonterminal Number : int =
+   num:NUMBER => sole_number
 
 nonterminal Constituent : constituent =
    (ident:Ident) => unlabeled_item
@@ -24,14 +31,23 @@ nonterminal Constituents : constituents =
    => nil_constituents
    (head:Constituent) (tail:Constituents) => cons_constituents
 
+nonterminal Precedence : precedence =
+   => empty_precedence
+   PRECL (num:Number) => left_precedence
+   PRECR (num:Number) => right_precedence
+   NOPREC => no_precedence
+
+nonterminal Production : production =
+   (constituents:Constituents) ARROW (action:Ident) (prec:Precedence) => sole_production
+
 nonterminal Productions : productions =
    => nil_productions
-   (constituents:Constituents) ARROW (action:Ident) (tail:Productions) => cons_productions
+   (head:Production) (tail:Productions) => cons_productions
 
 nonterminal Directive : directive =
    NAME (ident:Ident) => name_directive
-   TERMINAL (ident:Ident) => terminal_directive
-   TERMINAL (ident:Ident) OF (tp:Ident) => terminalOf_directive
+   TERMINAL (ident:Ident) (prec:Precedence) => terminal_directive
+   TERMINAL (ident:Ident) OF (tp:Ident) (prec:Precedence) => terminal_of_directive
    NONTERMINAL (ident:Ident) COLON (tp:Ident) EQUAL (arms:Productions) => nonterminal_directive
    START (ident:Ident) => start_directive
 

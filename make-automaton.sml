@@ -74,7 +74,7 @@ structure MakeAutomaton
                           List.exists
                           (fn rulenum =>
                               let
-                                 val (_, _, _, rhs, _, _, _) = Vector.sub (rules, rulenum)
+                                 val (_, _, _, rhs, _, _, _, _) = Vector.sub (rules, rulenum)
                               in
                                  List.all (nullableMain ctx trail') rhs
                               end)
@@ -112,7 +112,7 @@ structure MakeAutomaton
                              foldl
                              (fn (rulenum, acc) =>
                                  let
-                                    val (_, _, _, rhs, _, _, _) = Vector.sub (rules, rulenum)
+                                    val (_, _, _, rhs, _, _, _, _) = Vector.sub (rules, rulenum)
                                  in
                                     S.union
                                        acc
@@ -190,7 +190,7 @@ structure MakeAutomaton
                                          foldl
                                          (fn (rulenum, d) =>
                                              let
-                                                val (_, _, _, rhs, _, _, _) = Vector.sub (rules, rulenum)
+                                                val (_, _, _, rhs, _, _, _, _) = Vector.sub (rules, rulenum)
    
                                                 val item = (rulenum, 0, rhs)
                                              in
@@ -238,7 +238,7 @@ structure MakeAutomaton
       val shiftConflicts = ref false
       val reduceConflicts = ref false
 
-      fun prestateToState nonterminals rules (ref (_, trans, items)) =
+      fun prestateToState terminals nonterminals rules (ref (_, trans, items)) =
          let
             val action =
                ItemDict.foldr
@@ -248,11 +248,11 @@ structure MakeAutomaton
                           S.foldl
                           (fn (symbol, action) =>
                               D.insertMerge action symbol
-                              [Reduce rulenum]
-                              (fn l =>
+                              ([Reduce rulenum], NoConflict)
+                              (fn (l, _) =>
                                   (
                                   reduceConflicts := true;
-                                  Reduce rulenum :: l
+                                  (Reduce rulenum :: l, Conflict)
                                   )))
                           action
                           lookahead
@@ -269,24 +269,59 @@ structure MakeAutomaton
                        D.insert goto symbol statenum)
                    else
                       (D.insertMerge action symbol
-                          [Shift statenum]
-                          (fn l => 
-                              (
-                              shiftConflicts := true;
-                              Shift statenum :: l
-                              )),
+                          ([Shift statenum], NoConflict)
+                          (fn (l, Conflict) =>
+                                 (* We've seen a reduce-reduce conflict already, so don't bother using precedence. *)
+                                 (
+                                 shiftConflicts := true;
+                                 (Shift statenum :: l, Conflict)
+                                 )
+                            | ([Reduce rulenum], NoConflict) =>
+                                 let
+                                    val (_, _, _, _, _, _, reducepreco, _) = Vector.sub (rules, rulenum)
+                                    val (_, shiftpreco, _) = D.lookup terminals symbol
+                                 in
+                                    (case reducepreco of
+                                        SOME reduceprec =>
+                                           (case shiftpreco of
+                                               SOME shiftprec =>
+                                                  if reduceprec > shiftprec then
+                                                     ([Reduce rulenum, Shift statenum], Resolved)
+                                                  else if shiftprec > reduceprec then
+                                                     ([Shift statenum, Reduce rulenum], Resolved)
+                                                  else
+                                                     (
+                                                     shiftConflicts := true;
+                                                     ([Shift statenum, Reduce rulenum], Conflict)
+                                                     )
+                                             | NONE =>
+                                                     (
+                                                     shiftConflicts := true;
+                                                     ([Shift statenum, Reduce rulenum], Conflict)
+                                                     ))
+                                      | NONE =>
+                                           (
+                                           shiftConflicts := true;
+                                           ([Shift statenum, Reduce rulenum], Conflict)
+                                           ))
+                                 end
+                            | _ =>
+                                 (* At most one shift action per state/terminal, so we can only be seeing reduce actions here,
+                                    and no conflict means just one of them.
+                                 *)
+                                 raise (Fail "invariant")),
                        goto))
                (action, D.empty)
                trans
 
             val () =
                D.app
-               (fn (_, Reduce rulenum :: _) =>
+               (fn (_, (Reduce rulenum :: _, _)) =>
                       if rulenum = ~1 then
                          ()
                       else
                          let
-                            val (_, _, _, _, _, _, reduced) = Vector.sub (rules, rulenum)
+                            val (_, _, _, _, _, _, _, reduced) = Vector.sub (rules, rulenum)
                          in
                             reduced := true
                          end
@@ -301,7 +336,7 @@ structure MakeAutomaton
       (* The lexer ensures that this identifier will not be in use. *)
       val finalSymbol = Symbol.fromString "$"
 
-      fun makeAutomaton start nonterminals rules =
+      fun makeAutomaton start terminals nonterminals rules =
          let
             val nullableTable = SymbolTable.table 50
             val firstTable = SymbolTable.table 50
@@ -407,7 +442,7 @@ structure MakeAutomaton
 
             val () = shiftConflicts := false
             val () = reduceConflicts := false
-            val states = map (prestateToState nonterminals rules) (rev (!stateList))
+            val states = map (prestateToState terminals nonterminals rules) (rev (!stateList))
 
             val () =
                if !reduceConflicts then
@@ -425,7 +460,7 @@ structure MakeAutomaton
 
             val () =
                Vector.app
-               (fn (_, localnum, lhs, _, _, _, reduced) =>
+               (fn (_, localnum, lhs, _, _, _, _, reduced) =>
                    if !reduced then
                       ()
                    else

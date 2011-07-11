@@ -11,10 +11,14 @@ structure Parser =
       structure Arg =
          struct
             type pos_symbol = pos * Symbol.symbol
+            type pos_int = pos * int
             type pos = pos
 
             type symbol = Symbol.symbol
-            fun ident {ident=(_, sym)} = sym
+            fun sole_ident {ident=(_, sym)} = sym
+
+            type int = int
+            fun sole_number {num=(_, n)} = n
   
             type constituent = constituent
             fun unlabeled_item {ident} = Unlabeled ident
@@ -25,14 +29,23 @@ structure Parser =
             fun nil_constituents {} = []
             fun cons_constituents {head, tail} = head :: tail
   
+            type precedence = precedence
+            fun empty_precedence {} = EmptyPrec
+            fun left_precedence {num} = PrecLeft num
+            fun right_precedence {num} = PrecRight num
+            fun no_precedence {} = PrecNone
+
+            type production = production
+            fun sole_production {constituents, action, prec} = (constituents, action, prec)
+
             type productions = production list
             fun nil_productions {} = []
-            fun cons_productions {constituents, action, tail} = (constituents, action) :: tail
+            fun cons_productions {head, tail} = head :: tail
   
             type directive = directive
             fun name_directive {ident} = Name ident
-            fun terminal_directive {ident} = Terminal (ident, NONE)
-            fun terminalOf_directive {ident, tp} = Terminal (ident, SOME tp)
+            fun terminal_directive {ident, prec} = Terminal (ident, NONE, prec)
+            fun terminal_of_directive {ident, tp, prec} = Terminal (ident, SOME tp, prec)
             fun nonterminal_directive {ident, tp, arms} = Nonterminal (ident, tp, arms)
             fun start_directive {ident} = Start ident
   
@@ -54,13 +67,17 @@ structure Parser =
                          val pos =
                             (case h of
                                 IDENT (pos, _) => pos
+                              | NUMBER (pos, _) => pos
                               | ARROW pos => pos
                               | COLON pos => pos
                               | EQUAL pos => pos
                               | NAME pos => pos
                               | NONTERMINAL pos => pos
                               | LPAREN pos => pos
+                              | NOPREC pos => pos
                               | OF pos => pos
+                              | PRECL pos => pos
+                              | PRECR pos => pos
                               | RPAREN pos => pos
                               | START pos => pos
                               | TERMINAL pos => pos)

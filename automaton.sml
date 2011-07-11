@@ -6,6 +6,8 @@ structure SymbolSet = ListHashableSet (structure ElemOrdered = SymbolOrdered
 structure Automaton =
    struct
 
+      type precedence = int option
+
       type rule =
          int                        (* rule number *)
          *
@@ -18,6 +20,8 @@ structure Automaton =
          Symbol.symbol option list  (* arguments *)
          *
          Symbol.symbol              (* action *)
+         *
+         precedence                 (* precedence *)
          *
          bool ref                   (* reduced? *)
 
@@ -32,12 +36,17 @@ structure Automaton =
          *
          Symbol.symbol list  (* remaining symbols *)
 
+      datatype conflict =
+         NoConflict
+       | Resolved
+       | Conflict
+
       type state =
-         action list SymbolDict.dict  (* action table: each list nonempty, ordered in decreasing priority *)
+         (action list * conflict) SymbolDict.dict  (* action table: each list nonempty, ordered in decreasing priority *)
          *
-         int SymbolDict.dict          (* goto table *)
+         int SymbolDict.dict                       (* goto table *)
          *
-         (item * SymbolSet.set) list  (* LR(1) items *)
+         (item * SymbolSet.set) list               (* LR(1) items *)
 
       type automaton =
          int                 (* total states *)
@@ -49,14 +58,14 @@ structure Automaton =
          Symbol.symbol       (* start symbol *)
 
       type parser =
-         string                                                  (* functor name *)
+         string                                                          (* functor name *)
          *
-         SymbolSet.set                                           (* type arguments *)
+         SymbolSet.set                                                   (* type arguments *)
          *
-         (Symbol.symbol option * bool ref) SymbolDict.dict       (* terminals *)
+         (Symbol.symbol option * precedence * bool ref) SymbolDict.dict  (* terminals *)
          *
-         (int list * Symbol.symbol * bool ref) SymbolDict.dict   (* nonterminals *)
+         (int list * Symbol.symbol * bool ref) SymbolDict.dict           (* nonterminals *)
          *
-         automaton                                               (* the automaton *)
+         automaton                                                       (* the automaton *)
 
    end

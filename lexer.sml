@@ -71,7 +71,10 @@ structure Lexer
          [
          ("name", NAME),
          ("nonterminal", NONTERMINAL),
+         ("noprec", NOPREC),
          ("of", OF),
+         ("precl", PRECL),
+         ("precr", PRECR),
          ("start", START),
          ("terminal", TERMINAL)
          ]
@@ -124,6 +127,22 @@ structure Lexer
                            | SOME (SOME token) =>
                                 token pos)
                       end)
+
+            val number = 
+               action 
+               (fn (chars, _, pos) =>
+                      ((case Int.fromString (implode chars) of
+                           SOME n => 
+                              NUMBER (pos, n)
+                         | NONE =>
+                              raise (Fail "invariant"))
+                       handle Overflow => 
+                                 (
+                                 print "Illegal constant at ";
+                                 print (Int.toString pos);
+                                 print ".\n";
+                                 raise Error
+                                 )))
   
             fun skip ({ len, follow, self, ... }:arg) pos = #lexmain self follow (pos+len)
   

@@ -136,7 +136,7 @@ structure Codegen
                types;
 
             Vector.app
-               (fn (_, _, lhs, rhs, args, action, _) =>
+               (fn (_, _, lhs, rhs, args, action, _, _) =>
                    let
                       val (_, lhstp, _) = D.lookup nonterminals lhs
                    in
@@ -154,10 +154,10 @@ structure Codegen
                                           SOME (_, tp, _) => tp
                                         | NONE =>
                                              (case D.lookup terminals symbol of
-                                                 (NONE, _) =>
+                                                 (NONE, _, _) =>
                                                     (* We've already generated an error in this case. *)
                                                     raise (Fail "invariant")
-                                               | (SOME tp, _) => tp))
+                                               | (SOME tp, _, _) => tp))
                                 in
                                    if first then
                                       ()
@@ -179,7 +179,7 @@ structure Codegen
 
             write "datatype terminal =\n";
             D.foldl
-               (fn (symbol, (tpo, _), first) =>
+               (fn (symbol, (tpo, _, _), first) =>
                       (
                       if first then
                          ()
@@ -215,7 +215,7 @@ structure Codegen
             write "end\nstructure ParseEngine = ParseEngineFun (structure Streamable = Streamable\ntype terminal = Arg.terminal\ntype value = Value.nonterminal\nval dummy = Value.nonterminal\nfun read terminal =\n(case terminal of\n";
 
             D.foldl
-               (fn (terminal, (tpo, _), first) =>
+               (fn (terminal, (tpo, _, _), first) =>
                    (
                    if first then
                       ()
@@ -259,9 +259,9 @@ structure Codegen
                          Array.array (minorLimit', 0)
                    in
                       D.app
-                         (fn (terminal, Shift n :: _) =>
+                         (fn (terminal, (Shift n :: _, _)) =>
                                 Array.update (arr, D.lookup terminalOrdinals terminal, n+1)
-                           | (terminal, Reduce n :: _) =>
+                           | (terminal, (Reduce n :: _, _)) =>
                                 Array.update (arr, D.lookup terminalOrdinals terminal, ~(n+2))
                            | _ =>
                                 raise (Fail "invariant"))
@@ -295,7 +295,7 @@ structure Codegen
             write "\",\nVector.fromList [";
 
             Vector.foldl
-               (fn ((rulenum, _, lhs, rhs, args, action, _), first) =>
+               (fn ((rulenum, _, lhs, rhs, args, action, _, _), first) =>
                    (
                    if first then
                       ()

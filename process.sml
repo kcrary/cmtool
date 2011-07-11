@@ -15,7 +15,7 @@ structure Process
 
       val modulename   : string option ref                          = ref NONE
       val types        : S.set ref                                  = ref S.empty
-      val terminals    : (symbol option * bool ref) D.dict ref      = ref D.empty
+      val terminals    : (symbol option * Automaton.precedence * bool ref) D.dict ref = ref D.empty
       val nonterminals : (int list * symbol * bool ref) D.dict ref  = ref D.empty
       val actions      : int D.dict ref                             = ref D.empty
       val rules        : rule list ref                              = ref []
@@ -49,7 +49,7 @@ structure Process
                          | NONE =>
                               start := SOME name)
 
-                  | Terminal (name, tpo) =>
+                  | Terminal (name, tpo, prec) =>
                        if
                           D.member (!terminals) name
                           orelse
@@ -62,22 +62,48 @@ structure Process
                           raise Error
                           )
                        else
-                          (
-                          (case tpo of
-                              NONE => ()
-                            | SOME tp =>
-                                 if D.member (!actions) tp then
-                                    (
-                                    print "Error: type identifier ";
-                                    print (Symbol.toString tp);
-                                    print " already used for an action.\n";
-                                    raise Error
-                                    )
-                                 else
-                                    types := S.insert (!types) tp);
+                          let
+                             val () =
+                                (case tpo of
+                                    NONE => ()
+                                  | SOME tp =>
+                                       if D.member (!actions) tp then
+                                          (
+                                          print "Error: type identifier ";
+                                          print (Symbol.toString tp);
+                                          print " already used for an action.\n";
+                                          raise Error
+                                          )
+                                       else
+                                          types := S.insert (!types) tp)
 
-                          terminals := (D.insert (!terminals) name (tpo, ref false))
-                          )
+                             val prec' =
+                                (case prec of
+                                    EmptyPrec => NONE
+                                  | PrecNone => NONE
+                                  | PrecLeft n =>
+                                       if n < 0 orelse n > 100 then
+                                          (
+                                          print "Error: precedence of terminal ";
+                                          print (Symbol.toString name);
+                                          print " is out of range.\n";
+                                          raise Error
+                                          )
+                                       else
+                                          SOME (2*n)
+                                  | PrecRight n =>
+                                       if n < 0 orelse n > 100 then
+                                          (
+                                          print "Error: precedence of terminal ";
+                                          print (Symbol.toString name);
+                                          print " is out of range.\n";
+                                          raise Error
+                                          )
+                                       else
+                                          SOME (2*n+1))  (* boost shift precedence for right associative operator *)
+                          in
+                             terminals := (D.insert (!terminals) name (tpo, prec', ref false))
+                          end
 
                   | Nonterminal (name, tp, productions) =>
                        if
@@ -115,7 +141,7 @@ structure Process
 
                                     val (rules', actions', next, _) =
                                        foldl
-                                       (fn ((constituents, action), (acc, actions', next, localnumber)) =>
+                                       (fn ((constituents, action, prec), (acc, actions', next, localnumber)) =>
                                            let
                                               val globalnumber = !ruleCount
                                               val () = ruleCount := globalnumber + 1
@@ -168,8 +194,63 @@ structure Process
                                                     )
                                                  else
                                                     D.insert actions' action globalnumber
+
+                                              val prec' =
+                                                 (case prec of
+                                                     PrecNone => NONE
+                                                   | PrecLeft n =>
+                                                        if n < 0 orelse n > 100 then
+                                                           (
+                                                           print "Error: precedence of rule ";
+                                                           print (Int.toString localnumber);
+                                                           print " of nonterminal ";
+                                                           print (Symbol.toString name);
+                                                           print " is out of range.\n";
+                                                           raise Error
+                                                           )
+                                                        else
+                                                           SOME (2*n+1)  (* boost reduce precedence for left associative operator *)
+                                                   | PrecRight n =>
+                                                        if n < 0 orelse n > 100 then
+                                                           (
+                                                           print "Error: precedence of rule ";
+                                                           print (Int.toString localnumber);
+                                                           print " of nonterminal ";
+                                                           print (Symbol.toString name);
+                                                           print " is out of range.\n";
+                                                           raise Error
+                                                           )
+                                                        else
+                                                           SOME (2*n)
+                                                   | EmptyPrec =>
+                                                        (* No precedence give, try to infer one from the rhs. *)
+                                                        let
+                                                           fun findLastTerminal l =
+                                                              (case l of
+                                                                  symbol :: rest =>
+                                                                     (case D.find (!terminals) symbol of
+                                                                         NONE =>
+                                                                            (* nonterminal *)
+                                                                            findLastTerminal rest
+                                                                       | SOME (_, prec, _) =>
+                                                                            prec)
+                                                                | [] =>
+                                                                     NONE)
+                                                        in
+                                                           (case findLastTerminal rhsrev of
+                                                               NONE =>
+                                                                  (* Last terminal has no precedence, or rule has no terminals at all. *)
+                                                                  NONE
+                                                             | SOME n =>
+                                                                  (* Last terminal has shift precedence n; flip the parity to get reduce precedence. *)
+                                                                  SOME (if n mod 2 = 0 then
+                                                                           n+1
+                                                                        else
+                                                                           n-1))
+                                                        end)
+                                                              
                                            in
-                                              ((globalnumber, localnumber, name, rev rhsrev, rev argsrev, action, ref false) :: acc,
+                                              ((globalnumber, localnumber, name, rev rhsrev, rev argsrev, action, prec', ref false) :: acc,
                                                actions'',
                                                globalnumber :: next,
                                                localnumber + 1)
@@ -251,14 +332,14 @@ structure Process
             val rules' = rev (!rules)
             val () =
                app
-               (fn (globalnumber, localnumber, nonterminalName, rhs, args, _, _) =>
+               (fn (globalnumber, localnumber, nonterminalName, rhs, args, _, _, _) =>
                    ListPair.appEq
                    (fn (symbol, argo) =>
                           (case D.find nonterminals' symbol of
                               SOME _ => ()
                             | NONE =>
                                  (case D.find terminals' symbol of
-                                     SOME (NONE, used) =>
+                                     SOME (NONE, _, used) =>
                                         (case argo of
                                             NONE =>
                                                used := true
@@ -273,7 +354,7 @@ structure Process
                                                print " carries no data.\n";
                                                raise Error
                                                ))
-                                   | SOME (SOME _, used) =>
+                                   | SOME (SOME _, _, used) =>
                                         used := true
                                    | NONE =>
                                         (
@@ -291,7 +372,7 @@ structure Process
 
             val () =
                D.app
-               (fn (terminal, (_, used)) =>
+               (fn (terminal, (_, _, used)) =>
                    if !used then
                       ()
                    else
@@ -304,7 +385,7 @@ structure Process
 
          in
             (modulename', !types, terminals', nonterminals',
-             MakeAutomaton.makeAutomaton start' nonterminals' (Vector.fromList rules'))
+             MakeAutomaton.makeAutomaton start' terminals' nonterminals' (Vector.fromList rules'))
          end
 
    end
