@@ -9,7 +9,8 @@ structure WriteAutomaton
 
       structure T =
          HashTable
-         (structure Key = S.Hashable)
+         (structure Key = SetHashable (structure Set = S
+                                       structure Elem = SymbolHashable))
 
       open Automaton
 

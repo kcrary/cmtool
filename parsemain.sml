@@ -13,11 +13,11 @@ start -> . Directives  / 0
 
 $ => reduce 19
 NAME => shift 1
-NONTERMINAL => shift 4
-START => shift 5
-TERMINAL => shift 6
-Directive => goto 2
-Directives => goto 3
+NONTERMINAL => shift 2
+START => shift 3
+TERMINAL => shift 4
+Directive => goto 5
+Directives => goto 6
 
 -----
 
@@ -33,6 +33,37 @@ Ident => goto 8
 
 State 2:
 
+0 : Ident -> . IDENT  / 2
+17 : Directive -> NONTERMINAL . Ident COLON Ident EQUAL Productions  / 1
+
+IDENT => shift 7
+Ident => goto 9
+
+-----
+
+State 3:
+
+0 : Ident -> . IDENT  / 1
+18 : Directive -> START . Ident  / 1
+
+IDENT => shift 7
+Ident => goto 10
+
+-----
+
+State 4:
+
+0 : Ident -> . IDENT  / 3
+15 : Directive -> TERMINAL . Ident Precedence  / 1
+16 : Directive -> TERMINAL . Ident OF Ident Precedence  / 1
+
+IDENT => shift 7
+Ident => goto 11
+
+-----
+
+State 5:
+
 14 : Directive -> . NAME Ident  / 1
 15 : Directive -> . TERMINAL Ident Precedence  / 1
 16 : Directive -> . TERMINAL Ident OF Ident Precedence  / 1
@@ -44,50 +75,19 @@ State 2:
 
 $ => reduce 19
 NAME => shift 1
-NONTERMINAL => shift 4
-START => shift 5
-TERMINAL => shift 6
-Directive => goto 2
-Directives => goto 9
-
------
-
-State 3:
-
-start -> Directives .  / 0
-
-$ => accept
-
------
-
-State 4:
-
-0 : Ident -> . IDENT  / 2
-17 : Directive -> NONTERMINAL . Ident COLON Ident EQUAL Productions  / 1
-
-IDENT => shift 7
-Ident => goto 10
-
------
-
-State 5:
-
-0 : Ident -> . IDENT  / 1
-18 : Directive -> START . Ident  / 1
-
-IDENT => shift 7
-Ident => goto 11
+NONTERMINAL => shift 2
+START => shift 3
+TERMINAL => shift 4
+Directive => goto 5
+Directives => goto 12
 
 -----
 
 State 6:
 
-0 : Ident -> . IDENT  / 3
-15 : Directive -> TERMINAL . Ident Precedence  / 1
-16 : Directive -> TERMINAL . Ident OF Ident Precedence  / 1
+start -> Directives .  / 0
 
-IDENT => shift 7
-Ident => goto 12
+$ => accept
 
 -----
 
@@ -100,16 +100,16 @@ IDENT => reduce 0
 ARROW => reduce 0
 COLON => reduce 0
 EQUAL => reduce 0
-LPAREN => reduce 0
 NAME => reduce 0
-RPAREN => reduce 0
 NONTERMINAL => reduce 0
+NOPREC => reduce 0
+LPAREN => reduce 0
 OF => reduce 0
-START => reduce 0
-TERMINAL => reduce 0
 PRECL => reduce 0
 PRECR => reduce 0
-NOPREC => reduce 0
+RPAREN => reduce 0
+START => reduce 0
+TERMINAL => reduce 0
 
 -----
 
@@ -127,21 +127,13 @@ TERMINAL => reduce 14
 
 State 9:
 
-20 : Directives -> Directive Directives .  / 0
-
-$ => reduce 20
-
------
-
-State 10:
-
 17 : Directive -> NONTERMINAL Ident . COLON Ident EQUAL Productions  / 1
 
 COLON => shift 13
 
 -----
 
-State 11:
+State 10:
 
 18 : Directive -> START Ident .  / 1
 
@@ -153,7 +145,7 @@ TERMINAL => reduce 18
 
 -----
 
-State 12:
+State 11:
 
 7 : Precedence -> .  / 1
 8 : Precedence -> . PRECL Number  / 1
@@ -165,13 +157,21 @@ State 12:
 $ => reduce 7
 NAME => reduce 7
 NONTERMINAL => reduce 7
-OF => shift 14
+NOPREC => shift 14
+OF => shift 15
+PRECL => shift 16
+PRECR => shift 17
 START => reduce 7
 TERMINAL => reduce 7
-PRECL => shift 15
-PRECR => shift 16
-NOPREC => shift 17
 Precedence => goto 18
+
+-----
+
+State 12:
+
+20 : Directives -> Directive Directives .  / 0
+
+$ => reduce 20
 
 -----
 
@@ -187,7 +187,22 @@ Ident => goto 19
 
 State 14:
 
-0 : Ident -> . IDENT  / 6
+10 : Precedence -> NOPREC .  / 6
+
+$ => reduce 10
+IDENT => reduce 10
+ARROW => reduce 10
+NAME => reduce 10
+NONTERMINAL => reduce 10
+LPAREN => reduce 10
+START => reduce 10
+TERMINAL => reduce 10
+
+-----
+
+State 15:
+
+0 : Ident -> . IDENT  / 7
 16 : Directive -> TERMINAL Ident OF . Ident Precedence  / 1
 
 IDENT => shift 7
@@ -195,38 +210,23 @@ Ident => goto 20
 
 -----
 
-State 15:
+State 16:
 
-1 : Number -> . NUMBER  / 7
-8 : Precedence -> PRECL . Number  / 7
+1 : Number -> . NUMBER  / 6
+8 : Precedence -> PRECL . Number  / 6
 
 NUMBER => shift 21
 Number => goto 22
 
 -----
 
-State 16:
+State 17:
 
-1 : Number -> . NUMBER  / 7
-9 : Precedence -> PRECR . Number  / 7
+1 : Number -> . NUMBER  / 6
+9 : Precedence -> PRECR . Number  / 6
 
 NUMBER => shift 21
 Number => goto 23
-
------
-
-State 17:
-
-10 : Precedence -> NOPREC .  / 7
-
-$ => reduce 10
-IDENT => reduce 10
-ARROW => reduce 10
-LPAREN => reduce 10
-NAME => reduce 10
-NONTERMINAL => reduce 10
-START => reduce 10
-TERMINAL => reduce 10
 
 -----
 
@@ -261,25 +261,25 @@ State 20:
 $ => reduce 7
 NAME => reduce 7
 NONTERMINAL => reduce 7
+NOPREC => shift 14
+PRECL => shift 16
+PRECR => shift 17
 START => reduce 7
 TERMINAL => reduce 7
-PRECL => shift 15
-PRECR => shift 16
-NOPREC => shift 17
 Precedence => goto 25
 
 -----
 
 State 21:
 
-1 : Number -> NUMBER .  / 7
+1 : Number -> NUMBER .  / 6
 
 $ => reduce 1
 IDENT => reduce 1
 ARROW => reduce 1
-LPAREN => reduce 1
 NAME => reduce 1
 NONTERMINAL => reduce 1
+LPAREN => reduce 1
 START => reduce 1
 TERMINAL => reduce 1
 
@@ -287,14 +287,14 @@ TERMINAL => reduce 1
 
 State 22:
 
-8 : Precedence -> PRECL Number .  / 7
+8 : Precedence -> PRECL Number .  / 6
 
 $ => reduce 8
 IDENT => reduce 8
 ARROW => reduce 8
-LPAREN => reduce 8
 NAME => reduce 8
 NONTERMINAL => reduce 8
+LPAREN => reduce 8
 START => reduce 8
 TERMINAL => reduce 8
 
@@ -302,14 +302,14 @@ TERMINAL => reduce 8
 
 State 23:
 
-9 : Precedence -> PRECR Number .  / 7
+9 : Precedence -> PRECR Number .  / 6
 
 $ => reduce 9
 IDENT => reduce 9
 ARROW => reduce 9
-LPAREN => reduce 9
 NAME => reduce 9
 NONTERMINAL => reduce 9
+LPAREN => reduce 9
 START => reduce 9
 TERMINAL => reduce 9
 
@@ -323,7 +323,7 @@ State 24:
 4 : Constituent -> . LPAREN Constituent RPAREN  / 9
 5 : Constituents -> .  / 10
 6 : Constituents -> . Constituent Constituents  / 10
-11 : Production -> . Constituents ARROW Ident Precedence  / 7
+11 : Production -> . Constituents ARROW Ident Precedence  / 6
 12 : Productions -> .  / 1
 13 : Productions -> . Production Productions  / 1
 17 : Directive -> NONTERMINAL Ident COLON Ident EQUAL . Productions  / 1
@@ -331,16 +331,16 @@ State 24:
 $ => reduce 12
 IDENT => shift 7
 ARROW => reduce 5
-LPAREN => shift 26
 NAME => reduce 12
 NONTERMINAL => reduce 12
+LPAREN => shift 26
 START => reduce 12
 TERMINAL => reduce 12
 Ident => goto 27
 Constituent => goto 28
 Constituents => goto 29
-Productions => goto 30
-Production => goto 31
+Production => goto 30
+Productions => goto 31
 
 -----
 
@@ -405,13 +405,42 @@ Constituents => goto 34
 
 State 29:
 
-11 : Production -> Constituents . ARROW Ident Precedence  / 7
+11 : Production -> Constituents . ARROW Ident Precedence  / 6
 
 ARROW => shift 35
 
 -----
 
 State 30:
+
+0 : Ident -> . IDENT  / 8
+2 : Constituent -> . Ident  / 9
+3 : Constituent -> . Ident COLON Ident  / 9
+4 : Constituent -> . LPAREN Constituent RPAREN  / 9
+5 : Constituents -> .  / 10
+6 : Constituents -> . Constituent Constituents  / 10
+11 : Production -> . Constituents ARROW Ident Precedence  / 6
+12 : Productions -> .  / 1
+13 : Productions -> . Production Productions  / 1
+13 : Productions -> Production . Productions  / 1
+
+$ => reduce 12
+IDENT => shift 7
+ARROW => reduce 5
+NAME => reduce 12
+NONTERMINAL => reduce 12
+LPAREN => shift 26
+START => reduce 12
+TERMINAL => reduce 12
+Ident => goto 27
+Constituent => goto 28
+Constituents => goto 29
+Production => goto 30
+Productions => goto 36
+
+-----
+
+State 31:
 
 17 : Directive -> NONTERMINAL Ident COLON Ident EQUAL Productions .  / 1
 
@@ -420,35 +449,6 @@ NAME => reduce 17
 NONTERMINAL => reduce 17
 START => reduce 17
 TERMINAL => reduce 17
-
------
-
-State 31:
-
-0 : Ident -> . IDENT  / 8
-2 : Constituent -> . Ident  / 9
-3 : Constituent -> . Ident COLON Ident  / 9
-4 : Constituent -> . LPAREN Constituent RPAREN  / 9
-5 : Constituents -> .  / 10
-6 : Constituents -> . Constituent Constituents  / 10
-11 : Production -> . Constituents ARROW Ident Precedence  / 7
-12 : Productions -> .  / 1
-13 : Productions -> . Production Productions  / 1
-13 : Productions -> Production . Productions  / 1
-
-$ => reduce 12
-IDENT => shift 7
-ARROW => reduce 5
-LPAREN => shift 26
-NAME => reduce 12
-NONTERMINAL => reduce 12
-START => reduce 12
-TERMINAL => reduce 12
-Ident => goto 27
-Constituent => goto 28
-Constituents => goto 29
-Productions => goto 36
-Production => goto 31
 
 -----
 
@@ -481,7 +481,7 @@ ARROW => reduce 6
 State 35:
 
 0 : Ident -> . IDENT  / 14
-11 : Production -> Constituents ARROW . Ident Precedence  / 7
+11 : Production -> Constituents ARROW . Ident Precedence  / 6
 
 IDENT => shift 7
 Ident => goto 39
@@ -524,37 +524,37 @@ RPAREN => reduce 3
 
 State 39:
 
-7 : Precedence -> .  / 7
-8 : Precedence -> . PRECL Number  / 7
-9 : Precedence -> . PRECR Number  / 7
-10 : Precedence -> . NOPREC  / 7
-11 : Production -> Constituents ARROW Ident . Precedence  / 7
+7 : Precedence -> .  / 6
+8 : Precedence -> . PRECL Number  / 6
+9 : Precedence -> . PRECR Number  / 6
+10 : Precedence -> . NOPREC  / 6
+11 : Production -> Constituents ARROW Ident . Precedence  / 6
 
 $ => reduce 7
 IDENT => reduce 7
 ARROW => reduce 7
-LPAREN => reduce 7
 NAME => reduce 7
 NONTERMINAL => reduce 7
+NOPREC => shift 14
+LPAREN => reduce 7
+PRECL => shift 16
+PRECR => shift 17
 START => reduce 7
 TERMINAL => reduce 7
-PRECL => shift 15
-PRECR => shift 16
-NOPREC => shift 17
 Precedence => goto 40
 
 -----
 
 State 40:
 
-11 : Production -> Constituents ARROW Ident Precedence .  / 7
+11 : Production -> Constituents ARROW Ident Precedence .  / 6
 
 $ => reduce 11
 IDENT => reduce 11
 ARROW => reduce 11
-LPAREN => reduce 11
 NAME => reduce 11
 NONTERMINAL => reduce 11
+LPAREN => reduce 11
 START => reduce 11
 TERMINAL => reduce 11
 
@@ -563,35 +563,35 @@ TERMINAL => reduce 11
 lookahead 0 = $ 
 lookahead 1 = $ NAME NONTERMINAL START TERMINAL 
 lookahead 2 = COLON 
-lookahead 3 = $ NAME NONTERMINAL OF START TERMINAL PRECL PRECR NOPREC 
-lookahead 4 = $ IDENT ARROW COLON EQUAL LPAREN NAME RPAREN NONTERMINAL OF START TERMINAL PRECL PRECR NOPREC 
+lookahead 3 = $ NAME NONTERMINAL NOPREC OF PRECL PRECR START TERMINAL 
+lookahead 4 = $ IDENT ARROW COLON EQUAL NAME NONTERMINAL NOPREC LPAREN OF PRECL PRECR RPAREN START TERMINAL 
 lookahead 5 = EQUAL 
-lookahead 6 = $ NAME NONTERMINAL START TERMINAL PRECL PRECR NOPREC 
-lookahead 7 = $ IDENT ARROW LPAREN NAME NONTERMINAL START TERMINAL 
+lookahead 6 = $ IDENT ARROW NAME NONTERMINAL LPAREN START TERMINAL 
+lookahead 7 = $ NAME NONTERMINAL NOPREC PRECL PRECR START TERMINAL 
 lookahead 8 = IDENT ARROW COLON LPAREN 
 lookahead 9 = IDENT ARROW LPAREN 
 lookahead 10 = ARROW 
 lookahead 11 = COLON RPAREN 
 lookahead 12 = RPAREN 
 lookahead 13 = IDENT ARROW LPAREN RPAREN 
-lookahead 14 = $ IDENT ARROW LPAREN NAME NONTERMINAL START TERMINAL PRECL PRECR NOPREC 
+lookahead 14 = $ IDENT ARROW NAME NONTERMINAL NOPREC LPAREN PRECL PRECR START TERMINAL 
 
 *)
 
 functor ParseMainFun (structure Streamable : STREAMABLE
 structure Arg : sig
+type pos_symbol
 type pos_int
 type pos
-type directive
-type directives
-type pos_symbol
-type constituent
-type constituents
-type productions
 type symbol
 type int
-type production
+type constituent
+type constituents
 type precedence
+type production
+type productions
+type directive
+type directives
 val sole_ident : {ident:pos_symbol} -> symbol
 val sole_number : {num:pos_int} -> int
 val unlabeled_item : {ident:symbol} -> constituent
@@ -619,16 +619,16 @@ IDENT of pos_symbol
 | ARROW of pos
 | COLON of pos
 | EQUAL of pos
-| LPAREN of pos
 | NAME of pos
-| RPAREN of pos
 | NONTERMINAL of pos
+| NOPREC of pos
+| LPAREN of pos
 | OF of pos
-| START of pos
-| TERMINAL of pos
 | PRECL of pos
 | PRECR of pos
-| NOPREC of pos
+| RPAREN of pos
+| START of pos
+| TERMINAL of pos
 val error : terminal Streamable.t -> exn
 end)
 =
@@ -637,18 +637,18 @@ local
 structure Value = struct
 datatype nonterminal =
 nonterminal
+| pos_symbol of Arg.pos_symbol
 | pos_int of Arg.pos_int
 | pos of Arg.pos
-| directive of Arg.directive
-| directives of Arg.directives
-| pos_symbol of Arg.pos_symbol
-| constituent of Arg.constituent
-| constituents of Arg.constituents
-| productions of Arg.productions
 | symbol of Arg.symbol
 | int of Arg.int
-| production of Arg.production
+| constituent of Arg.constituent
+| constituents of Arg.constituents
 | precedence of Arg.precedence
+| production of Arg.production
+| productions of Arg.productions
+| directive of Arg.directive
+| directives of Arg.directives
 end
 structure ParseEngine = ParseEngineFun (structure Streamable = Streamable
 type terminal = Arg.terminal
@@ -661,43 +661,43 @@ Arg.IDENT x => (1, Value.pos_symbol x)
 | Arg.ARROW x => (3, Value.pos x)
 | Arg.COLON x => (4, Value.pos x)
 | Arg.EQUAL x => (5, Value.pos x)
-| Arg.LPAREN x => (6, Value.pos x)
-| Arg.NAME x => (7, Value.pos x)
-| Arg.RPAREN x => (8, Value.pos x)
-| Arg.NONTERMINAL x => (9, Value.pos x)
+| Arg.NAME x => (6, Value.pos x)
+| Arg.NONTERMINAL x => (7, Value.pos x)
+| Arg.NOPREC x => (8, Value.pos x)
+| Arg.LPAREN x => (9, Value.pos x)
 | Arg.OF x => (10, Value.pos x)
-| Arg.START x => (11, Value.pos x)
-| Arg.TERMINAL x => (12, Value.pos x)
-| Arg.PRECL x => (13, Value.pos x)
-| Arg.PRECR x => (14, Value.pos x)
-| Arg.NOPREC x => (15, Value.pos x)
+| Arg.PRECL x => (11, Value.pos x)
+| Arg.PRECR x => (12, Value.pos x)
+| Arg.RPAREN x => (13, Value.pos x)
+| Arg.START x => (14, Value.pos x)
+| Arg.TERMINAL x => (15, Value.pos x)
 )
 )
 in
 val parse = ParseEngine.parse (
-ParseEngine.next5x1 "k\128\128\128\128\128\128\130\128\133\128\134\135\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\136\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128k\128\128\128\128\128\128\130\128\133\128\134\135\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\127\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\136\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\136\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\136\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128~~\128~~~~~~~~~~~~~\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128p\128\128\128\128\128\128p\128p\128pp\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128j\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\142\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128l\128\128\128\128\128\128l\128l\128ll\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128w\128\128\128\128\128\128w\128w\143ww\144\145\146\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\136\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\136\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\150\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\150\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128tt\128t\128\128tt\128t\128tt\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128o\128\128\128\128\128\128o\128o\128oo\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\153\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128w\128\128\128\128\128\128w\128w\128ww\144\145\146\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128}}\128}\128\128}}\128}\128}}\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128vv\128v\128\128vv\128v\128vv\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128uu\128u\128\128uu\128u\128uu\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128r\136\128y\128\128\155r\128r\128rr\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128n\128\128\128\128\128\128n\128n\128nn\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\136\128\128\128\128\155\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128|\128|\162\128|\128|\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\136\128y\128\128\155\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\164\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128m\128\128\128\128\128\128m\128m\128mm\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128r\136\128y\128\128\155r\128r\128rr\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\166\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\136\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128x\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\136\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128q\128\128\128\128\128\128q\128q\128qq\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128z\128z\128\128z\128z\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128{\128{\128\128{\128{\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128ww\128w\128\128ww\128w\128ww\144\145\146\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128ss\128s\128\128ss\128s\128ss\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128",
-ParseEngine.next5x1 "\128\130\131\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\136\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\130\137\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\138\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\139\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\140\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\146\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\147\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\148\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\150\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\151\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\153\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\155\128\128\128\156\157\158\159\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\155\128\128\128\160\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\155\128\128\128\156\162\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\155\128\128\128\156\157\164\159\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\166\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\167\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\168\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128",
+ParseEngine.next5x1 "k\128\128\128\128\128\130\131\128\128\128\128\128\128\132\133\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\136\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\136\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\136\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\136\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128k\128\128\128\128\128\130\131\128\128\128\128\128\128\132\133\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\127\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128~~\128~~~~~~~~~~~~~\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128p\128\128\128\128\128pp\128\128\128\128\128\128pp\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\142\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128l\128\128\128\128\128ll\128\128\128\128\128\128ll\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128w\128\128\128\128\128ww\143\128\144\145\146\128ww\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128j\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\136\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128tt\128t\128\128tt\128t\128\128\128\128tt\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\136\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\150\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\150\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128o\128\128\128\128\128oo\128\128\128\128\128\128oo\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\153\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128w\128\128\128\128\128ww\143\128\128\145\146\128ww\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128}}\128}\128\128}}\128}\128\128\128\128}}\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128vv\128v\128\128vv\128v\128\128\128\128vv\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128uu\128u\128\128uu\128u\128\128\128\128uu\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128r\136\128y\128\128rr\128\155\128\128\128\128rr\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128n\128\128\128\128\128nn\128\128\128\128\128\128nn\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\136\128\128\128\128\128\128\128\155\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128|\128|\162\128\128\128\128|\128\128\128|\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\136\128y\128\128\128\128\128\155\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\164\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128r\136\128y\128\128rr\128\155\128\128\128\128rr\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128m\128\128\128\128\128mm\128\128\128\128\128\128mm\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\166\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\136\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128x\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\136\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128q\128\128\128\128\128qq\128\128\128\128\128\128qq\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128z\128z\128\128\128\128\128z\128\128\128z\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128{\128{\128\128\128\128\128{\128\128\128{\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128ww\128w\128\128ww\143w\128\145\146\128ww\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128ss\128s\128\128ss\128s\128\128\128\128ss\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128",
+ParseEngine.next5x1 "\128\128\128\128\128\128\128\133\134\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\136\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\137\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\138\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\139\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\133\140\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\146\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\147\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\148\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\150\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\151\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\153\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\155\128\156\157\128\158\159\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\155\128\160\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\155\128\156\162\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\155\128\156\157\128\158\164\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\166\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\167\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\168\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128",
 Vector.fromList [(0,1,(fn Value.pos_symbol(arg0)::rest => Value.symbol(Arg.sole_ident {ident=arg0})::rest|_=>raise (Fail "bad parser"))),
-(3,1,(fn Value.pos_int(arg0)::rest => Value.int(Arg.sole_number {num=arg0})::rest|_=>raise (Fail "bad parser"))),
-(4,1,(fn Value.symbol(arg0)::rest => Value.constituent(Arg.unlabeled_item {ident=arg0})::rest|_=>raise (Fail "bad parser"))),
-(4,3,(fn Value.symbol(arg0)::_::Value.symbol(arg1)::rest => Value.constituent(Arg.labeled_item {ident=arg0,label=arg1})::rest|_=>raise (Fail "bad parser"))),
-(4,3,(fn _::Value.constituent(arg0)::_::rest => Value.constituent(Arg.paren_item {constituent=arg0})::rest|_=>raise (Fail "bad parser"))),
-(5,0,(fn rest => Value.constituents(Arg.nil_constituents {})::rest)),
-(5,2,(fn Value.constituents(arg0)::Value.constituent(arg1)::rest => Value.constituents(Arg.cons_constituents {tail=arg0,head=arg1})::rest|_=>raise (Fail "bad parser"))),
-(8,0,(fn rest => Value.precedence(Arg.empty_precedence {})::rest)),
-(8,2,(fn Value.int(arg0)::_::rest => Value.precedence(Arg.left_precedence {num=arg0})::rest|_=>raise (Fail "bad parser"))),
-(8,2,(fn Value.int(arg0)::_::rest => Value.precedence(Arg.right_precedence {num=arg0})::rest|_=>raise (Fail "bad parser"))),
-(8,1,(fn _::rest => Value.precedence(Arg.no_precedence {})::rest|_=>raise (Fail "bad parser"))),
-(7,4,(fn Value.precedence(arg0)::Value.symbol(arg1)::_::Value.constituents(arg2)::rest => Value.production(Arg.sole_production {prec=arg0,action=arg1,constituents=arg2})::rest|_=>raise (Fail "bad parser"))),
+(1,1,(fn Value.pos_int(arg0)::rest => Value.int(Arg.sole_number {num=arg0})::rest|_=>raise (Fail "bad parser"))),
+(2,1,(fn Value.symbol(arg0)::rest => Value.constituent(Arg.unlabeled_item {ident=arg0})::rest|_=>raise (Fail "bad parser"))),
+(2,3,(fn Value.symbol(arg0)::_::Value.symbol(arg1)::rest => Value.constituent(Arg.labeled_item {ident=arg0,label=arg1})::rest|_=>raise (Fail "bad parser"))),
+(2,3,(fn _::Value.constituent(arg0)::_::rest => Value.constituent(Arg.paren_item {constituent=arg0})::rest|_=>raise (Fail "bad parser"))),
+(3,0,(fn rest => Value.constituents(Arg.nil_constituents {})::rest)),
+(3,2,(fn Value.constituents(arg0)::Value.constituent(arg1)::rest => Value.constituents(Arg.cons_constituents {tail=arg0,head=arg1})::rest|_=>raise (Fail "bad parser"))),
+(4,0,(fn rest => Value.precedence(Arg.empty_precedence {})::rest)),
+(4,2,(fn Value.int(arg0)::_::rest => Value.precedence(Arg.left_precedence {num=arg0})::rest|_=>raise (Fail "bad parser"))),
+(4,2,(fn Value.int(arg0)::_::rest => Value.precedence(Arg.right_precedence {num=arg0})::rest|_=>raise (Fail "bad parser"))),
+(4,1,(fn _::rest => Value.precedence(Arg.no_precedence {})::rest|_=>raise (Fail "bad parser"))),
+(5,4,(fn Value.precedence(arg0)::Value.symbol(arg1)::_::Value.constituents(arg2)::rest => Value.production(Arg.sole_production {prec=arg0,action=arg1,constituents=arg2})::rest|_=>raise (Fail "bad parser"))),
 (6,0,(fn rest => Value.productions(Arg.nil_productions {})::rest)),
 (6,2,(fn Value.productions(arg0)::Value.production(arg1)::rest => Value.productions(Arg.cons_productions {tail=arg0,head=arg1})::rest|_=>raise (Fail "bad parser"))),
-(1,2,(fn Value.symbol(arg0)::_::rest => Value.directive(Arg.name_directive {ident=arg0})::rest|_=>raise (Fail "bad parser"))),
-(1,3,(fn Value.precedence(arg0)::Value.symbol(arg1)::_::rest => Value.directive(Arg.terminal_directive {prec=arg0,ident=arg1})::rest|_=>raise (Fail "bad parser"))),
-(1,5,(fn Value.precedence(arg0)::Value.symbol(arg1)::_::Value.symbol(arg2)::_::rest => Value.directive(Arg.terminal_of_directive {prec=arg0,tp=arg1,ident=arg2})::rest|_=>raise (Fail "bad parser"))),
-(1,6,(fn Value.productions(arg0)::_::Value.symbol(arg1)::_::Value.symbol(arg2)::_::rest => Value.directive(Arg.nonterminal_directive {arms=arg0,tp=arg1,ident=arg2})::rest|_=>raise (Fail "bad parser"))),
-(1,2,(fn Value.symbol(arg0)::_::rest => Value.directive(Arg.start_directive {ident=arg0})::rest|_=>raise (Fail "bad parser"))),
-(2,0,(fn rest => Value.directives(Arg.nil_directives {})::rest)),
-(2,2,(fn Value.directives(arg0)::Value.directive(arg1)::rest => Value.directives(Arg.cons_directives {tail=arg0,head=arg1})::rest|_=>raise (Fail "bad parser")))],
+(7,2,(fn Value.symbol(arg0)::_::rest => Value.directive(Arg.name_directive {ident=arg0})::rest|_=>raise (Fail "bad parser"))),
+(7,3,(fn Value.precedence(arg0)::Value.symbol(arg1)::_::rest => Value.directive(Arg.terminal_directive {prec=arg0,ident=arg1})::rest|_=>raise (Fail "bad parser"))),
+(7,5,(fn Value.precedence(arg0)::Value.symbol(arg1)::_::Value.symbol(arg2)::_::rest => Value.directive(Arg.terminal_of_directive {prec=arg0,tp=arg1,ident=arg2})::rest|_=>raise (Fail "bad parser"))),
+(7,6,(fn Value.productions(arg0)::_::Value.symbol(arg1)::_::Value.symbol(arg2)::_::rest => Value.directive(Arg.nonterminal_directive {arms=arg0,tp=arg1,ident=arg2})::rest|_=>raise (Fail "bad parser"))),
+(7,2,(fn Value.symbol(arg0)::_::rest => Value.directive(Arg.start_directive {ident=arg0})::rest|_=>raise (Fail "bad parser"))),
+(8,0,(fn rest => Value.directives(Arg.nil_directives {})::rest)),
+(8,2,(fn Value.directives(arg0)::Value.directive(arg1)::rest => Value.directives(Arg.cons_directives {tail=arg0,head=arg1})::rest|_=>raise (Fail "bad parser")))],
 (fn Value.directives x => x | _ => raise (Fail "bad parser")), Arg.error)
 end
 end

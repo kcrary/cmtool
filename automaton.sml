@@ -1,7 +1,6 @@
 
 structure SymbolDict = ListDict (structure Key = SymbolOrdered)
-structure SymbolSet = ListHashableSet (structure ElemOrdered = SymbolOrdered
-                                       structure ElemHashable = SymbolHashable)
+structure SymbolSet = ListSet (structure Elem = SymbolOrdered)
 
 structure Automaton =
    struct
