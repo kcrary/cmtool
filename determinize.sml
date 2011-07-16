@@ -5,12 +5,12 @@ structure Determinize
    struct
 
       structure Set =
-         ListHashableSet
-         (structure ElemOrdered = IntOrdered
-          structure ElemHashable = IntHashable)
+         ListSet
+         (structure Elem = IntOrdered)
 
       structure Table =
-         HashTable (structure Key = Set.Hashable)
+         HashTable (structure Key = SetHashable (structure Set = Set
+                                                 structure Elem = IntHashable))
 
       structure StateDict =
          ListDict (structure Key = IntOrdered)
