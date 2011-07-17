@@ -5,15 +5,14 @@ structure Determinize
    struct
 
       structure Set =
-         ListSet
-         (structure Elem = IntOrdered)
+         SplaySet (structure Elem = IntOrdered)
 
       structure Table =
          HashTable (structure Key = SetHashable (structure Set = Set
                                                  structure Elem = IntHashable))
 
       structure StateDict =
-         ListDict (structure Key = IntOrdered)
+         SplayDict (structure Key = IntOrdered)
 
       structure S = Set
       structure T = Table

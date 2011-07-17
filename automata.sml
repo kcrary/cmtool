@@ -1,7 +1,7 @@
 
-structure SymbolDict = ListDict (structure Key = IntOrdered)
-structure SymbolSet = ListSet (structure Elem = IntOrdered)
-structure StringSet = ListSet (structure Elem = StringOrdered)
+structure SymbolDict = SplayDict (structure Key = IntOrdered)
+structure SymbolSet = SplaySet (structure Elem = IntOrdered)
+structure StringSet = SplaySet (structure Elem = StringOrdered)
 
 
 structure Automata =

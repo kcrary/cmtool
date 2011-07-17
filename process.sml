@@ -12,7 +12,7 @@ structure Process
 
 
       structure S = StringSet
-      structure D = ListDict (structure Key = StringOrdered)
+      structure D = SplayDict (structure Key = StringOrdered)
       structure SS = SymbolSet
 
       open Syntax
