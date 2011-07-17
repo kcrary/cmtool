@@ -1,6 +1,6 @@
 
-structure SymbolDict = ListDict (structure Key = SymbolOrdered)
-structure SymbolSet = ListSet (structure Elem = SymbolOrdered)
+structure SymbolDict = SplayDict (structure Key = SymbolOrdered)
+structure SymbolSet = SplaySet (structure Elem = SymbolOrdered)
 
 structure Automaton =
    struct

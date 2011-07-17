@@ -37,7 +37,7 @@ structure MakeAutomaton
          end
 
       structure ItemDict =
-         ListDict (structure Key = ItemOrdered)
+         SplayDict (structure Key = ItemOrdered)
 
       structure ItemListHashable =
          ListHashable (structure Elem = ItemHashable)
