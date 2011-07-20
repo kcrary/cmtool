@@ -241,6 +241,10 @@ structure CodeGen
              val outs = TextIO.openOut filename
              fun write str = TextIO.output (outs, str)
           in
+             write "(*\n\n";
+             WriteAutomata.writeAutomata outs functions;
+             write "\n*)\n\n";
+
              write "functor ";
              write functorName;
              write " (structure Streamable : STREAMABLE\nstructure Arg : sig\ntype symbol\nval ord : symbol -> int\n";

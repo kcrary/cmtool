@@ -17,5 +17,7 @@ Group is
 	reverse-dfa.sig
 	reverse-dfa.sml
 	syntax.sml
+	write-automata.sig
+	write-automata.sml
 
 	../lib/sources.cm
