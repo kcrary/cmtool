@@ -1,4 +1,7 @@
 
+structure Symbol = SymbolFun (structure Value = StringHashable)
+structure SymbolOrdered = SymbolOrderedFun (structure Symbol = Symbol)
+structure SymbolHashable = SymbolHashableFun (structure Symbol = Symbol)
 structure SymbolDict = SplayDict (structure Key = SymbolOrdered)
 structure SymbolSet = SplaySet (structure Elem = SymbolOrdered)
 

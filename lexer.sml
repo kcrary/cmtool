@@ -116,7 +116,7 @@ structure Lexer
                       in
                          (case Table.find keywords str of
                              NONE =>
-                                IDENT (pos, Symbol.fromString str)
+                                IDENT (pos, Symbol.fromValue str)
                            | SOME NONE =>
                                 (
                                 print "Illegal identifier at ";

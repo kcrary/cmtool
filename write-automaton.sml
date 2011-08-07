@@ -53,7 +53,7 @@ structure WriteAutomaton
                   let
                      val (_, _, lhs, rhs, _, _, _, _) = Vector.sub (rules, rulenum)
                   in
-                     (Symbol.toString lhs, rhs)
+                     (Symbol.toValue lhs, rhs)
                   end
             
             fun loop n l =
@@ -65,7 +65,7 @@ structure WriteAutomaton
                          raise (Fail "invariant")
                     | symbol :: rest =>
                          (
-                         write (Symbol.toString symbol);
+                         write (Symbol.toValue symbol);
                          write " ";
                          loop (n-1) rest
                          ))
@@ -81,7 +81,7 @@ structure WriteAutomaton
             write " -> ";
             loop read rhs;
             write ". ";
-            app (fn symbol => (write (Symbol.toString symbol); write " ")) remaining;
+            app (fn symbol => (write (Symbol.toValue symbol); write " ")) remaining;
             write " / ";
             write (Int.toString (lookaheadNumber ctx lookahead));
             write "\n"
@@ -101,7 +101,7 @@ structure WriteAutomaton
             D.app
                (fn (symbol, (actions, conflict)) =>
                    (
-                   write (Symbol.toString symbol);
+                   write (Symbol.toValue symbol);
                    write " => ";
                    appSeparated
                       (fn Shift n =>
@@ -132,7 +132,7 @@ structure WriteAutomaton
             D.app
                (fn (symbol, n) =>
                    (
-                   write (Symbol.toString symbol);
+                   write (Symbol.toValue symbol);
                    write " => goto ";
                    write (Int.toString n);
                    write "\n"
@@ -173,7 +173,7 @@ structure WriteAutomaton
                    write "lookahead ";
                    write (Int.toString setnum);
                    write " = ";
-                   S.app (fn symbol => (write (Symbol.toString symbol); write " ")) set;
+                   S.app (fn symbol => (write (Symbol.toValue symbol); write " ")) set;
                    write "\n";
                    setnum+1
                    ))

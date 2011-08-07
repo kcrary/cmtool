@@ -37,7 +37,7 @@ structure Process
                               raise Error
                               )
                          | NONE =>
-                              modulename := SOME (Symbol.toString name))
+                              modulename := SOME (Symbol.toValue name))
                        
                   | Start name =>
                        (case !start of
@@ -57,7 +57,7 @@ structure Process
                        then
                           (
                           print "Error: multiply specified symbol ";
-                          print (toString name);
+                          print (toValue name);
                           print ".\n";
                           raise Error
                           )
@@ -70,7 +70,7 @@ structure Process
                                        if D.member (!actions) tp then
                                           (
                                           print "Error: type identifier ";
-                                          print (Symbol.toString tp);
+                                          print (Symbol.toValue tp);
                                           print " already used for an action.\n";
                                           raise Error
                                           )
@@ -85,7 +85,7 @@ structure Process
                                        if n < 0 orelse n > 100 then
                                           (
                                           print "Error: precedence of terminal ";
-                                          print (Symbol.toString name);
+                                          print (Symbol.toValue name);
                                           print " is out of range.\n";
                                           raise Error
                                           )
@@ -95,7 +95,7 @@ structure Process
                                        if n < 0 orelse n > 100 then
                                           (
                                           print "Error: precedence of terminal ";
-                                          print (Symbol.toString name);
+                                          print (Symbol.toValue name);
                                           print " is out of range.\n";
                                           raise Error
                                           )
@@ -113,7 +113,7 @@ structure Process
                        then
                           (
                           print "Error: multiply specified symbol ";
-                          print (toString name);
+                          print (toValue name);
                           print ".\n";
                           raise Error
                           )
@@ -122,7 +122,7 @@ structure Process
                               [] =>
                                  (
                                  print "Error: no productions for nonterminal ";
-                                 print (toString name);
+                                 print (toValue name);
                                  print ".\n";
                                  raise Error
                                  )
@@ -132,7 +132,7 @@ structure Process
                                        if D.member (!actions) tp then
                                           (
                                           print "Error: type identifier ";
-                                          print (Symbol.toString tp);
+                                          print (Symbol.toValue tp);
                                           print " already used for an action.\n";
                                           raise Error
                                           )
@@ -158,11 +158,11 @@ structure Process
                                                             if S.member labels label then
                                                                (
                                                                print "Error: argument ";
-                                                               print (toString label);
+                                                               print (toValue label);
                                                                print " is used multiple times in rule ";
                                                                print (Int.toString localnumber);
                                                                print " of nonterminal ";
-                                                               print (toString name);
+                                                               print (toValue name);
                                                                print ".\n";
                                                                raise Error
                                                                )
@@ -177,18 +177,18 @@ structure Process
                                                  if D.member actions' action then
                                                     (
                                                     print "Error: multiply specified action ";
-                                                    print (toString action);
+                                                    print (toValue action);
                                                     print " in rule ";
                                                     print (Int.toString localnumber);
                                                     print " of nonterminal ";
-                                                    print (toString name);
+                                                    print (toValue name);
                                                     print ".\n";
                                                     raise Error
                                                     )
                                                  else if S.member (!types) action then
                                                     (
                                                     print "Error: action identifier ";
-                                                    print (Symbol.toString action);
+                                                    print (Symbol.toValue action);
                                                     print " already used for a type.\n";
                                                     raise Error
                                                     )
@@ -204,7 +204,7 @@ structure Process
                                                            print "Error: precedence of rule ";
                                                            print (Int.toString localnumber);
                                                            print " of nonterminal ";
-                                                           print (Symbol.toString name);
+                                                           print (Symbol.toValue name);
                                                            print " is out of range.\n";
                                                            raise Error
                                                            )
@@ -216,7 +216,7 @@ structure Process
                                                            print "Error: precedence of rule ";
                                                            print (Int.toString localnumber);
                                                            print " of nonterminal ";
-                                                           print (Symbol.toString name);
+                                                           print (Symbol.toValue name);
                                                            print " is out of range.\n";
                                                            raise Error
                                                            )
@@ -317,14 +317,14 @@ structure Process
                       else if D.member terminals' symbol then
                          (
                          print "Error: start symbol ";
-                         print (toString symbol);
+                         print (toValue symbol);
                          print " is a terminal.\n";
                          raise Error
                          )
                       else
                          (
                          print "Error: start symbol ";
-                         print (toString symbol);
+                         print (toValue symbol);
                          print " is never specified.\n";
                          raise Error
                          ))
@@ -346,11 +346,11 @@ structure Process
                                           | SOME label =>
                                                (
                                                print "Error: argument ";
-                                               print (toString label);
+                                               print (toValue label);
                                                print " in rule ";
                                                print (Int.toString localnumber);
                                                print " of nonterminal ";
-                                               print (toString nonterminalName);
+                                               print (toValue nonterminalName);
                                                print " carries no data.\n";
                                                raise Error
                                                ))
@@ -359,11 +359,11 @@ structure Process
                                    | NONE =>
                                         (
                                         print "Error: symbol ";
-                                        print (toString symbol);
+                                        print (toValue symbol);
                                         print " in rule ";
                                         print (Int.toString localnumber);
                                         print " of nonterminal ";
-                                        print (toString nonterminalName);
+                                        print (toValue nonterminalName);
                                         print " is never specified.\n";
                                         raise Error
                                         ))))
@@ -378,7 +378,7 @@ structure Process
                    else
                       (
                       print "Warning: terminal ";
-                      print (Symbol.toString terminal);
+                      print (Symbol.toValue terminal);
                       print " is unused.\n"
                       ))
                terminals'

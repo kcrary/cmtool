@@ -62,7 +62,7 @@ structure Codegen
                (fn (terminal, _, (ordinals, count)) =>
                    (D.insert ordinals terminal count,
                     count+1))
-               (D.singleton (Symbol.fromString "$") 0, 1)
+               (D.singleton (Symbol.fromValue "$") 0, 1)
                terminals
 
             val (nonterminalOrdinals, nonterminalCount) =
@@ -130,7 +130,7 @@ structure Codegen
                (fn tp =>
                    (
                    write "type ";
-                   write (Symbol.toString tp);
+                   write (Symbol.toValue tp);
                    write "\n"
                    ))
                types;
@@ -141,7 +141,7 @@ structure Codegen
                       val (_, lhstp, _) = D.lookup nonterminals lhs
                    in
                       write "val ";
-                      write (Symbol.toString action);
+                      write (Symbol.toValue action);
                       write " : {";
 
                       ListPair.foldlEq
@@ -163,16 +163,16 @@ structure Codegen
                                       ()
                                    else
                                       write ", ";
-                                   write (Symbol.toString label);
+                                   write (Symbol.toValue label);
                                    write ":";
-                                   write (Symbol.toString tp);
+                                   write (Symbol.toValue tp);
                                    false
                                 end)
                          true
                          (rhs, args);
                       
                       write "} -> ";
-                      write (Symbol.toString lhstp);
+                      write (Symbol.toValue lhstp);
                       write "\n"
                    end)
                rules;
@@ -185,13 +185,13 @@ structure Codegen
                          ()
                       else
                          write "| ";
-                      write (Symbol.toString symbol);
+                      write (Symbol.toValue symbol);
                       (case tpo of
                           NONE => ()
                         | SOME tp =>
                              (
                              write " of ";
-                             write (Symbol.toString tp)
+                             write (Symbol.toValue tp)
                              ));
                       write "\n";
                       false
@@ -205,9 +205,9 @@ structure Codegen
                (fn tp =>
                    (
                    write "| ";
-                   write (Symbol.toString tp);
+                   write (Symbol.toValue tp);
                    write " of Arg.";
-                   write (Symbol.toString tp);
+                   write (Symbol.toValue tp);
                    write "\n"
                    ))
                types;
@@ -225,7 +225,7 @@ structure Codegen
                        NONE =>
                           (
                           write "Arg.";
-                          write (Symbol.toString terminal);
+                          write (Symbol.toValue terminal);
                           write " => (";
                           write (Int.toString (D.lookup terminalOrdinals terminal));
                           write ", Value.nonterminal)\n"
@@ -233,11 +233,11 @@ structure Codegen
                      | SOME tp =>
                           (
                           write "Arg.";
-                          write (Symbol.toString terminal);
+                          write (Symbol.toValue terminal);
                           write " x => (";
                           write (Int.toString (D.lookup terminalOrdinals terminal));
                           write ", Value.";
-                          write (Symbol.toString tp);
+                          write (Symbol.toValue tp);
                           write " x)\n"
                           ));
                    false
@@ -322,7 +322,7 @@ structure Codegen
                                           valOf (#1 (D.lookup terminals symbol)))
                              in
                                 write "Value.";
-                                write (Symbol.toString tp);
+                                write (Symbol.toValue tp);
                                 write "(arg";
                                 write (Int.toString n);
                                 write ")::";
@@ -332,9 +332,9 @@ structure Codegen
                       (rev rhs, rev args);
 
                    write "rest => Value.";
-                   write (Symbol.toString (#2 (D.lookup nonterminals lhs)));
+                   write (Symbol.toValue (#2 (D.lookup nonterminals lhs)));
                    write "(Arg.";
-                   write (Symbol.toString action);
+                   write (Symbol.toValue action);
                    write " {";
 
                    foldr
@@ -345,7 +345,7 @@ structure Codegen
                                 ()
                              else
                                 write ",";
-                             write (Symbol.toString label);
+                             write (Symbol.toValue label);
                              write "=arg";
                              write (Int.toString n);
                              n+1
@@ -365,7 +365,7 @@ structure Codegen
                rules;
 
             write "],\n(fn Value.";
-            write (Symbol.toString (#2 (D.lookup nonterminals start)));
+            write (Symbol.toValue (#2 (D.lookup nonterminals start)));
             write " x => x | _ => raise (Fail \"bad parser\")), Arg.error)\nend\nend\n";
 
             TextIO.closeOut outs

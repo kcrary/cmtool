@@ -334,7 +334,7 @@ structure MakeAutomaton
 
 
       (* The lexer ensures that this identifier will not be in use. *)
-      val finalSymbol = Symbol.fromString "$"
+      val finalSymbol = Symbol.fromValue "$"
 
       fun makeAutomaton start terminals nonterminals rules =
          let
@@ -468,7 +468,7 @@ structure MakeAutomaton
                       print "Warning: rule ";
                       print (Int.toString localnum);
                       print " of nonterminal ";
-                      print (Symbol.toString lhs);
+                      print (Symbol.toValue lhs);
                       print " is never reduced.\n"
                       ))
                rules
@@ -481,7 +481,7 @@ structure MakeAutomaton
                    else
                       (
                       print "Warning: nonterminal ";
-                      print (Symbol.toString nonterminal);
+                      print (Symbol.toValue nonterminal);
                       print " is unreachable.\n"
                       ))
                nonterminals
