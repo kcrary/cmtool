@@ -1,4 +1,8 @@
-Group is
+Group
+        source(-)
+        library(../lib/sources.cm)      
+        library(../lib/basis.cm)      
+is
 	(* Not specific to any language. *)
 	automata.sml
 	codegen.sig
@@ -21,3 +25,4 @@ Group is
 	write-automata.sml
 
 	../lib/sources.cm
+        ../lib/basis.cm
