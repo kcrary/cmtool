@@ -25,6 +25,9 @@ structure Syntax =
        | Option of regexp
        | Closure of regexp
        | Plus of regexp
+       | Exactly of regexp * int
+       | AtLeast of regexp * int
+       | Repeat of regexp * int * int
        | Eos
 
       datatype directive =

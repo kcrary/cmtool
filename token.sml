@@ -19,6 +19,7 @@ structure Token =
        | EPSILON of pos
        | EQUAL of pos
        | FUNCTION of pos
+       | GEQ of pos
        | LPAREN of pos
        | MINUS of pos
        | NAME of pos
@@ -27,6 +28,7 @@ structure Token =
        | QUESTION of pos
        | RANGE of pos
        | REGEXP of pos
+       | REPEAT of pos
        | RPAREN of pos
        | SEQ of pos
        | SET of pos

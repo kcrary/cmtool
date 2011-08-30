@@ -31,6 +31,8 @@ function lexmain : t =
    ') => rparen
    '/ => slash
    '* => star
+   "**" => starstar
+   ">=" => geq
    '~ => tilde
    epsilon => error
 

@@ -55,6 +55,9 @@ structure Parser
             fun option_regexp {r} = Option r
             fun closure_regexp {r} = Closure r
             fun plus_regexp {r} = Plus r
+            fun equal_regexp {r, n} = Exactly (r, n)
+            fun geq_regexp {r, n} = AtLeast (r, n)
+            fun repeat_regexp {r, first, last} = Repeat (r, first, last)
             fun eos_regexp {} = Eos
 
             type regexps = regexp list
@@ -107,6 +110,7 @@ structure Parser
                               | EPSILON pos => pos
                               | EQUAL pos => pos
                               | FUNCTION pos => pos
+                              | GEQ pos => pos
                               | LPAREN pos => pos
                               | MINUS pos => pos
                               | NAME pos => pos
@@ -115,6 +119,7 @@ structure Parser
                               | QUESTION pos => pos
                               | RANGE pos => pos
                               | REGEXP pos => pos
+                              | REPEAT pos => pos
                               | RPAREN pos => pos
                               | SEQ pos => pos
                               | SET pos => pos

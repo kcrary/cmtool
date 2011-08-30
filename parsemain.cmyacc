@@ -14,6 +14,7 @@ terminal ENABLE of pos
 terminal EPSILON of pos
 terminal EQUAL of pos
 terminal FUNCTION of pos
+terminal GEQ of pos
 terminal LPAREN of pos
 terminal MINUS of pos
 terminal NAME of pos
@@ -22,6 +23,7 @@ terminal PLUS of pos
 terminal QUESTION of pos
 terminal RANGE of pos
 terminal REGEXP of pos
+terminal REPEAT of pos
 terminal RPAREN of pos
 terminal SEQ of pos
 terminal SET of pos
@@ -67,6 +69,9 @@ nonterminal Regexp : regexp =
    LPAREN QUESTION (r:Regexp) RPAREN => option_regexp
    LPAREN STAR (r:Regexp) RPAREN => closure_regexp
    LPAREN PLUS (r:Regexp) RPAREN => plus_regexp
+   LPAREN EQUAL (n:Number) (r:Regexp) RPAREN => equal_regexp
+   LPAREN GEQ (n:Number) (r:Regexp) RPAREN => geq_regexp
+   LPAREN REPEAT (first:Number) (last:Number) (r:Regexp) RPAREN => repeat_regexp
    EOS => eos_regexp
 
 nonterminal Regexps : regexps =

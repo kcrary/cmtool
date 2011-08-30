@@ -1,7 +1,6 @@
 Group
         source(-)
         library(../lib/sources.cm)      
-        library(../lib/basis.cm)      
 is
 	(* Not specific to any language. *)
 	automata.sml
@@ -25,4 +24,3 @@ is
 	write-automata.sml
 
 	../lib/sources.cm
-        ../lib/basis.cm

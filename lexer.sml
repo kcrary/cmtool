@@ -198,6 +198,8 @@ structure Lexer
             val slash = simple RANGE
             val star = simple STAR
             val tilde = simple TILDE
+            val geq = simple GEQ
+            val starstar = simple REPEAT
   
             fun comment_open ({ len, follow, self, ... }:arg) pos =
                 let

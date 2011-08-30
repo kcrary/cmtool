@@ -198,6 +198,79 @@ structure Process
                  Regexp.Closure (processRegexp errfn re1)
             | Plus re1 =>
                  Regexp.Plus (processRegexp errfn re1)
+            | Exactly (re1, n) =>
+                 if n < 0 then
+                    (
+                    print "Error: illegal repetition specification in ";
+                    errfn ();
+                    print ".\n";
+                    raise Error
+                    )
+                 else
+                    let
+                       val re1' = processRegexp errfn re1
+   
+                       fun loop m =
+                          if m = 0 then
+                             Regexp.Epsilon
+                          else if m = 1 then
+                             re1'
+                          else
+                             Regexp.Concat (re1', loop (m-1))
+                    in
+                       loop n
+                    end
+            | AtLeast (re1, n) =>
+                 if n < 0 then
+                    (
+                    print "Error: illegal repetition specification in ";
+                    errfn ();
+                    print ".\n";
+                    raise Error
+                    )
+                 else
+                    let
+                       val re1' = processRegexp errfn re1
+   
+                       fun loop m =
+                          if m = 0 then
+                             Regexp.Closure re1'
+                          else if m = 1 then
+                             Regexp.Plus re1'
+                          else
+                             Regexp.Concat (re1', loop (m-1))
+                    in
+                       loop n
+                    end
+            | Repeat (re1, first, last) =>
+                 if first < 0 orelse last < first then
+                    (
+                    print "Error: illegal repetition specification in ";
+                    errfn ();
+                    print ".\n";
+                    raise Error
+                    )
+                 else
+                    let
+                       val re1' = processRegexp errfn re1
+                    
+                       fun loopOpt m =
+                          if m = 0 then
+                             Regexp.Epsilon
+                          else if m = 1 then
+                             Regexp.Option re1'
+                          else
+                             Regexp.Option (Regexp.Concat (re1',
+                                                           loopOpt (m-1)))
+
+                       fun loop m =
+                          if m = 0 then
+                             loopOpt (last-first)
+                          else
+                             Regexp.Concat (re1', loop (m-1))
+                    in
+                       loop first
+                    end
             | Eos =>
                  Regexp.String [~1])
 
