@@ -11,36 +11,6 @@ structure Process
       open Symbol
       open Automaton
 
-(*
-      structure LabelOrdered =
-         struct
-            type t = Syntax.label
-
-            fun eq l1_l2 =
-               (case l1_l2 of
-                   (IdentLabel id1, IdentLabel id2) =>
-                      Symbol.eq (id1, id2)
-                 | (NumericLabel n1, NumericLabel n2) =>
-                      n1 = n2
-                 | _ =>
-                      false)
-
-            fun compare l1_l2 =
-               (case l1_l2 of
-                   (IdentLabel id1, IdentLabel id2) =>
-                      Symbol.compare (id1, id2)
-                 | (NumericLabel n1, NumericLabel n2) =>
-                      Int.compare (n1, n2)
-                 | (NumericLabel _, IdentLabel _) =>
-                      LESS
-                 | (IdentLabel _, NumericLabel _) =>
-                      GREATER)
-
-         end
-
-      structure LabelSet = ListSet (structure Elem = LabelOrdered)
-*)
-
       fun labelToString l =
          (case l of
              IdentLabel s =>
@@ -272,6 +242,9 @@ structure Process
                                               val solearg =
                                                  (case labelset of
                                                      Numbers (_, 1) =>
+                                                        (* Every number in set is positive.
+                                                           Therefore, set = {1} iff max(set) = 1.
+                                                        *)
                                                         true
                                                    | Numbers (set, n) =>
                                                         (* Every number in set is positive.
