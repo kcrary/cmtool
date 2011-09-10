@@ -51,7 +51,7 @@ structure WriteAutomaton
                   ("start", [start])
                else
                   let
-                     val (_, _, lhs, rhs, _, _, _, _) = Vector.sub (rules, rulenum)
+                     val (_, _, lhs, rhs, _, _, _, _, _) = Vector.sub (rules, rulenum)
                   in
                      (Symbol.toValue lhs, rhs)
                   end

@@ -8,6 +8,9 @@ structure Parser =
 
       type pos = int
 
+      fun lift x () = x
+      fun identity x = x
+
       structure Arg =
          struct
             type pos_symbol = pos * Symbol.symbol
@@ -15,43 +18,47 @@ structure Parser =
             type pos = pos
 
             type symbol = Symbol.symbol
-            fun sole_ident {ident=(_, sym)} = sym
+            fun sole_ident (_, sym) = sym
 
             type int = int
-            fun sole_number {num=(_, n)} = n
+            fun sole_number (_, n) = n
   
+            type label = label
+            val ident_label = IdentLabel
+            val number_label = NumericLabel
+
             type constituent = constituent
-            fun unlabeled_item {ident} = Unlabeled ident
-            fun labeled_item {label, ident} = Labeled (label, ident)
-            fun paren_item {constituent} = constituent
+            val unlabeled_item = Unlabeled
+            val labeled_item = Labeled
+            val paren_item = identity
   
             type constituents = constituent list
-            fun nil_constituents {} = []
-            fun cons_constituents {head, tail} = head :: tail
+            fun nil_constituents () = []
+            val cons_constituents = op ::
   
             type precedence = precedence
-            fun empty_precedence {} = EmptyPrec
-            fun left_precedence {num} = PrecLeft num
-            fun right_precedence {num} = PrecRight num
-            fun no_precedence {} = PrecNone
+            val empty_precedence = lift EmptyPrec
+            val left_precedence = PrecLeft
+            val right_precedence = PrecRight
+            val no_precedence = lift PrecNone
 
             type production = production
             fun sole_production {constituents, action, prec} = (constituents, action, prec)
 
             type productions = production list
-            fun nil_productions {} = []
-            fun cons_productions {head, tail} = head :: tail
+            fun nil_productions () = []
+            val cons_productions = op ::
   
             type directive = directive
-            fun name_directive {ident} = Name ident
-            fun terminal_directive {ident, prec} = Terminal (ident, NONE, prec)
-            fun terminal_of_directive {ident, tp, prec} = Terminal (ident, SOME tp, prec)
-            fun nonterminal_directive {ident, tp, arms} = Nonterminal (ident, tp, arms)
-            fun start_directive {ident} = Start ident
+            val name_directive = Name
+            fun terminal_directive (ident, prec) = Terminal (ident, NONE, prec)
+            fun terminal_of_directive (ident, tp, prec) = Terminal (ident, SOME tp, prec)
+            val nonterminal_directive = Nonterminal
+            val start_directive = Start
   
             type directives = directive list
-            fun nil_directives {} = []
-            fun cons_directives {head, tail} = head :: tail
+            fun nil_directives () = []
+            val cons_directives = op ::
   
             datatype terminal = datatype Token.token
   

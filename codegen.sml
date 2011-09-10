@@ -10,6 +10,14 @@ structure Codegen
       open Automaton
 
 
+      fun labelToString l =
+         (case l of
+             Syntax.IdentLabel s =>
+                Symbol.toValue s
+           | Syntax.NumericLabel n =>
+                Int.toString n)
+
+
       (* Converts a word to a big-endian byte list. *)
       fun wordToBytelist w acc =
          if w = 0w0 then
@@ -136,13 +144,18 @@ structure Codegen
                types;
 
             Vector.app
-               (fn (_, _, lhs, rhs, args, action, _, _) =>
+               (fn (_, _, lhs, rhs, args, solearg, action, _, _) =>
                    let
                       val (_, lhstp, _) = D.lookup nonterminals lhs
                    in
                       write "val ";
                       write (Symbol.toValue action);
-                      write " : {";
+                      write " : ";
+
+                      if solearg then
+                         ()
+                      else
+                         write "{";
 
                       ListPair.foldlEq
                          (fn (_, NONE, first) =>
@@ -163,15 +176,27 @@ structure Codegen
                                       ()
                                    else
                                       write ", ";
-                                   write (Symbol.toValue label);
-                                   write ":";
+
+                                   if solearg then
+                                      ()
+                                   else
+                                      (
+                                      write (labelToString label);
+                                      write ":"
+                                      );
+
                                    write (Symbol.toValue tp);
                                    false
                                 end)
                          true
                          (rhs, args);
                       
-                      write "} -> ";
+                      if solearg then
+                         ()
+                      else
+                         write "}";
+
+                      write " -> ";
                       write (Symbol.toValue lhstp);
                       write "\n"
                    end)
@@ -295,7 +320,7 @@ structure Codegen
             write "\",\nVector.fromList [";
 
             Vector.foldl
-               (fn ((rulenum, _, lhs, rhs, args, action, _, _), first) =>
+               (fn ((rulenum, _, lhs, rhs, args, solearg, action, _, _), first) =>
                    (
                    if first then
                       ()
@@ -313,7 +338,7 @@ structure Codegen
                              write "_::";
                              n
                              )
-                        | (symbol, SOME _, n) =>
+                        | (symbol, SOME label, n) =>
                              let
                                 val tp =
                                    (case D.find nonterminals symbol of
@@ -330,30 +355,39 @@ structure Codegen
                              end)
                       0
                       (rev rhs, rev args);
-
+      
                    write "rest => Value.";
                    write (Symbol.toValue (#2 (D.lookup nonterminals lhs)));
                    write "(Arg.";
                    write (Symbol.toValue action);
-                   write " {";
+                   write " ";
+                   
+                   if solearg then
+                      write "arg0"
+                   else
+                      (
+                      write "{";
 
-                   foldr
-                      (fn (NONE, n) => n
-                        | (SOME label, n) =>
-                             (
-                             if n = 0 then
-                                ()
-                             else
-                                write ",";
-                             write (Symbol.toValue label);
-                             write "=arg";
-                             write (Int.toString n);
-                             n+1
-                             ))
-                      0
-                      args;
+                      foldr
+                         (fn (NONE, n) => n
+                           | (SOME label, n) =>
+                                (
+                                if n = 0 then
+                                   ()
+                                else
+                                   write ",";
+                                write (labelToString label);
+                                write "=arg";
+                                write (Int.toString n);
+                                n+1
+                                ))
+                         0
+                         args;
 
-                   write "})::rest";
+                      write "}"
+                      );
+
+                   write ")::rest";
                    if List.null rhs then
                       ()
                    else

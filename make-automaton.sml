@@ -74,7 +74,7 @@ structure MakeAutomaton
                           List.exists
                           (fn rulenum =>
                               let
-                                 val (_, _, _, rhs, _, _, _, _) = Vector.sub (rules, rulenum)
+                                 val (_, _, _, rhs, _, _, _, _, _) = Vector.sub (rules, rulenum)
                               in
                                  List.all (nullableMain ctx trail') rhs
                               end)
@@ -112,7 +112,7 @@ structure MakeAutomaton
                              foldl
                              (fn (rulenum, acc) =>
                                  let
-                                    val (_, _, _, rhs, _, _, _, _) = Vector.sub (rules, rulenum)
+                                    val (_, _, _, rhs, _, _, _, _, _) = Vector.sub (rules, rulenum)
                                  in
                                     S.union
                                        acc
@@ -190,7 +190,7 @@ structure MakeAutomaton
                                          foldl
                                          (fn (rulenum, d) =>
                                              let
-                                                val (_, _, _, rhs, _, _, _, _) = Vector.sub (rules, rulenum)
+                                                val (_, _, _, rhs, _, _, _, _, _) = Vector.sub (rules, rulenum)
    
                                                 val item = (rulenum, 0, rhs)
                                              in
@@ -278,7 +278,7 @@ structure MakeAutomaton
                                  )
                             | ([Reduce rulenum], NoConflict) =>
                                  let
-                                    val (_, _, _, _, _, _, reducepreco, _) = Vector.sub (rules, rulenum)
+                                    val (_, _, _, _, _, _, _, reducepreco, _) = Vector.sub (rules, rulenum)
                                     val (_, shiftpreco, _) = D.lookup terminals symbol
                                  in
                                     (case reducepreco of
@@ -321,7 +321,7 @@ structure MakeAutomaton
                          ()
                       else
                          let
-                            val (_, _, _, _, _, _, _, reduced) = Vector.sub (rules, rulenum)
+                            val (_, _, _, _, _, _, _, _, reduced) = Vector.sub (rules, rulenum)
                          in
                             reduced := true
                          end
@@ -460,7 +460,7 @@ structure MakeAutomaton
 
             val () =
                Vector.app
-               (fn (_, localnum, lhs, _, _, _, _, reduced) =>
+               (fn (_, localnum, lhs, _, _, _, _, _, reduced) =>
                    if !reduced then
                       ()
                    else

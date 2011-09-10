@@ -11,6 +11,50 @@ structure Process
       open Symbol
       open Automaton
 
+(*
+      structure LabelOrdered =
+         struct
+            type t = Syntax.label
+
+            fun eq l1_l2 =
+               (case l1_l2 of
+                   (IdentLabel id1, IdentLabel id2) =>
+                      Symbol.eq (id1, id2)
+                 | (NumericLabel n1, NumericLabel n2) =>
+                      n1 = n2
+                 | _ =>
+                      false)
+
+            fun compare l1_l2 =
+               (case l1_l2 of
+                   (IdentLabel id1, IdentLabel id2) =>
+                      Symbol.compare (id1, id2)
+                 | (NumericLabel n1, NumericLabel n2) =>
+                      Int.compare (n1, n2)
+                 | (NumericLabel _, IdentLabel _) =>
+                      LESS
+                 | (IdentLabel _, NumericLabel _) =>
+                      GREATER)
+
+         end
+
+      structure LabelSet = ListSet (structure Elem = LabelOrdered)
+*)
+
+      fun labelToString l =
+         (case l of
+             IdentLabel s =>
+                Symbol.toValue s
+           | NumericLabel n =>
+                Int.toString n)
+
+      structure IntSet = ListSet (structure Elem = IntOrdered)
+
+      datatype labelset =
+         Empty
+       | Numbers of IntSet.set * int  (* maximum *)
+       | Idents of S.set
+
       exception Error
 
       val modulename   : string option ref                          = ref NONE
@@ -146,32 +190,106 @@ structure Process
                                               val globalnumber = !ruleCount
                                               val () = ruleCount := globalnumber + 1
 
-                                              val (rhsrev, argsrev, _) =
+                                              val (rhsrev, argsrev, labelset) =
                                                  foldl
-                                                 (fn (constituent, (rhsrev, argsrev, labels)) =>
+                                                 (fn (constituent, (rhsrev, argsrev, labelset)) =>
                                                      (case constituent of
                                                          Unlabeled symbol =>
                                                             (symbol :: rhsrev,
                                                              NONE :: argsrev,
-                                                             labels)
+                                                             labelset)
                                                        | Labeled (label, symbol) =>
-                                                            if S.member labels label then
-                                                               (
-                                                               print "Error: argument ";
-                                                               print (toValue label);
-                                                               print " is used multiple times in rule ";
-                                                               print (Int.toString localnumber);
-                                                               print " of nonterminal ";
-                                                               print (toValue name);
-                                                               print ".\n";
-                                                               raise Error
-                                                               )
-                                                            else
+                                                            let
+                                                               val labelset' =
+                                                                  (case (label, labelset) of
+                                                                      (IdentLabel ident, Empty) =>
+                                                                         Idents (S.singleton ident)
+                                                                    | (IdentLabel ident, Idents set) =>
+                                                                         if S.member set ident then
+                                                                            (
+                                                                            print "Error: argument ";
+                                                                            print (Symbol.toValue ident);
+                                                                            print " is used multiple times in rule ";
+                                                                            print (Int.toString localnumber);
+                                                                            print " of nonterminal ";
+                                                                            print (toValue name);
+                                                                            print ".\n";
+                                                                            raise Error
+                                                                            )
+                                                                         else
+                                                                            Idents (S.insert set ident)
+                                                                    | (IdentLabel ident, Numbers _) =>
+                                                                         (
+                                                                         print "Error: identifer and numeric arguments are mixed in rule ";
+                                                                         print (Int.toString localnumber);
+                                                                         print " of nonterminal ";
+                                                                         print (toValue name);
+                                                                         print ".\n";
+                                                                         raise Error
+                                                                         )
+                                                                    | (NumericLabel 0, _) =>
+                                                                         (
+                                                                         print "Error: illegal label 0 in rule ";
+                                                                         print (Int.toString localnumber);
+                                                                         print " of nonterminal ";
+                                                                         print (toValue name);
+                                                                         print ".\n";
+                                                                         raise Error
+                                                                         )
+                                                                    | (NumericLabel n, Empty) =>
+                                                                         Numbers (IntSet.singleton n, n)
+                                                                    | (NumericLabel n, Numbers (set, max)) =>
+                                                                         if IntSet.member set n then
+                                                                            (
+                                                                            print "Error: argument ";
+                                                                            print (Int.toString n);
+                                                                            print " is used multiple times in rule ";
+                                                                            print (Int.toString localnumber);
+                                                                            print " of nonterminal ";
+                                                                            print (toValue name);
+                                                                            print ".\n";
+                                                                            raise Error
+                                                                            )
+                                                                         else
+                                                                            Numbers (IntSet.insert set n, Int.max (max, n))
+                                                                    | (NumericLabel n, Idents _) =>
+                                                                         (
+                                                                         print "Error: identifer and numeric arguments are mixed in rule ";
+                                                                         print (Int.toString localnumber);
+                                                                         print " of nonterminal ";
+                                                                         print (toValue name);
+                                                                         print ".\n";
+                                                                         raise Error
+                                                                         ))
+                                                            in
                                                                (symbol :: rhsrev,
                                                                 SOME label :: argsrev,
-                                                                S.insert labels label)))
-                                                 ([], [], S.empty)
+                                                                labelset')
+                                                            end))
+                                                 ([], [], Empty)
                                                  constituents
+
+                                              val solearg =
+                                                 (case labelset of
+                                                     Numbers (_, 1) =>
+                                                        true
+                                                   | Numbers (set, n) =>
+                                                        (* Every number in set is positive.
+                                                           Therefore, set is sequential iff |set| = max(set).
+                                                        *)
+                                                        if IntSet.size set = n then
+                                                           false
+                                                        else
+                                                           (
+                                                           print "Error: non-sequential numeric arguments in rule ";
+                                                           print (Int.toString localnumber);
+                                                           print " of nonterminal ";
+                                                           print (toValue name);
+                                                           print ".\n";
+                                                           raise Error
+                                                           )
+                                                   | _ =>
+                                                        false)
 
                                               val actions'' =
                                                  if D.member actions' action then
@@ -250,7 +368,7 @@ structure Process
                                                         end)
                                                               
                                            in
-                                              ((globalnumber, localnumber, name, rev rhsrev, rev argsrev, action, prec', ref false) :: acc,
+                                              ((globalnumber, localnumber, name, rev rhsrev, rev argsrev, solearg, action, prec', ref false) :: acc,
                                                actions'',
                                                globalnumber :: next,
                                                localnumber + 1)
@@ -332,7 +450,7 @@ structure Process
             val rules' = rev (!rules)
             val () =
                app
-               (fn (globalnumber, localnumber, nonterminalName, rhs, args, _, _, _) =>
+               (fn (globalnumber, localnumber, nonterminalName, rhs, args, _, _, _, _) =>
                    ListPair.appEq
                    (fn (symbol, argo) =>
                           (case D.find nonterminals' symbol of
@@ -346,7 +464,7 @@ structure Process
                                           | SOME label =>
                                                (
                                                print "Error: argument ";
-                                               print (toValue label);
+                                               print (labelToString label);
                                                print " in rule ";
                                                print (Int.toString localnumber);
                                                print " of nonterminal ";

@@ -17,24 +17,28 @@ terminal START of pos
 terminal TERMINAL of pos
 
 nonterminal Ident : symbol =
-   ident:IDENT => sole_ident
+   1:IDENT => sole_ident
 
 nonterminal Number : int =
-   num:NUMBER => sole_number
+   1:NUMBER => sole_number
+
+nonterminal Label : label =
+   1:Ident => ident_label
+   1:Number => number_label
 
 nonterminal Constituent : constituent =
-   (ident:Ident) => unlabeled_item
-   (label:Ident) COLON (ident:Ident) => labeled_item
-   LPAREN (constituent:Constituent) RPAREN => paren_item
+   1:Ident => unlabeled_item
+   1:Label COLON 2:Ident => labeled_item
+   LPAREN 1:Constituent RPAREN => paren_item
 
 nonterminal Constituents : constituents =
    => nil_constituents
-   (head:Constituent) (tail:Constituents) => cons_constituents
+   1:Constituent 2:Constituents => cons_constituents
 
 nonterminal Precedence : precedence =
    => empty_precedence
-   PRECL (num:Number) => left_precedence
-   PRECR (num:Number) => right_precedence
+   PRECL 1:Number => left_precedence
+   PRECR 1:Number => right_precedence
    NOPREC => no_precedence
 
 nonterminal Production : production =
@@ -42,17 +46,17 @@ nonterminal Production : production =
 
 nonterminal Productions : productions =
    => nil_productions
-   (head:Production) (tail:Productions) => cons_productions
+   1:Production 2:Productions => cons_productions
 
 nonterminal Directive : directive =
-   NAME (ident:Ident) => name_directive
-   TERMINAL (ident:Ident) (prec:Precedence) => terminal_directive
-   TERMINAL (ident:Ident) OF (tp:Ident) (prec:Precedence) => terminal_of_directive
-   NONTERMINAL (ident:Ident) COLON (tp:Ident) EQUAL (arms:Productions) => nonterminal_directive
-   START (ident:Ident) => start_directive
+   NAME 1:Ident => name_directive
+   TERMINAL 1:Ident 2:Precedence => terminal_directive
+   TERMINAL 1:Ident OF 2:Ident 3:Precedence => terminal_of_directive
+   NONTERMINAL 1:Ident COLON 2:Ident EQUAL 3:Productions => nonterminal_directive
+   START 1:Ident => start_directive
 
 nonterminal Directives : directives =
    => nil_directives
-   (head:Directive) (tail:Directives) => cons_directives
+   1:Directive 2:Directives => cons_directives
 
 start Directives

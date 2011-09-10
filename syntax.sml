@@ -1,12 +1,18 @@
 
+structure Symbol = SymbolFun (structure Value = StringHashable)
+
 structure Syntax =
    struct
 
       type symbol = Symbol.symbol
 
+      datatype label =
+         IdentLabel of symbol
+       | NumericLabel of int  (* nonnegative (zero is illegal too, but that's not enforced by the parser) *)
+
       datatype constituent =
          Unlabeled of symbol
-       | Labeled of symbol * symbol  (* (label, symbol) *)
+       | Labeled of label * symbol
 
       datatype precedence =
          EmptyPrec

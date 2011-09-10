@@ -1,5 +1,4 @@
 
-structure Symbol = SymbolFun (structure Value = StringHashable)
 structure SymbolOrdered = SymbolOrderedFun (structure Symbol = Symbol)
 structure SymbolHashable = SymbolHashableFun (structure Symbol = Symbol)
 structure SymbolDict = SplayDict (structure Key = SymbolOrdered)
@@ -9,7 +8,9 @@ structure Automaton =
    struct
 
       type precedence = int option
+      type label = Syntax.label
 
+      (* Ideally, this should be a record. *)
       type rule =
          int                        (* rule number *)
          *
@@ -19,7 +20,13 @@ structure Automaton =
          *
          Symbol.symbol list         (* rhs *)
          *
-         Symbol.symbol option list  (* arguments *)
+         label option list          (* arguments *)
+         *
+         bool                       (* sole argument:
+                                       If true then arguments should
+                                       contain only one label, which will
+                                       be ignored.
+                                    *)
          *
          Symbol.symbol              (* action *)
          *
