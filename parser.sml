@@ -10,6 +10,9 @@ structure Parser
 
       type pos = int
 
+      fun identity x = x
+      fun lift x () = x
+
       structure Arg =
          struct
             type pos_string = pos * string
@@ -18,70 +21,70 @@ structure Parser
             type pos = pos
 
             type string = string
-            fun ident {ident=(_, str)} = str
+            fun ident (_, str) = str
 
             type int = int
-            fun number {num=(_, n)} = n
+            fun number (_, n) = n
 
             type numpairs = (int * int) list
-            fun nil_numpairs {} = []
-            fun cons_numpairs {first, last, tail} = (first, last) :: tail
+            fun nil_numpairs () = []
+            fun cons_numpairs (first, last, tail) = (first, last) :: tail
 
             type charset = charset
-            fun ident_charset {ident} = Svar ident
-            fun number_charset {num} = Ssymbol num
-            fun range_charset {l} = Srange l
-            fun empty_charset {} = Sempty
-            fun union_charset {l} = Sunion l
-            fun intersect_charset {l} = Sintersection l
-            fun diff_charset {head, l} = Sdifference (head, l)
-            fun comp_charset {l} = Scomplement l
-            fun any_charset {} = Sany
+            val ident_charset = Svar
+            val number_charset = Ssymbol
+            val range_charset = Srange
+            val empty_charset = lift Sempty
+            val union_charset = Sunion
+            val intersect_charset = Sintersection
+            val diff_charset = Sdifference
+            val comp_charset = Scomplement
+            val any_charset = lift Sany
 
             type charsets = charset list
-            fun nil_charsets {} = []
-            fun cons_charsets {head, tail} = head :: tail
+            fun nil_charsets () = []
+            val cons_charsets = op ::
             
             type regexp = regexp
-            fun ident_regexp {ident} = Var ident
-            fun number_regexp {num} = Symbol num
-            fun string_regexp {str=(_, str)} = String str
-            fun any_regexp {} = Any
-            fun epsilon_regexp {} = Epsilon
-            fun empty_regexp {} = Empty
-            fun concat_regexp {l} = Concat l
-            val seq_regexp = concat_regexp
-            fun union_regexp {l} = Union l
-            fun option_regexp {r} = Option r
-            fun closure_regexp {r} = Closure r
-            fun plus_regexp {r} = Plus r
+            val ident_regexp = Var
+            val number_regexp = Symbol
+            fun string_regexp (_, str) = String str
+            val any_regexp = lift Any
+            val epsilon_regexp = lift Epsilon
+            val empty_regexp = lift Empty
+            val concat_regexp = Concat
+            val seq_regexp = Concat
+            val union_regexp = Union
+            val option_regexp = Option
+            val closure_regexp = Closure
+            val plus_regexp = Plus
             fun equal_regexp {r, n} = Exactly (r, n)
             fun geq_regexp {r, n} = AtLeast (r, n)
             fun repeat_regexp {r, first, last} = Repeat (r, first, last)
-            fun eos_regexp {} = Eos
+            val eos_regexp = lift Eos
 
             type regexps = regexp list
-            fun nil_regexps {} = []
-            fun cons_regexps {head, tail} = head :: tail
+            fun nil_regexps () = []
+            val cons_regexps = op ::
 
             type arm = regexp * string
             fun sole_arm {r, action} = (r, action)
 
             type arms = arm list
-            fun sing_arms {arm} = [arm]
-            fun cons_arms {head, tail} = head :: tail
+            fun sing_arms arm = [arm]
+            val cons_arms = op ::
 
             type directive = directive
-            fun name_directive {ident} = Name ident
-            fun enable_directive {ident} = Enable ident
-            fun alphabet_directive {num} = Alphabet num
-            fun regexp_directive {ident, r} = Regexp (ident, r)
-            fun set_directive {ident, s} = Set (ident, s)
-            fun function_directive {ident, tp, arms} = Function (ident, tp, arms)
+            val name_directive = Name
+            val enable_directive = Enable
+            val alphabet_directive = Alphabet
+            val regexp_directive = Regexp
+            val set_directive = Set
+            val function_directive = Function
 
             type directives = directive list
-            fun nil_directives {} = []
-            fun cons_directives {head, tail} = head :: tail
+            fun nil_directives () = []
+            val cons_directives = op ::
 
             datatype terminal = datatype Token.token
 

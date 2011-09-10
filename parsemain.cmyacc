@@ -32,43 +32,43 @@ terminal TILDE of pos
 
 
 nonterminal Ident : string =
-   ident:IDENT => ident
+   1:IDENT => ident
 
 nonterminal Number : int =
-   num:NUMBER => number
+   1:NUMBER => number
 
 nonterminal NumPairs : numpairs =
    => nil_numpairs
-   (first:Number) (last:Number) (tail:NumPairs) => cons_numpairs
+   1:Number 2:Number 3:NumPairs => cons_numpairs
 
 nonterminal Charset : charset =
-   ident:Ident => ident_charset
-   num:Number => number_charset
-   LPAREN RANGE (l:NumPairs) RPAREN => range_charset
+   1:Ident => ident_charset
+   1:Number => number_charset
+   LPAREN RANGE 1:NumPairs RPAREN => range_charset
    EMPT => empty_charset
-   LPAREN OR (l:Charsets) RPAREN => union_charset
-   LPAREN AND (l:Charsets) RPAREN => intersect_charset
-   LPAREN MINUS (head:Charset) (l:Charsets) RPAREN => diff_charset
-   LPAREN TILDE (l:Charsets) RPAREN => comp_charset
+   LPAREN OR 1:Charsets RPAREN => union_charset
+   LPAREN AND 1:Charsets RPAREN => intersect_charset
+   LPAREN MINUS 1:Charset 2:Charsets RPAREN => diff_charset
+   LPAREN TILDE 1:Charsets RPAREN => comp_charset
    ANY => any_charset
 
 nonterminal Charsets : charsets =
    => nil_charsets
-   (head:Charset) (tail:Charsets) => cons_charsets
+   1:Charset 2:Charsets => cons_charsets
    
 nonterminal Regexp : regexp =
-   ident:Ident => ident_regexp
-   num:Number => number_regexp
-   str:STRING => string_regexp
+   1:Ident => ident_regexp
+   1:Number => number_regexp
+   1:STRING => string_regexp
    ANY => any_regexp
    EPSILON => epsilon_regexp
    EMPT => empty_regexp
-   LPAREN COLON (l:Regexps) RPAREN => concat_regexp
-   LPAREN SEQ (l:Regexps) RPAREN => seq_regexp
-   LPAREN OR (l:Regexps) RPAREN => union_regexp
-   LPAREN QUESTION (r:Regexp) RPAREN => option_regexp
-   LPAREN STAR (r:Regexp) RPAREN => closure_regexp
-   LPAREN PLUS (r:Regexp) RPAREN => plus_regexp
+   LPAREN COLON 1:Regexps RPAREN => concat_regexp
+   LPAREN SEQ 1:Regexps RPAREN => seq_regexp
+   LPAREN OR 1:Regexps RPAREN => union_regexp
+   LPAREN QUESTION 1:Regexp RPAREN => option_regexp
+   LPAREN STAR 1:Regexp RPAREN => closure_regexp
+   LPAREN PLUS 1:Regexp RPAREN => plus_regexp
    LPAREN EQUAL (n:Number) (r:Regexp) RPAREN => equal_regexp
    LPAREN GEQ (n:Number) (r:Regexp) RPAREN => geq_regexp
    LPAREN REPEAT (first:Number) (last:Number) (r:Regexp) RPAREN => repeat_regexp
@@ -76,25 +76,25 @@ nonterminal Regexp : regexp =
 
 nonterminal Regexps : regexps =
    => nil_regexps
-   (head:Regexp) (tail:Regexps) => cons_regexps
+   1:Regexp 2:Regexps => cons_regexps
    
 nonterminal Arm : arm =
    (r:Regexp) ARROW (action:Ident) => sole_arm
 
 nonterminal Arms : arms =
-   arm:Arm => sing_arms
-   (head:Arm) (tail:Arms) => cons_arms
+   1:Arm => sing_arms
+   1:Arm 2:Arms => cons_arms
 
 nonterminal Directive : directive =
-   NAME (ident:Ident) => name_directive
-   ENABLE (ident:Ident) => enable_directive
-   ALPHABET (num:Number) => alphabet_directive
-   REGEXP (ident:Ident) EQUAL (r:Regexp) => regexp_directive
-   SET (ident:Ident) EQUAL (s:Charset) => set_directive
-   FUNCTION (ident:Ident) COLON (tp:Ident) EQUAL (arms:Arms) => function_directive
+   NAME 1:Ident => name_directive
+   ENABLE 1:Ident => enable_directive
+   ALPHABET 1:Number => alphabet_directive
+   REGEXP 1:Ident EQUAL 2:Regexp => regexp_directive
+   SET 1:Ident EQUAL 2:Charset => set_directive
+   FUNCTION 1:Ident COLON 2:Ident EQUAL 3:Arms => function_directive
 
 nonterminal Directives : directives =
    => nil_directives
-   (head:Directive) (tail:Directives) => cons_directives
+   1:Directive 2:Directives => cons_directives
 
 start Directives
