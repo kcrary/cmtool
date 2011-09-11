@@ -12,6 +12,7 @@ structure Parser
 
       fun identity x = x
       fun lift x () = x
+      fun null () = []
 
       structure Arg =
          struct
@@ -27,7 +28,7 @@ structure Parser
             fun number (_, n) = n
 
             type numpairs = (int * int) list
-            fun nil_numpairs () = []
+            val nil_numpairs = null
             fun cons_numpairs (first, last, tail) = (first, last) :: tail
 
             type charset = charset
@@ -42,7 +43,7 @@ structure Parser
             val any_charset = lift Sany
 
             type charsets = charset list
-            fun nil_charsets () = []
+            val nil_charsets = null
             val cons_charsets = op ::
             
             type regexp = regexp
@@ -64,11 +65,11 @@ structure Parser
             val eos_regexp = lift Eos
 
             type regexps = regexp list
-            fun nil_regexps () = []
+            val nil_regexps = null
             val cons_regexps = op ::
 
             type arm = regexp * string
-            fun sole_arm {r, action} = (r, action)
+            val sole_arm = identity
 
             type arms = arm list
             fun sing_arms arm = [arm]
@@ -83,7 +84,7 @@ structure Parser
             val function_directive = Function
 
             type directives = directive list
-            fun nil_directives () = []
+            val nil_directives = null
             val cons_directives = op ::
 
             datatype terminal = datatype Token.token

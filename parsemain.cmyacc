@@ -79,7 +79,7 @@ nonterminal Regexps : regexps =
    1:Regexp 2:Regexps => cons_regexps
    
 nonterminal Arm : arm =
-   (r:Regexp) ARROW (action:Ident) => sole_arm
+   1:Regexp ARROW 2:Ident => sole_arm
 
 nonterminal Arms : arms =
    1:Arm => sing_arms
