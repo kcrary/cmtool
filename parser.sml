@@ -10,6 +10,7 @@ structure Parser =
 
       fun lift x () = x
       fun identity x = x
+      fun null () = []
 
       structure Arg =
          struct
@@ -33,7 +34,7 @@ structure Parser =
             val paren_item = identity
   
             type constituents = constituent list
-            fun nil_constituents () = []
+            val nil_constituents = null
             val cons_constituents = op ::
   
             type precedence = precedence
@@ -43,10 +44,10 @@ structure Parser =
             val no_precedence = lift PrecNone
 
             type production = production
-            fun sole_production {constituents, action, prec} = (constituents, action, prec)
+            fun sole_production (constituents, action, prec) = (constituents, action, prec)
 
             type productions = production list
-            fun nil_productions () = []
+            val nil_productions = null
             val cons_productions = op ::
   
             type directive = directive
@@ -57,7 +58,7 @@ structure Parser =
             val start_directive = Start
   
             type directives = directive list
-            fun nil_directives () = []
+            val nil_directives = null
             val cons_directives = op ::
   
             datatype terminal = datatype Token.token

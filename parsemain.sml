@@ -658,7 +658,7 @@ val empty_precedence : {} -> precedence
 val left_precedence : int -> precedence
 val right_precedence : int -> precedence
 val no_precedence : {} -> precedence
-val sole_production : {constituents:constituents, action:symbol, prec:precedence} -> production
+val sole_production : {1:constituents, 2:symbol, 3:precedence} -> production
 val nil_productions : {} -> productions
 val cons_productions : {1:production, 2:productions} -> productions
 val name_directive : symbol -> directive
@@ -746,7 +746,7 @@ Vector.fromList [(0,1,(fn Value.pos_symbol(arg0)::rest => Value.symbol(Arg.sole_
 (5,2,(fn Value.int(arg0)::_::rest => Value.precedence(Arg.left_precedence arg0)::rest|_=>raise (Fail "bad parser"))),
 (5,2,(fn Value.int(arg0)::_::rest => Value.precedence(Arg.right_precedence arg0)::rest|_=>raise (Fail "bad parser"))),
 (5,1,(fn _::rest => Value.precedence(Arg.no_precedence {})::rest|_=>raise (Fail "bad parser"))),
-(6,4,(fn Value.precedence(arg0)::Value.symbol(arg1)::_::Value.constituents(arg2)::rest => Value.production(Arg.sole_production {prec=arg0,action=arg1,constituents=arg2})::rest|_=>raise (Fail "bad parser"))),
+(6,4,(fn Value.precedence(arg0)::Value.symbol(arg1)::_::Value.constituents(arg2)::rest => Value.production(Arg.sole_production {3=arg0,2=arg1,1=arg2})::rest|_=>raise (Fail "bad parser"))),
 (7,0,(fn rest => Value.productions(Arg.nil_productions {})::rest)),
 (7,2,(fn Value.productions(arg0)::Value.production(arg1)::rest => Value.productions(Arg.cons_productions {2=arg0,1=arg1})::rest|_=>raise (Fail "bad parser"))),
 (8,2,(fn Value.symbol(arg0)::_::rest => Value.directive(Arg.name_directive arg0)::rest|_=>raise (Fail "bad parser"))),

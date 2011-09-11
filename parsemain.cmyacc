@@ -42,7 +42,7 @@ nonterminal Precedence : precedence =
    NOPREC => no_precedence
 
 nonterminal Production : production =
-   (constituents:Constituents) ARROW (action:Ident) (prec:Precedence) => sole_production
+   1:Constituents ARROW 2:Ident 3:Precedence => sole_production
 
 nonterminal Productions : productions =
    => nil_productions
