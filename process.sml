@@ -248,13 +248,14 @@ structure Process
                                                         true
                                                    | Numbers (set, n) =>
                                                         (* Every number in set is positive.
-                                                           Therefore, set is sequential iff |set| = max(set).
+                                                           Therefore, set = {1 .. n} (for some n) 
+                                                           iff |set| = max(set).
                                                         *)
                                                         if IntSet.size set = n then
                                                            false
                                                         else
                                                            (
-                                                           print "Error: non-sequential numeric arguments in rule ";
+                                                           print "Error: numeric arguments do not complete a tuple in rule ";
                                                            print (Int.toString localnumber);
                                                            print " of nonterminal ";
                                                            print (toValue name);
