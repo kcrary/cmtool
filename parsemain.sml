@@ -1938,9 +1938,9 @@ val union_regexp : regexps -> regexp
 val option_regexp : regexp -> regexp
 val closure_regexp : regexp -> regexp
 val plus_regexp : regexp -> regexp
-val equal_regexp : {n:int, r:regexp} -> regexp
-val geq_regexp : {n:int, r:regexp} -> regexp
-val repeat_regexp : {first:int, last:int, r:regexp} -> regexp
+val equal_regexp : {2:int, 1:regexp} -> regexp
+val geq_regexp : {2:int, 1:regexp} -> regexp
+val repeat_regexp : {2:int, 3:int, 1:regexp} -> regexp
 val eos_regexp : {} -> regexp
 val nil_regexps : {} -> regexps
 val cons_regexps : {1:regexp, 2:regexps} -> regexps
@@ -2077,9 +2077,9 @@ Vector.fromList [(0,1,(fn Value.pos_string(arg0)::rest => Value.string(Arg.ident
 (5,4,(fn _::Value.regexp(arg0)::_::_::rest => Value.regexp(Arg.option_regexp arg0)::rest|_=>raise (Fail "bad parser"))),
 (5,4,(fn _::Value.regexp(arg0)::_::_::rest => Value.regexp(Arg.closure_regexp arg0)::rest|_=>raise (Fail "bad parser"))),
 (5,4,(fn _::Value.regexp(arg0)::_::_::rest => Value.regexp(Arg.plus_regexp arg0)::rest|_=>raise (Fail "bad parser"))),
-(5,5,(fn _::Value.regexp(arg0)::Value.int(arg1)::_::_::rest => Value.regexp(Arg.equal_regexp {r=arg0,n=arg1})::rest|_=>raise (Fail "bad parser"))),
-(5,5,(fn _::Value.regexp(arg0)::Value.int(arg1)::_::_::rest => Value.regexp(Arg.geq_regexp {r=arg0,n=arg1})::rest|_=>raise (Fail "bad parser"))),
-(5,6,(fn _::Value.regexp(arg0)::Value.int(arg1)::Value.int(arg2)::_::_::rest => Value.regexp(Arg.repeat_regexp {r=arg0,last=arg1,first=arg2})::rest|_=>raise (Fail "bad parser"))),
+(5,5,(fn _::Value.regexp(arg0)::Value.int(arg1)::_::_::rest => Value.regexp(Arg.equal_regexp {1=arg0,2=arg1})::rest|_=>raise (Fail "bad parser"))),
+(5,5,(fn _::Value.regexp(arg0)::Value.int(arg1)::_::_::rest => Value.regexp(Arg.geq_regexp {1=arg0,2=arg1})::rest|_=>raise (Fail "bad parser"))),
+(5,6,(fn _::Value.regexp(arg0)::Value.int(arg1)::Value.int(arg2)::_::_::rest => Value.regexp(Arg.repeat_regexp {1=arg0,3=arg1,2=arg2})::rest|_=>raise (Fail "bad parser"))),
 (5,1,(fn _::rest => Value.regexp(Arg.eos_regexp {})::rest|_=>raise (Fail "bad parser"))),
 (6,0,(fn rest => Value.regexps(Arg.nil_regexps {})::rest)),
 (6,2,(fn Value.regexps(arg0)::Value.regexp(arg1)::rest => Value.regexps(Arg.cons_regexps {2=arg0,1=arg1})::rest|_=>raise (Fail "bad parser"))),

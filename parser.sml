@@ -59,9 +59,9 @@ structure Parser
             val option_regexp = Option
             val closure_regexp = Closure
             val plus_regexp = Plus
-            fun equal_regexp {r, n} = Exactly (r, n)
-            fun geq_regexp {r, n} = AtLeast (r, n)
-            fun repeat_regexp {r, first, last} = Repeat (r, first, last)
+            val equal_regexp = Exactly
+            val geq_regexp = AtLeast
+            val repeat_regexp = Repeat
             val eos_regexp = lift Eos
 
             type regexps = regexp list

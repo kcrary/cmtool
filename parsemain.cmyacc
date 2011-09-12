@@ -69,9 +69,9 @@ nonterminal Regexp : regexp =
    LPAREN QUESTION 1:Regexp RPAREN => option_regexp
    LPAREN STAR 1:Regexp RPAREN => closure_regexp
    LPAREN PLUS 1:Regexp RPAREN => plus_regexp
-   LPAREN EQUAL (n:Number) (r:Regexp) RPAREN => equal_regexp
-   LPAREN GEQ (n:Number) (r:Regexp) RPAREN => geq_regexp
-   LPAREN REPEAT (first:Number) (last:Number) (r:Regexp) RPAREN => repeat_regexp
+   LPAREN EQUAL 2:Number 1:Regexp RPAREN => equal_regexp
+   LPAREN GEQ 2:Number 1:Regexp RPAREN => geq_regexp
+   LPAREN REPEAT 2:Number 3:Number 1:Regexp RPAREN => repeat_regexp
    EOS => eos_regexp
 
 nonterminal Regexps : regexps =
