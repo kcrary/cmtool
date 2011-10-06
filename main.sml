@@ -24,7 +24,7 @@ functor MainFun (structure Parser : PARSER
 
       fun mainCmd (name, args) =
           let 
-             val usage = "Usage: cmlex file.cmlex\n" 
+             val usage = "Usage: " ^ name ^ " file.cmlex\n" 
           in  
              case args of 
                 [] => 
