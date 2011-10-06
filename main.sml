@@ -23,7 +23,7 @@ structure Main =
 
        fun mainCmd (name, args) =
           let 
-             val usage = "Usage: cmyacc file.cmyacc\n" 
+             val usage = "Usage: " ^ name ^ " file.cmyacc\n" 
           in  
              case args of 
                 [] => 
