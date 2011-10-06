@@ -23,7 +23,7 @@ functor MainFun (structure Parser : PARSER
           end
 
       fun mainCmd (name, args) =
-          let val usage = "Usage: cmlex file.cmlex" in  
+          let val usage = "Usage: cmlex file.cmlex\n" in  
              case args of 
                 [] => 
                 (print "not enough files\n"; print usage; OS.Process.failure)
@@ -32,7 +32,10 @@ functor MainFun (structure Parser : PARSER
               | [ arg ] => 
                 (main arg (OS.Path.joinBaseExt {base = arg, ext = SOME "sml"})
                 ; OS.Process.success)
-          end handle exn => 
-             (print ("Exception: " ^ exnName exn ^ "\n" ^ exnMessage exn ^ "\n")
-             ; OS.Process.failure) 
+          end handle Process.Error => OS.Process.failure
+                   | Parser.Error => OS.Process.failure
+                   | exn =>  
+                     (print ("Failed with exception: " ^ exnName exn ^ "\n")
+                     ; print ("[" ^ exnMessage exn ^ "]\n")
+                     ; OS.Process.failure) 
    end
