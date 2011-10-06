@@ -23,7 +23,9 @@ functor MainFun (structure Parser : PARSER
           end
 
       fun mainCmd (name, args) =
-          let val usage = "Usage: cmlex file.cmlex\n" in  
+          let 
+             val usage = "Usage: cmlex file.cmlex\n" 
+          in  
              case args of 
                 [] => 
                 (print "not enough files\n"; print usage; OS.Process.failure)
