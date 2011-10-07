@@ -47,13 +47,13 @@ functor MainFun (structure Parser : PARSER
                    NONE => OS.Path.joinBaseExt {base = infile, ext = SOME "sml"}
                  | SOME file => file
           in  
-             main infile outfile; OS.Process.failure
+             main infile outfile; OS.Process.success
           end handle Process.Error => OS.Process.failure
                    | Parser.Error => OS.Process.failure
                    | Quit msg => 
                      (print ("Error: " ^ msg ^ "\n\
                              \Usage: " ^ name ^ " file.cmlex [-o file.sml]\n\
-                             \Default output file is file.cmlex.sml\n")
+                             \(Default output file is file.cmlex.sml)\n")
                      ; OS.Process.failure) 
                    | exn =>  
                      (print ("Failed with exception: " ^ exnName exn ^ "\n")
