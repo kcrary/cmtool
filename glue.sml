@@ -1,3 +1,4 @@
 
-structure Main = MainFun (structure Parser = Parser
+structure Main = MainFun (structure Lexer = Lexer
+                          structure Parser = Parser
                           structure CodeGen = CodeGen)

@@ -1,5 +1,6 @@
 
-functor MainFun (structure Parser : PARSER
+functor MainFun (structure Lexer : sig exception Error end
+                 structure Parser : PARSER
                  structure CodeGen : CODEGEN) =
    struct
 
@@ -46,10 +47,11 @@ functor MainFun (structure Parser : PARSER
                 case (!outfile) of
                    NONE => OS.Path.joinBaseExt {base = infile, ext = SOME "sml"}
                  | SOME file => file
-          in  
+          in   
              main infile outfile; OS.Process.success
           end handle Process.Error => OS.Process.failure
                    | Parser.Error => OS.Process.failure
+                   | Lexer.Error => OS.Process.failure
                    | Quit msg => 
                      (print ("Error: " ^ msg ^ "\n\
                              \Usage: " ^ name ^ " file.cmlex [-o file.sml]\n\
