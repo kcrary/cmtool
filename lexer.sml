@@ -62,7 +62,12 @@ structure Lexer
          "int",
          "list",
          "ord",
-         "symbol"
+         "symbol",
+
+         "true",
+         "false",
+         "nil",
+         "ref"
          ]
 
 
