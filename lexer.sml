@@ -60,7 +60,12 @@ structure Lexer
          "o",
 
          "error",
-         "exn"
+         "exn",
+
+         "true",
+         "false",
+         "nil",
+         "ref"
          ]
 
 
