@@ -18,6 +18,5 @@ Group is
 	write-automaton.sig
 	write-automaton.sml
 
-	../lib/sources.cm
-        ../lib/basis.cm
+	../lib/cmlib.cm
 
