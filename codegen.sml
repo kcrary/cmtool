@@ -263,7 +263,7 @@ structure CodeGen
                     (
                     write "val ";
                     write actionName;
-                    write " : { str : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {";
+                    write " : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {";
 
                     appSeparated
                     (fn (fname, tp, _) =>

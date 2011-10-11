@@ -96,7 +96,7 @@ structure Lexer
 
       open Stream
 
-      type arg = { str : char list,
+      type arg = { match : char list,
                    len : int, 
                    start : char stream, 
                    follow : char stream, 
@@ -105,8 +105,8 @@ structure Lexer
 
       exception Error
 
-      fun action f ({ str, len, follow, self, ... }:arg) pos =
-         Cons (f (str, len, pos), lazy (fn () => #lexmain self follow (pos+len)))
+      fun action f ({ match, len, follow, self, ... }:arg) pos =
+         Cons (f (match, len, pos), lazy (fn () => #lexmain self follow (pos+len)))
 
       fun simple token ({ len, follow, self, ... }:arg) pos =
          Cons (token pos, lazy (fn () => #lexmain self follow (pos+len)))
