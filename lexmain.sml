@@ -102,21 +102,21 @@ type symbol
 val ord : symbol -> int
 type t
 type u
-val arrow : { str : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
-val colon : { str : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
-val comment_close : { str : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> u
-val comment_error : { str : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> u
-val comment_open : { str : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> u
-val comment_skip : { str : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> u
-val eof : { str : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
-val equal : { str : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
-val error : { str : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
-val ident : { str : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
-val lcomment : { str : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
-val lparen : { str : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
-val number : { str : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
-val rparen : { str : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
-val skip : { str : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
+val arrow : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
+val colon : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
+val comment_close : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> u
+val comment_error : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> u
+val comment_open : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> u
+val comment_skip : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> u
+val eof : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
+val equal : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
+val error : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
+val ident : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
+val lcomment : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
+val lparen : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
+val number : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
+val rparen : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
+val skip : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
 end)
 =
 struct
