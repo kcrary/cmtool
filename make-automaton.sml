@@ -336,8 +336,9 @@ structure MakeAutomaton
       (* The lexer ensures that this identifier will not be in use. *)
       val finalSymbol = Symbol.fromValue "$"
 
-      fun makeAutomaton start terminals nonterminals rules =
+      fun makeAutomaton start terminals nonterminals followers rules =
          let
+            val followers = S.insert followers finalSymbol
             val nullableTable = SymbolTable.table 50
             val firstTable = SymbolTable.table 50
             val ctx =
@@ -347,7 +348,7 @@ structure MakeAutomaton
                  firstTable=firstTable }
 
             val initialDict =
-               closure ctx (ItemDict.singleton (~1, 0, [start]) (S.singleton finalSymbol))
+               closure ctx (ItemDict.singleton (~1, 0, [start]) followers)
             val initialPrestate =
                ref (0, D.empty, initialDict)
             

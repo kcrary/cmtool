@@ -56,6 +56,7 @@ structure Parser =
             fun terminal_of_directive (ident, tp, prec) = Terminal (ident, SOME tp, prec)
             val nonterminal_directive = Nonterminal
             val start_directive = Start
+            val follower_directive = Follower
   
             type directives = directive list
             val nil_directives = null
@@ -79,6 +80,7 @@ structure Parser =
                               | ARROW pos => pos
                               | COLON pos => pos
                               | EQUAL pos => pos
+                              | FOLLOWER pos => pos
                               | NAME pos => pos
                               | NONTERMINAL pos => pos
                               | LPAREN pos => pos

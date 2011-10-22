@@ -287,6 +287,7 @@ structure Codegen
                          (fn (terminal, (Shift n :: _, _)) =>
                                 Array.update (arr, D.lookup terminalOrdinals terminal, n+1)
                            | (terminal, (Reduce n :: _, _)) =>
+                                (* When n = ~1, this is the accept action. *)
                                 Array.update (arr, D.lookup terminalOrdinals terminal, ~(n+2))
                            | _ =>
                                 raise (Fail "invariant"))

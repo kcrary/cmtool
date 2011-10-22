@@ -10,6 +10,7 @@ structure Token =
        | ARROW of pos
        | COLON of pos
        | EQUAL of pos
+       | FOLLOWER of pos
        | NAME of pos
        | NONTERMINAL of pos
        | NOPREC of pos

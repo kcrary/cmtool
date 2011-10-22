@@ -35,6 +35,7 @@ structure Process
       val rules        : rule list ref                              = ref []
       val start        : symbol option ref                          = ref NONE
       val ruleCount    : int ref                                    = ref 0
+      val followers    : S.set ref                                  = ref S.empty
 
       fun processMain l =
          (case l of
@@ -62,6 +63,17 @@ structure Process
                               )
                          | NONE =>
                               start := SOME name)
+
+                  | Follower name =>
+                       if D.member (!terminals) name then
+                          followers := S.insert (!followers) name
+                       else
+                          (
+                          print "Error: parse follower symbol ";
+                          print (toValue name);
+                          print " is not declared as a terminal.\n";
+                          raise Error
+                          )
 
                   | Terminal (name, tpo, prec) =>
                        if
@@ -477,7 +489,7 @@ structure Process
 
          in
             (modulename', !types, terminals', nonterminals',
-             MakeAutomaton.makeAutomaton start' terminals' nonterminals' (Vector.fromList rules'))
+             MakeAutomaton.makeAutomaton start' terminals' nonterminals' (!followers) (Vector.fromList rules'))
          end
 
    end

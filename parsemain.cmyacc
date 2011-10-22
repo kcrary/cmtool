@@ -5,6 +5,7 @@ terminal NUMBER of pos_int
 terminal ARROW of pos
 terminal COLON of pos
 terminal EQUAL of pos
+terminal FOLLOWER of pos
 terminal NAME of pos
 terminal NONTERMINAL of pos
 terminal NOPREC of pos
@@ -54,6 +55,7 @@ nonterminal Directive : directive =
    TERMINAL 1:Ident OF 2:Ident 3:Precedence => terminal_of_directive
    NONTERMINAL 1:Ident COLON 2:Ident EQUAL 3:Productions => nonterminal_directive
    START 1:Ident => start_directive
+   FOLLOWER 1:Ident => follower_directive
 
 nonterminal Directives : directives =
    => nil_directives

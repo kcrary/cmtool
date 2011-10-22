@@ -27,5 +27,6 @@ structure Syntax =
        | Start of symbol
        | Terminal of symbol * symbol option * precedence
        | Nonterminal of symbol * symbol * production list
+       | Follower of symbol
 
    end

@@ -74,6 +74,7 @@ structure Lexer
          List.app
          (fn (str, token) => Table.insert keywords str (SOME token))
          [
+         ("follower", FOLLOWER),
          ("name", NAME),
          ("nonterminal", NONTERMINAL),
          ("noprec", NOPREC),
