@@ -382,7 +382,8 @@ structure Process
                actions := D.empty;
                rules := [];
                start := NONE;
-               ruleCount := 0
+               ruleCount := 0;
+               followers := S.empty
                )
 
             val () = processMain l
