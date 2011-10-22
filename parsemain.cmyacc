@@ -1,21 +1,21 @@
 name ParseMainFun
 
-terminal IDENT of pos_symbol
-terminal NUMBER of pos_int
-terminal ARROW of pos
-terminal COLON of pos
-terminal EQUAL of pos
-terminal FOLLOWER of pos
-terminal NAME of pos
-terminal NONTERMINAL of pos
-terminal NOPREC of pos
-terminal LPAREN of pos
-terminal OF of pos
-terminal PRECL of pos
-terminal PRECR of pos
-terminal RPAREN of pos
-terminal START of pos
-terminal TERMINAL of pos
+terminal IDENT of symbol
+terminal NUMBER of int
+terminal ARROW
+terminal COLON
+terminal EQUAL
+terminal FOLLOWER
+terminal NAME
+terminal NONTERMINAL
+terminal NOPREC
+terminal LPAREN
+terminal OF
+terminal PRECL
+terminal PRECR
+terminal RPAREN
+terminal START
+terminal TERMINAL
 
 nonterminal Ident : symbol =
    1:IDENT => sole_ident

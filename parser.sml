@@ -14,15 +14,14 @@ structure Parser =
 
       structure Arg =
          struct
-            type pos_symbol = pos * Symbol.symbol
-            type pos_int = pos * int
-            type pos = pos
+            type symbol = Symbol.symbol
+            type int = int
 
             type symbol = Symbol.symbol
-            fun sole_ident (_, sym) = sym
+            val sole_ident = identity
 
             type int = int
-            fun sole_number (_, n) = n
+            val sole_number = identity
   
             type label = label
             val ident_label = IdentLabel
@@ -71,37 +70,23 @@ structure Parser =
                       print "Syntax error at end of file.\n";
                       Error
                       )
-                 | Stream.Cons (h, _) =>
-                      let
-                         val pos =
-                            (case h of
-                                IDENT (pos, _) => pos
-                              | NUMBER (pos, _) => pos
-                              | ARROW pos => pos
-                              | COLON pos => pos
-                              | EQUAL pos => pos
-                              | FOLLOWER pos => pos
-                              | NAME pos => pos
-                              | NONTERMINAL pos => pos
-                              | LPAREN pos => pos
-                              | NOPREC pos => pos
-                              | OF pos => pos
-                              | PRECL pos => pos
-                              | PRECR pos => pos
-                              | RPAREN pos => pos
-                              | START pos => pos
-                              | TERMINAL pos => pos)
-                         in
-                            print "Syntax error at ";
-                            print (Int.toString pos);
-                            print ".\n";
-                            Error
-                         end)
+                 | Stream.Cons ((_, pos), _) =>
+                      (
+                      print "Syntax error at ";
+                      print (Int.toString pos);
+                      print ".\n";
+                      Error
+                      ))
          end
+
+      structure StreamWithPos =
+         CoercedStreamable (structure Streamable = StreamStreamable
+                            type 'a item = 'a * pos
+                            fun coerce (x, _) = x)
 
       structure ParseMain =
          ParseMainFun
-         (structure Streamable = StreamStreamable
+         (structure Streamable = StreamWithPos
           structure Arg = Arg)
 
       fun parse s =

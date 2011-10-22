@@ -9,7 +9,7 @@ structure Lexer
       structure Table =
          HashTable (structure Key = StringHashable)
          
-      val keywords : (pos -> token) option Table.table = Table.table 60
+      val keywords : token option Table.table = Table.table 60
 
       (* Illegal identifiers (most are SML reserved words). *)
       val () =
@@ -89,11 +89,13 @@ structure Lexer
 
       open Stream
 
+      type pos = int
+
       type arg = { match : char list,
                    len : int, 
                    start : char stream, 
                    follow : char stream, 
-                   self : { lexmain : char stream -> int -> token front,
+                   self : { lexmain : char stream -> int -> (token * pos) front,
                             skipcomment : char stream -> int -> char stream * int} }
 
       exception Error
@@ -102,14 +104,14 @@ structure Lexer
          Cons (f (match, len, pos), lazy (fn () => #lexmain self follow (pos+len)))
 
       fun simple token ({ len, follow, self, ... }:arg) pos =
-         Cons (token pos, lazy (fn () => #lexmain self follow (pos+len)))
+         Cons ((token, pos), lazy (fn () => #lexmain self follow (pos+len)))
 
       structure Arg =
          struct
             type symbol = char
             val ord = Char.ord
   
-            type t = int -> token front
+            type t = int -> (token * pos) front
             type u = int -> char stream * int
   
             fun eof _ _ = Nil
@@ -122,7 +124,7 @@ structure Lexer
                       in
                          (case Table.find keywords str of
                              NONE =>
-                                IDENT (pos, Symbol.fromValue str)
+                                (IDENT (Symbol.fromValue str), pos)
                            | SOME NONE =>
                                 (
                                 print "Illegal identifier at ";
@@ -131,7 +133,7 @@ structure Lexer
                                 raise Error
                                 )
                            | SOME (SOME token) =>
-                                token pos)
+                                (token, pos))
                       end)
 
             val number = 
@@ -139,7 +141,7 @@ structure Lexer
                (fn (chars, _, pos) =>
                       ((case Int.fromString (implode chars) of
                            SOME n => 
-                              NUMBER (pos, n)
+                              (NUMBER n, pos)
                          | NONE =>
                               raise (Fail "invariant"))
                        handle Overflow => 
