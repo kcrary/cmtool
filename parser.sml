@@ -16,16 +16,15 @@ structure Parser
 
       structure Arg =
          struct
-            type pos_string = pos * string
-            type pos_int = pos * int
-            type pos_intlist = pos * int list
-            type pos = pos
+            type string = string
+            type int = int
+            type intlist = int list
 
             type string = string
-            fun ident (_, str) = str
+            val ident = identity
 
             type int = int
-            fun number (_, n) = n
+            val number = identity
 
             type numpairs = (int * int) list
             val nil_numpairs = null
@@ -49,7 +48,7 @@ structure Parser
             type regexp = regexp
             val ident_regexp = Var
             val number_regexp = Symbol
-            fun string_regexp (_, str) = String str
+            val string_regexp = String
             val any_regexp = lift Any
             val epsilon_regexp = lift Epsilon
             val empty_regexp = lift Empty
@@ -96,50 +95,23 @@ structure Parser
                       print "Syntax error at end of file.\n";
                       Error
                       )
-                 | Stream.Cons (h, _) =>
-                      let
-                         val pos =
-                            (case h of
-                                IDENT (pos, _) => pos
-                              | NUMBER (pos, _) => pos
-                              | STRING (pos, _) => pos
-                              | ALPHABET pos => pos
-                              | AND pos => pos
-                              | ANY pos => pos
-                              | ARROW pos => pos
-                              | COLON pos => pos
-                              | EOS pos => pos
-                              | EMPT pos => pos
-                              | ENABLE pos => pos
-                              | EPSILON pos => pos
-                              | EQUAL pos => pos
-                              | FUNCTION pos => pos
-                              | GEQ pos => pos
-                              | LPAREN pos => pos
-                              | MINUS pos => pos
-                              | NAME pos => pos
-                              | OR pos => pos
-                              | PLUS pos => pos
-                              | QUESTION pos => pos
-                              | RANGE pos => pos
-                              | REGEXP pos => pos
-                              | REPEAT pos => pos
-                              | RPAREN pos => pos
-                              | SEQ pos => pos
-                              | SET pos => pos
-                              | STAR pos => pos
-                              | TILDE pos => pos)
-                         in
-                            print "Syntax error at ";
-                            print (Int.toString pos);
-                            print ".\n";
-                            Error
-                         end)
+                 | Stream.Cons ((_, pos), _) =>
+                      (
+                      print "Syntax error at ";
+                      print (Int.toString pos);
+                      print ".\n";
+                      Error
+                      ))
          end
+
+      structure StreamWithPos =
+         CoercedStreamable (structure Streamable = StreamStreamable
+                            type 'a item = 'a * pos
+                            fun coerce (x, _) = x)
 
       structure ParseMain =
          ParseMainFun
-         (structure Streamable = StreamStreamable
+         (structure Streamable = StreamWithPos
           structure Arg = Arg)
 
       fun parse s =

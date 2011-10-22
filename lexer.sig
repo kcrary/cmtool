@@ -4,6 +4,8 @@ signature LEXER =
 
       exception Error
 
-      val lex : char Stream.stream -> Token.token Stream.stream
+      type pos = int
+
+      val lex : char Stream.stream -> (Token.token * pos) Stream.stream
 
    end

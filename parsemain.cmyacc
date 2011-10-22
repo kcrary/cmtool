@@ -1,34 +1,34 @@
 name ParseMainFun
 
-terminal IDENT of pos_string
-terminal NUMBER of pos_int
-terminal STRING of pos_intlist
-terminal ALPHABET of pos
-terminal AND of pos
-terminal ANY of pos
-terminal ARROW of pos
-terminal COLON of pos
-terminal EOS of pos
-terminal EMPT of pos
-terminal ENABLE of pos
-terminal EPSILON of pos
-terminal EQUAL of pos
-terminal FUNCTION of pos
-terminal GEQ of pos
-terminal LPAREN of pos
-terminal MINUS of pos
-terminal NAME of pos
-terminal OR of pos
-terminal PLUS of pos
-terminal QUESTION of pos
-terminal RANGE of pos
-terminal REGEXP of pos
-terminal REPEAT of pos
-terminal RPAREN of pos
-terminal SEQ of pos
-terminal SET of pos
-terminal STAR of pos
-terminal TILDE of pos
+terminal IDENT of string
+terminal NUMBER of int
+terminal STRING of intlist
+terminal ALPHABET
+terminal AND
+terminal ANY
+terminal ARROW
+terminal COLON
+terminal EOS
+terminal EMPT
+terminal ENABLE
+terminal EPSILON
+terminal EQUAL
+terminal FUNCTION
+terminal GEQ
+terminal LPAREN
+terminal MINUS
+terminal NAME
+terminal OR
+terminal PLUS
+terminal QUESTION
+terminal RANGE
+terminal REGEXP
+terminal REPEAT
+terminal RPAREN
+terminal SEQ
+terminal SET
+terminal STAR
+terminal TILDE
 
 
 nonterminal Ident : string =
