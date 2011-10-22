@@ -7,7 +7,7 @@ structure Main =
              val ins = TextIO.openIn infile
 
              val program =
-                Parser.parse (Stream.fromInstream ins)
+                Parser.parse (Stream.fromTextInstream ins)
                 handle exn =>
                           (
                           TextIO.closeIn ins;
