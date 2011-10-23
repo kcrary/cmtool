@@ -18,6 +18,26 @@ structure Process
            | NumericLabel n =>
                 Int.toString n)
 
+      fun compareLabel l1_l2 =
+         (case l1_l2 of
+             (IdentLabel s1, IdentLabel s2) =>
+                Symbol.compare (s1, s2)
+           | (NumericLabel n1, NumericLabel n2) =>
+                Int.compare (n1, n2)
+           | (NumericLabel _, IdentLabel _) =>
+                LESS
+           | (IdentLabel _, NumericLabel _) =>
+                GREATER)
+
+      fun eqLabel l1_l2 =
+         (case l1_l2 of
+             (IdentLabel s1, IdentLabel s2) =>
+                Symbol.eq (s1, s2)
+           | (NumericLabel n1, NumericLabel n2) =>
+                n1 = n2
+           | _ =>
+                false)
+
       structure IntSet = ListSet (structure Elem = IntOrdered)
 
       datatype labelset =
@@ -27,11 +47,20 @@ structure Process
 
       exception Error
 
+
       val modulename   : string option ref                          = ref NONE
       val types        : S.set ref                                  = ref S.empty
+
+      (* (type carried (if any), precedence, whether it is used) *)
       val terminals    : (symbol option * Automaton.precedence * bool ref) D.dict ref = ref D.empty
+
+      (* (rule numbers, type, whether it is reachable) *)
       val nonterminals : (int list * symbol * bool ref) D.dict ref  = ref D.empty
-      val actions      : int D.dict ref                             = ref D.empty
+
+      (* (nonterminal, rule of nonterminal, arguments (for each argument, the label and nonterminal
+         (not the nonterminal's type, because don't know it yet)), sole argument?, result type) *)
+      val actions      : (symbol * int * (label * symbol) list * bool * symbol) list  D.dict ref = ref D.empty
+
       val rules        : rule list ref                              = ref []
       val start        : symbol option ref                          = ref NONE
       val ruleCount    : int ref                                    = ref 0
@@ -172,14 +201,15 @@ structure Process
                                               val globalnumber = !ruleCount
                                               val () = ruleCount := globalnumber + 1
 
-                                              val (rhsrev, argsrev, labelset) =
+                                              val (rhsrev, argsrev, labelset, actionargs) =
                                                  foldl
-                                                 (fn (constituent, (rhsrev, argsrev, labelset)) =>
+                                                 (fn (constituent, (rhsrev, argsrev, labelset, actionargs)) =>
                                                      (case constituent of
                                                          Unlabeled symbol =>
                                                             (symbol :: rhsrev,
                                                              NONE :: argsrev,
-                                                             labelset)
+                                                             labelset,
+                                                             actionargs)
                                                        | Labeled (label, symbol) =>
                                                             let
                                                                val labelset' =
@@ -246,9 +276,10 @@ structure Process
                                                             in
                                                                (symbol :: rhsrev,
                                                                 SOME label :: argsrev,
-                                                                labelset')
+                                                                labelset',
+                                                                (label, symbol) :: actionargs)
                                                             end))
-                                                 ([], [], Empty)
+                                                 ([], [], Empty, [])
                                                  constituents
 
                                               val solearg =
@@ -278,26 +309,32 @@ structure Process
                                                         false)
 
                                               val actions'' =
-                                                 if D.member actions' action then
+                                                 if S.member (!types) action then
                                                     (
-                                                    print "Error: multiply specified action ";
-                                                    print (toValue action);
+                                                    print "Error: action identifier ";
+                                                    print (Symbol.toValue action);
                                                     print " in rule ";
                                                     print (Int.toString localnumber);
                                                     print " of nonterminal ";
                                                     print (toValue name);
-                                                    print ".\n";
-                                                    raise Error
-                                                    )
-                                                 else if S.member (!types) action then
-                                                    (
-                                                    print "Error: action identifier ";
-                                                    print (Symbol.toValue action);
                                                     print " already used for a type.\n";
                                                     raise Error
                                                     )
                                                  else
-                                                    D.insert actions' action globalnumber
+                                                    let
+                                                       val actioninfo =
+                                                          (case D.find actions' action of
+                                                              NONE =>
+                                                                 []
+                                                            | SOME l => l)
+                                                          
+                                                       val actioninfo' =
+                                                          (name, localnumber, actionargs, solearg, tp)
+                                                          ::
+                                                          actioninfo
+                                                    in
+                                                       D.insert actions' action actioninfo'
+                                                    end
 
                                               val prec' =
                                                  (case prec of
@@ -369,6 +406,25 @@ structure Process
 
                 processMain rest
                 ))
+
+
+      fun argsToDom args =
+         map
+         (fn (lab, sym) =>
+             let
+                val tp =
+                   (case D.find (!nonterminals) sym of
+                       SOME (_, tp, _) => tp
+                     | NONE =>
+                          (case D.find (!terminals) sym of
+                              SOME (SOME tp, _, _) => tp
+                            | _ =>
+                                 (* Already verified that this doesn't happen. *)
+                                 raise (Fail "invariant")))
+             in
+                (lab, tp)
+             end)
+         (Mergesort.sort (fn ((l1, _), (l2, _)) => compareLabel (l1, l2)) args)
 
 
       fun process l =
@@ -488,8 +544,54 @@ structure Process
                       ))
                terminals'
 
+            val actions' =
+               D.foldl
+               (fn (action, info, actions') =>
+                   (* Reverse the list because we'd like the action's first appearance to predominate. *)
+                   (case rev info of
+                       [] =>
+                          (* Can't be empty; wouldn't be in the dict in the first place. *)
+                          raise (Fail "invariant")
+                     | (_, _, args, solearg, cod) :: rest =>
+                          let
+                             val dom = argsToDom args
+
+                             val () =
+                                app
+                                (fn (nonterminal, localnumber, args', _, cod') =>
+                                    let
+                                       val dom' = argsToDom args'
+                                    in
+                                       if
+                                          Symbol.eq (cod, cod')
+                                          andalso
+                                          ListPair.allEq
+                                             (fn ((l1, t1), (l2, t2)) =>
+                                                 eqLabel (l1, l2) andalso Symbol.eq (t1, t2))
+                                             (dom, dom')
+                                       then
+                                          ()
+                                       else
+                                          (
+                                          print "Error: inconsistent type for action ";
+                                          print (Symbol.toValue action);
+                                          print " in arm ";
+                                          print (Int.toString localnumber);
+                                          print " of nonterminal ";
+                                          print (Symbol.toValue nonterminal);
+                                          print ".\n";
+                                          raise Error
+                                          )
+                                    end)
+                                rest
+                          in
+                             (action, dom, solearg, cod) :: actions'
+                          end))
+               []
+               (!actions)                          
+
          in
-            (modulename', !types, terminals', nonterminals',
+            (modulename', !types, terminals', nonterminals', actions',
              MakeAutomaton.makeAutomaton start' terminals' nonterminals' (!followers) (Vector.fromList rules'))
          end
 

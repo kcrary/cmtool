@@ -676,7 +676,6 @@ lookahead 15 = $ IDENT NUMBER ARROW FOLLOWER NAME NONTERMINAL NOPREC LPAREN PREC
 
 functor ParseMainFun (structure Streamable : STREAMABLE
 structure Arg : sig
-type directive
 type symbol
 type int
 type label
@@ -685,31 +684,32 @@ type constituents
 type precedence
 type production
 type productions
+type directive
 type directives
-val sole_ident : symbol -> symbol
-val sole_number : int -> int
-val ident_label : symbol -> label
-val number_label : int -> label
-val unlabeled_item : symbol -> constituent
-val labeled_item : {1:label, 2:symbol} -> constituent
-val paren_item : constituent -> constituent
-val nil_constituents : {} -> constituents
-val cons_constituents : {1:constituent, 2:constituents} -> constituents
-val empty_precedence : {} -> precedence
-val left_precedence : int -> precedence
-val right_precedence : int -> precedence
-val no_precedence : {} -> precedence
-val sole_production : {1:constituents, 2:symbol, 3:precedence} -> production
-val nil_productions : {} -> productions
-val cons_productions : {1:production, 2:productions} -> productions
-val name_directive : symbol -> directive
-val terminal_directive : {1:symbol, 2:precedence} -> directive
-val terminal_of_directive : {1:symbol, 2:symbol, 3:precedence} -> directive
-val nonterminal_directive : {1:symbol, 2:symbol, 3:productions} -> directive
-val start_directive : symbol -> directive
-val follower_directive : symbol -> directive
-val nil_directives : {} -> directives
 val cons_directives : {1:directive, 2:directives} -> directives
+val nil_directives : {} -> directives
+val follower_directive : symbol -> directive
+val start_directive : symbol -> directive
+val nonterminal_directive : {1:symbol, 2:symbol, 3:productions} -> directive
+val terminal_of_directive : {1:symbol, 2:symbol, 3:precedence} -> directive
+val terminal_directive : {1:symbol, 2:precedence} -> directive
+val name_directive : symbol -> directive
+val cons_productions : {1:production, 2:productions} -> productions
+val nil_productions : {} -> productions
+val sole_production : {1:constituents, 2:symbol, 3:precedence} -> production
+val no_precedence : {} -> precedence
+val right_precedence : int -> precedence
+val left_precedence : int -> precedence
+val empty_precedence : {} -> precedence
+val cons_constituents : {1:constituent, 2:constituents} -> constituents
+val nil_constituents : {} -> constituents
+val paren_item : constituent -> constituent
+val labeled_item : {1:label, 2:symbol} -> constituent
+val unlabeled_item : symbol -> constituent
+val number_label : int -> label
+val ident_label : symbol -> label
+val sole_number : int -> int
+val sole_ident : symbol -> symbol
 datatype terminal =
 IDENT of symbol
 | NUMBER of int
@@ -735,7 +735,6 @@ local
 structure Value = struct
 datatype nonterminal =
 nonterminal
-| directive of Arg.directive
 | symbol of Arg.symbol
 | int of Arg.int
 | label of Arg.label
@@ -744,6 +743,7 @@ nonterminal
 | precedence of Arg.precedence
 | production of Arg.production
 | productions of Arg.productions
+| directive of Arg.directive
 | directives of Arg.directives
 end
 structure ParseEngine = ParseEngineFun (structure Streamable = Streamable

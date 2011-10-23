@@ -63,7 +63,7 @@ structure Codegen
 
       exception Error
 
-      fun writeProgram outfile (functorName, types, terminals, nonterminals, automaton as (stateCount, states, rules, start)) =
+      fun writeProgram outfile (functorName, types, terminals, nonterminals, actions, automaton as (stateCount, states, rules, start)) =
          let
             val (terminalOrdinals, terminalCount) =
                D.foldl
@@ -143,6 +143,52 @@ structure Codegen
                    ))
                types;
 
+            app
+               (fn (action, dom, solearg, cod) =>
+                   (
+                   write "val ";
+                   write (Symbol.toValue action);
+                   write " : ";
+                   
+                   if solearg then
+                      ()
+                   else
+                      write "{";
+
+                   foldl
+                      (fn ((l, t), first) =>
+                          (
+                          if first then
+                             ()
+                          else
+                             write ", ";
+
+                          if solearg then
+                             ()
+                          else
+                             (
+                             write (labelToString l);
+                             write ":"
+                             );
+
+                          write (Symbol.toValue t);
+                          false
+                          ))
+                      true
+                      dom;
+
+                   if solearg then
+                      ()
+                   else
+                      write "}";
+
+                   write " -> ";
+                   write (Symbol.toValue cod);
+                   write "\n"
+                   ))
+               actions;
+
+(************
             Vector.app
                (fn (_, _, lhs, rhs, args, solearg, action, _, _) =>
                    let
@@ -201,6 +247,7 @@ structure Codegen
                       write "\n"
                    end)
                rules;
+*******)
 
             write "datatype terminal =\n";
             D.foldl

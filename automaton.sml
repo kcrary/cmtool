@@ -67,14 +67,17 @@ structure Automaton =
          Symbol.symbol       (* start symbol *)
 
       type parser =
-         string                                                          (* functor name *)
+         string                                                                             (* functor name *)
          *
-         SymbolSet.set                                                   (* type arguments *)
+         SymbolSet.set                                                                      (* type arguments *)
          *
-         (Symbol.symbol option * precedence * bool ref) SymbolDict.dict  (* terminals *)
+         (Symbol.symbol option * precedence * bool ref) SymbolDict.dict                     (* terminals *)
          *
-         (int list * Symbol.symbol * bool ref) SymbolDict.dict           (* nonterminals *)
+         (int list * Symbol.symbol * bool ref) SymbolDict.dict                              (* nonterminals *)
          *
-         automaton                                                       (* the automaton *)
+         (Symbol.symbol * (Syntax.label * Symbol.symbol) list * bool * Symbol.symbol) list  (* actions *)         
+         *
+         automaton                                                                          (* the automaton *)
 
    end
+                            
