@@ -1,6 +1,5 @@
 
-functor MainFun (structure Lexer : sig exception Error end
-                 structure Parser : PARSER
+functor MainFun (structure Parser : PARSER
                  structure CodeGen : CODEGEN) =
    struct
 
@@ -51,7 +50,6 @@ functor MainFun (structure Lexer : sig exception Error end
              main infile outfile; OS.Process.success
           end handle Process.Error => OS.Process.failure
                    | Parser.Error => OS.Process.failure
-                   | Lexer.Error => OS.Process.failure
                    | Quit msg => 
                      (print ("Error: " ^ msg ^ "\n\
                              \Usage: " ^ name ^ " file.cmlex [-o file.sml]\n\
