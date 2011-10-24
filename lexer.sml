@@ -91,12 +91,17 @@ structure Lexer
 
       type pos = int
 
+      type t = int -> (token * pos) front
+      type u = int -> char stream * int
+  
+      type self = { lexmain : char stream -> t,
+                    skipcomment : char stream -> u }
+
       type arg = { match : char list,
                    len : int, 
                    start : char stream, 
                    follow : char stream, 
-                   self : { lexmain : char stream -> int -> (token * pos) front,
-                            skipcomment : char stream -> int -> char stream * int} }
+                   self : self }
 
       exception Error
 
@@ -110,9 +115,9 @@ structure Lexer
          struct
             type symbol = char
             val ord = Char.ord
-  
-            type t = int -> (token * pos) front
-            type u = int -> char stream * int
+
+            type t = t
+            type u = u
   
             fun eof _ _ = Nil
   
