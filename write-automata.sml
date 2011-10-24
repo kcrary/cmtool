@@ -18,13 +18,23 @@ structure WriteAutomata
          let
             fun write str = TextIO.output (outs, str)
 
+            fun stateName state =
+               let
+                  val str = Array.sub (actions, state-1)
+               in
+                  if str = "" then
+                     "<error>"
+                  else
+                     str
+               end
+
             fun writeSort sep state =
                let
                   val l =
                      if state <= lastFinalSink then
-                        ["sink:", Array.sub (actions, state-1)]
+                        ["sink:", stateName state]
                      else if state <= lastFinal then
-                        ["final:", Array.sub (actions, state-1)]
+                        ["final:", stateName state]
                      else
                         []
 
