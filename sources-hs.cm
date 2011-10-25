@@ -1,0 +1,12 @@
+Group is
+	(* Haskell specific *)
+	codegen-hs.sml
+	glue-hs.sml
+	lexer-hs.sig
+	lexer-hs.sml
+	lexmain-hs.sml
+        parsemain-hs.sml
+	parser-hs.sml
+	token-hs.sml
+
+	sources-generic.cm
