@@ -201,6 +201,7 @@ structure Lexer
             val arrow = simple ARROW
             val bar = simple OR
             val colon = simple COLON
+            val dot = error
             val equal = simple EQUAL
             val lparen = simple LPAREN
             val minus = simple MINUS

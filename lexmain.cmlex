@@ -23,6 +23,7 @@ function lexmain : t =
    "=>" => arrow
    '| => bar
    ': => colon
+   '. => dot
    '= => equal
    '( => lparen
    '- => minus

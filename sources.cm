@@ -4,7 +4,6 @@ Group is
         glue.sml
         lexer.sig
         lexer.sml
-        lexmain.cmlex.sml
         parsemain.cmyacc.sml
         parser.sml
         token.sml
