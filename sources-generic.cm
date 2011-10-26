@@ -21,7 +21,6 @@ is
         reverse-dfa.sig
         reverse-dfa.sml
         syntax.sml
-        token.sig
         write-automata.sig
         write-automata.sml
         
