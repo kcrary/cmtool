@@ -1,9 +1,11 @@
 
 structure Lexer
    :> LEXER 
+      where type Token.token = Token.token
    =
    struct
 
+      structure Token = Token
       open Token
 
       structure Table =

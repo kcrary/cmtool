@@ -7,6 +7,7 @@ is
         codegen.sig
         determinize.sig
         determinize.sml
+        lexer.sig
         lexmain.cmlex.sml
         main.sml
         make-automaton.sig
@@ -20,6 +21,7 @@ is
         reverse-dfa.sig
         reverse-dfa.sml
         syntax.sml
+        token.sig
         write-automata.sig
         write-automata.sml
         

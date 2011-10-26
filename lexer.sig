@@ -2,6 +2,8 @@
 signature LEXER =
    sig
 
+      structure Token : TOKEN
+
       exception Error
 
       type pos = int

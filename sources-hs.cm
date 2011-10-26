@@ -2,7 +2,6 @@ Group is
 	(* Haskell specific *)
 	codegen-hs.sml
 	glue-hs.sml
-	lexer-hs.sig
 	lexer-hs.sml
         parsemain-hs.cmyacc.sml
 	parser-hs.sml
