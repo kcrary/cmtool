@@ -4,8 +4,8 @@ Group is
 	glue-hs.sml
 	lexer-hs.sig
 	lexer-hs.sml
-	lexmain-hs.sml
-        parsemain-hs.sml
+	lexmain-hs.cmlex.sml
+        parsemain-hs.cmyacc.sml
 	parser-hs.sml
 	token-hs.sml
 
