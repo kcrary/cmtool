@@ -1,7 +1,7 @@
-$(CMLIB)/lib/cmlib.mlb
+$(SMACKAGE)/cmlib/v0/cmlib.mlb
 
-lexmain.sml
-parsemain.sml
+lexmain.cmlex.sml
+parsemain.cmyacc.sml
 syntax.sml
 token.sml
 
