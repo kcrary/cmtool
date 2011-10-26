@@ -4,7 +4,7 @@ structure MakeNFA
    =
    struct
 
-      open TreeSequence
+      datatype seq = datatype TreeSequence.treeview
 
       structure D = SymbolDict
 
