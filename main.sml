@@ -23,7 +23,7 @@ functor MainFun (structure Parser : PARSER
           end
 
       exception Quit of string
-      fun mainCmd (name, args) =
+      fun mainCmd extension (name, args) =
           let 
              (* Parse arguments *)
              val infile: string option ref = ref NONE
@@ -44,7 +44,7 @@ functor MainFun (structure Parser : PARSER
                  | SOME file => file
              val outfile = 
                 case (!outfile) of
-                   NONE => OS.Path.joinBaseExt {base = infile, ext = SOME "sml"}
+                   NONE => OS.Path.joinBaseExt {base = infile, ext = SOME extension}
                  | SOME file => file
           in   
              main infile outfile; OS.Process.success
@@ -52,8 +52,8 @@ functor MainFun (structure Parser : PARSER
                    | Parser.Error => OS.Process.failure
                    | Quit msg => 
                      (print ("Error: " ^ msg ^ "\n\
-                             \Usage: " ^ name ^ " file.cmlex [-o file.sml]\n\
-                             \(Default output file is file.cmlex.sml)\n")
+                             \Usage: cmlex file.cmlex [-o file." ^ extension ^ "]\n\
+                             \(Default output file is file.cmlex." ^ extension ^ ")\n")
                      ; OS.Process.failure) 
                    | exn =>  
                      (print ("Failed with exception: " ^ exnName exn ^ "\n")
