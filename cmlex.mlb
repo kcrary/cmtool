@@ -1,8 +1,7 @@
 sources-generic.mlb
 
 codegen.sml 
-lexmain.sml
-parsemain.sml
+parsemain.cmyacc.sml
 token.sml
 
 lexer.sig
