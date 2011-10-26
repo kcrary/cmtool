@@ -2,7 +2,7 @@
 structure Parser =
    struct
 
-      exception Error
+      exception Error = Lexer.Error
 
       open Syntax
 

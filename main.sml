@@ -22,7 +22,7 @@ structure Main =
           end
 
       exception Quit of string
-      fun mainCmd (name, args) =
+      fun mainCmd extension (name, args) =
           let 
              (* Parse arguments *)
              val infile: string option ref = ref NONE
@@ -43,17 +43,16 @@ structure Main =
                  | SOME file => file
              val outfile = 
                 case (!outfile) of
-                   NONE => OS.Path.joinBaseExt {base = infile, ext = SOME "sml"}
+                   NONE => OS.Path.joinBaseExt {base = infile, ext = SOME extension}
                  | SOME file => file
           in  
              main infile outfile; OS.Process.success
           end handle Process.Error => OS.Process.failure
                    | Parser.Error => OS.Process.failure
-                   | Lexer.Error => OS.Process.failure
                    | Quit msg => 
                      (print ("Error: " ^ msg ^ "\n\
-                             \Usage: " ^ name ^ " file.cmyacc [-o file.sml]\n\
-                             \(Default output file is file.cmyacc.sml)\n")
+                             \Usage: cmyacc file.cmyacc [-o file." ^ extension ^ "]\n\
+                             \(Default output file is file.cmyacc." ^ extension ^ ")\n")
                      ; OS.Process.failure) 
                    | exn =>  
                      (print ("Failed with exception: " ^ exnName exn ^ "\n")
