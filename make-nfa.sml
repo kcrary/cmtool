@@ -4,9 +4,9 @@ structure MakeNFA
    =
    struct
 
-      structure D = SymbolDict
-      datatype quasilist = datatype Quasilist.quasilist
+      open TreeSequence
 
+      structure D = SymbolDict
 
       (* make1RevNfa R n
 
@@ -33,7 +33,7 @@ structure MakeNFA
                        D.empty
                        set
                  in
-                    (initial, final, One (d, []))
+                    (initial, final, ELT (d, []))
                  end
             | Regexp.String l =>
                  let
@@ -43,28 +43,28 @@ structure MakeNFA
                        foldr
                        (fn (sym, (i, acc)) =>
                               (i+1,
-                               Append (acc,
-                                       One (D.insert D.empty sym [i+1], []))))
-                       (n, Zero)
+                               NODE (acc,
+                                     ELT (D.insert D.empty sym [i+1], []))))
+                       (n, EMPTY)
                        l
                  in
                     (initial, final, trans)
                  end
             | Regexp.Epsilon =>
-                 (n, n, Zero)
+                 (n, n, EMPTY)
             | Regexp.Empty =>
                  let 
                     val initial = n
                     val final = initial+1
                  in
-                    (initial, final, One (D.empty, []))
+                    (initial, final, ELT (D.empty, []))
                  end
             | Regexp.Concat (re1, re2) =>
                  let
                     val (initial1, final1, trans1) = make1RevNfa re2 n
                     val (initial2, final2, trans2) = make1RevNfa re1 (final1+1)
 
-                    val trans = Append (Append (trans1, One (D.empty, [initial2])), trans2)
+                    val trans = NODE (NODE (trans1, ELT (D.empty, [initial2])), trans2)
                  in
                     (initial1, final2, trans)
                  end
@@ -79,9 +79,9 @@ structure MakeNFA
                     val transInitial = ([], [initial1, initial2])
 
                     val trans = 
-                       Append (Append (Append (trans1, One (D.empty, [final])),
-                                       Append (trans2, One (D.empty, [final]))),
-                               One (D.empty, [initial1, initial2]))
+                       NODE (NODE (NODE (trans1, ELT (D.empty, [final])),
+                                   NODE (trans2, ELT (D.empty, [final]))),
+                             ELT (D.empty, [initial1, initial2]))
                  in
                     (initial, final, trans)
                  end
@@ -93,8 +93,8 @@ structure MakeNFA
                     val final' = initial'+1
 
                     val trans' =
-                       Append (Append (trans, One (D.empty, [final'])),
-                               One (D.empty, [initial, final']))
+                       NODE (NODE (trans, ELT (D.empty, [final'])),
+                             ELT (D.empty, [initial, final']))
                  in
                     (initial', final', trans')
                  end
@@ -106,8 +106,8 @@ structure MakeNFA
                     val final' = initial'+1
 
                     val trans' =
-                       Append (Append (trans, One (D.empty, [initial'])),
-                               One (D.empty, [initial, final']))
+                       NODE (NODE (trans, ELT (D.empty, [initial'])),
+                             ELT (D.empty, [initial, final']))
                  in
                     (initial', final', trans')
                  end
@@ -118,7 +118,7 @@ structure MakeNFA
                     val final' = final+1
 
                     val trans' =
-                       Append (trans, One (D.empty, [initial, final']))
+                       NODE (trans, ELT (D.empty, [initial, final']))
                  in
                     (initial, final', trans')
                  end)
@@ -142,19 +142,19 @@ structure MakeNFA
             | (re, action) :: rest =>
                  let
                     val (initial, final, trans) = make1RevNfa re n
-                    val trans' = Append (trans, One (D.empty, [0]))  (* add omitted final state *)
+                    val trans' = NODE (trans, ELT (D.empty, [0]))  (* add omitted final state *)
                  in
-                    makeRevNfaMain rest (final+1) ((initial, action) :: initialAcc) (Append (transAcc, trans'))
+                    makeRevNfaMain rest (final+1) ((initial, action) :: initialAcc) (NODE (transAcc, trans'))
                  end)
 
 
       fun makeRevNfa res =
           let
              (* Put the master final state at 0. *)
-             val (count, initial, trans) = makeRevNfaMain res 1 [] Zero
-             val trans' = Append (One (D.empty, []), trans)  (* add omitted final state *)
+             val (count, initial, trans) = makeRevNfaMain res 1 [] EMPTY
+             val trans' = NODE (ELT (D.empty, []), trans)  (* add omitted final state *)
 
-             val transvec = Array.fromList (Quasilist.toList trans')
+             val transvec = Array.fromList (TreeSequence.toList trans')
           in
              (initial, [(0, ())], transvec)
           end
