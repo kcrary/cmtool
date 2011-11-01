@@ -1,6 +1,6 @@
 Group
         source(-)
-        library(../lib/cmlib.cm)
+        library($SMACKAGE/cmlib/v1/cmlib.cm)
 is
         (* Not specific to any language. *)
         automaton.sml
@@ -17,4 +17,4 @@ is
         write-automaton.sig
         write-automaton.sml
 
-        ../lib/cmlib.cm
+        $SMACKAGE/cmlib/v1/cmlib.cm
