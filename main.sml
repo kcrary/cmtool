@@ -1,5 +1,6 @@
 
-structure Main =
+functor MainFun (structure Parser : PARSER
+                 structure Codegen : CODEGEN) =
    struct
 
       fun main infile outfile =
@@ -49,6 +50,7 @@ structure Main =
              main infile outfile; OS.Process.success
           end handle Process.Error => OS.Process.failure
                    | Parser.Error => OS.Process.failure
+                   | Codegen.Error => OS.Process.failure
                    | Quit msg => 
                      (print ("Error: " ^ msg ^ "\n\
                              \Usage: cmyacc file.cmyacc [-o file." ^ extension ^ "]\n\

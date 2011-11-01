@@ -48,7 +48,7 @@ structure Process
       exception Error
 
 
-      val modulename   : string option ref                          = ref NONE
+      val options      : string D.dict ref                          = ref D.empty
       val types        : S.set ref                                  = ref S.empty
 
       (* (type carried (if any), precedence, whether it is used) *)
@@ -73,16 +73,22 @@ structure Process
            | directive :: rest =>
                 (
                 (case directive of
-                    Name name =>
-                       (case !modulename of
-                           SOME _ =>
-                              (
-                              print "Error: multiple functor names specified.\n";
-                              raise Error
-                              )
-                         | NONE =>
-                              modulename := SOME (Symbol.toValue name))
-                       
+                    Option (name, value) =>
+                       (case D.find (!options) name of
+                           NONE =>
+                              options := D.insert (!options) name value
+                         | SOME _ =>
+                              if value = "" then
+                                 (* Nullary option, we'll allow it to be respecified. *)
+                                 ()
+                              else
+                                 (
+                                 print "Error: multiple specification of ";
+                                 print (Symbol.toValue name);
+                                 print ".\n";
+                                 raise Error
+                                 ))
+
                   | Start name =>
                        (case !start of
                            SOME _ =>
@@ -431,7 +437,7 @@ structure Process
          let
             val () =
                (
-               modulename := NONE;
+               options := D.empty;
                types := S.empty;
                terminals := D.empty;
                nonterminals := D.empty;
@@ -443,15 +449,6 @@ structure Process
                )
 
             val () = processMain l
-
-            val modulename' =
-               (case !modulename of
-                   NONE =>
-                      (
-                      print "Error: no functor name specified.\n";
-                      raise Error
-                      )
-                 | SOME name => name)
 
             val nonterminals' = !nonterminals
             val terminals' = !terminals
@@ -591,7 +588,7 @@ structure Process
                (!actions)                          
 
          in
-            (modulename', !types, terminals', nonterminals', actions',
+            (!options, !types, terminals', nonterminals', actions',
              MakeAutomaton.makeAutomaton start' terminals' nonterminals' (!followers) (Vector.fromList rules'))
          end
 

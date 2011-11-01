@@ -1,11 +1,15 @@
 name ParseMainFun
 
-terminal IDENT of string
+terminal LIDENT of string
+terminal UIDENT of string
 terminal NUMBER of int
 terminal ARROW
 terminal COLON
+terminal DATA
+terminal DOT
 terminal EQUAL
 terminal FOLLOWER
+terminal MONADIC
 terminal NAME
 terminal NONTERMINAL
 terminal NOPREC
@@ -17,19 +21,22 @@ terminal RPAREN
 terminal START
 terminal TERMINAL
 
-nonterminal Ident : symbol =
-   1:IDENT => sole_ident
+nonterminal LIdent : symbol =
+   1:LIDENT => sole_lident
+
+nonterminal UIdent : symbol =
+   1:UIDENT => sole_uident
 
 nonterminal Number : int =
    1:NUMBER => sole_number
 
 nonterminal Label : label =
-   1:Ident => ident_label
+   /* Don't allow named labels in CM-Yacc-Haskell. */
    1:Number => number_label
 
 nonterminal Constituent : constituent =
-   1:Ident => unlabeled_item
-   1:Label COLON 2:Ident => labeled_item
+   1:UIdent => unlabeled_item
+   1:Label COLON 2:UIdent => labeled_item
    LPAREN 1:Constituent RPAREN => paren_item
 
 nonterminal Constituents : constituents =
@@ -43,19 +50,25 @@ nonterminal Precedence : precedence =
    NOPREC => no_precedence
 
 nonterminal Production : production =
-   1:Constituents ARROW 2:Ident 3:Precedence => sole_production
+   1:Constituents ARROW 2:LIdent 3:Precedence => sole_production
 
 nonterminal Productions : productions =
    => nil_productions
    1:Production 2:Productions => cons_productions
 
+nonterminal QIdent : qident =
+   1:UIDENT => sing_qident
+   1:UIDENT DOT 2:QIdent => cons_qident
+
 nonterminal Directive : directive =
-   NAME 1:IDENT => name_directive
-   TERMINAL 1:Ident 2:Precedence => terminal_directive
-   TERMINAL 1:Ident OF 2:Ident 3:Precedence => terminal_of_directive
-   NONTERMINAL 1:Ident COLON 2:Ident EQUAL 3:Productions => nonterminal_directive
-   START 1:Ident => start_directive
-   FOLLOWER 1:Ident => follower_directive
+   NAME 1:QIdent => name_directive
+   DATA 1:UIDENT => data_directive
+   MONADIC => monadic_directive
+   TERMINAL 1:UIdent 2:Precedence => terminal_directive
+   TERMINAL 1:UIdent OF 2:LIdent 3:Precedence => terminal_of_directive
+   NONTERMINAL 1:UIdent COLON 2:LIdent EQUAL 3:Productions => nonterminal_directive
+   START 1:UIdent => start_directive
+   FOLLOWER 1:UIdent => follower_directive
 
 nonterminal Directives : directives =
    => nil_directives

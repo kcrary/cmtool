@@ -5,12 +5,16 @@ structure Token =
       type pos = int
 
       datatype token =
-         IDENT of string
+         LIDENT of string
+       | UIDENT of string
        | NUMBER of int
        | ARROW 
        | COLON 
+       | DATA
+       | DOT
        | EQUAL 
        | FOLLOWER 
+       | MONADIC
        | NAME
        | NONTERMINAL 
        | NOPREC 

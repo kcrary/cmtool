@@ -17,6 +17,7 @@ function lexmain : t =
    "/*" => lcomment
    "=>" => arrow
    ': => colon
+   '. => dot
    '= => equal
    '( => lparen
    ') => rparen

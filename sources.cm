@@ -1,21 +1,10 @@
 Group is
-        automaton.sml
-        codegen.sig
+        (* SML specific *)
         codegen.sml
-        lexer.sig
+        glue.sml
         lexer.sml
-        lexmain.cmlex.sml
-        main.sml
-        make-automaton.sig
-        make-automaton.sml
         parsemain.cmyacc.sml
-        parser.sig
         parser.sml
-        process.sig
-        process.sml
-        syntax.sml
         token.sml
-        write-automaton.sig
-        write-automaton.sml
 
-        ../lib/cmlib.cm
+        sources-generic.cm

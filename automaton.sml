@@ -23,9 +23,8 @@ structure Automaton =
          label option list          (* arguments *)
          *
          bool                       (* sole argument:
-                                       If true then arguments should
-                                       contain only one label, which will
-                                       be ignored.
+                                       True iff the arguments contain exactly one label
+                                       and that label is 1.
                                     *)
          *
          Symbol.symbol              (* action *)
@@ -67,17 +66,17 @@ structure Automaton =
          Symbol.symbol       (* start symbol *)
 
       type parser =
-         string                                                                             (* functor name *)
+         string SymbolDict.dict                                             (* options *)
          *
-         SymbolSet.set                                                                      (* type arguments *)
+         SymbolSet.set                                                      (* type arguments *)
          *
-         (Symbol.symbol option * precedence * bool ref) SymbolDict.dict                     (* terminals *)
+         (Symbol.symbol option * precedence * bool ref) SymbolDict.dict     (* terminals *)
          *
-         (int list * Symbol.symbol * bool ref) SymbolDict.dict                              (* nonterminals *)
+         (int list * Symbol.symbol * bool ref) SymbolDict.dict              (* nonterminals *)
          *
-         (Symbol.symbol * (Syntax.label * Symbol.symbol) list * bool * Symbol.symbol) list  (* actions *)         
+         (Symbol.symbol * (Syntax.label * Symbol.symbol) list * bool * Symbol.symbol) list  (* actions *)
          *
-         automaton                                                                          (* the automaton *)
+         automaton                                                          (* the automaton *)
 
    end
                             

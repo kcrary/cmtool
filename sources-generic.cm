@@ -1,0 +1,20 @@
+Group
+        source(-)
+        library(../lib/cmlib.cm)
+is
+        (* Not specific to any language. *)
+        automaton.sml
+        codegen.sig
+        lexer.sig
+        lexmain.cmlex.sml
+        main.sml
+        make-automaton.sig
+        make-automaton.sml
+        parser.sig
+        process.sig
+        process.sml
+        syntax.sml
+        write-automaton.sig
+        write-automaton.sml
+
+        ../lib/cmlib.cm

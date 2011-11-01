@@ -18,12 +18,12 @@ structure Parser =
             type string = string
             type symbol = Symbol.symbol
 
-            val sole_ident = Symbol.fromValue
+            val sole_uident = Symbol.fromValue
+            val sole_lident = Symbol.fromValue
 
             val sole_number = identity
   
             type label = label
-            val ident_label = IdentLabel
             val number_label = NumericLabel
 
             type constituent = constituent
@@ -48,8 +48,16 @@ structure Parser =
             val nil_productions = null
             val cons_productions = op ::
   
+            type qident = string list
+            fun sing_qident ident = [ident]
+            fun cons_qident (h, t) = h :: "." :: t
+
             type directive = directive
-            fun name_directive str = Option (Symbol.fromValue "name", str)
+
+            fun name_directive l = Option (Symbol.fromValue "name", String.concat l)
+            fun data_directive str = Option (Symbol.fromValue "data", str)
+            val monadic_directive = lift (Option (Symbol.fromValue "monadic", ""))
+
             fun terminal_directive (ident, prec) = Terminal (ident, NONE, prec)
             fun terminal_of_directive (ident, tp, prec) = Terminal (ident, SOME tp, prec)
             val nonterminal_directive = Nonterminal

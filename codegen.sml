@@ -9,6 +9,9 @@ structure Codegen
 
       open Automaton
 
+      exception Error
+
+
 
       fun labelToString l =
          (case l of
@@ -58,13 +61,20 @@ structure Codegen
          app
             (fn ch => write (Char.toString ch))
             (intToChars stateSize (entry + adjust))
-         
 
 
-      exception Error
 
-      fun writeProgram outfile (functorName, types, terminals, nonterminals, actions, automaton as (stateCount, states, rules, start)) =
+      fun writeProgram outfile (options, types, terminals, nonterminals, actions, automaton as (stateCount, states, rules, start)) =
          let
+            val functorName =
+               (case D.find options (Symbol.fromValue "name") of
+                   SOME name => name
+                 | NONE =>
+                      (
+                      print "Error: no functor name specified.\n";
+                      raise Error
+                      ))
+
             val (terminalOrdinals, terminalCount) =
                D.foldl
                (fn (terminal, _, (ordinals, count)) =>
@@ -150,6 +160,7 @@ structure Codegen
                    write (Symbol.toValue action);
                    write " : ";
                    
+                   (* If solearg, we suppress generating a record. *)
                    if solearg then
                       ()
                    else
@@ -187,67 +198,6 @@ structure Codegen
                    write "\n"
                    ))
                actions;
-
-(************
-            Vector.app
-               (fn (_, _, lhs, rhs, args, solearg, action, _, _) =>
-                   let
-                      val (_, lhstp, _) = D.lookup nonterminals lhs
-                   in
-                      write "val ";
-                      write (Symbol.toValue action);
-                      write " : ";
-
-                      if solearg then
-                         ()
-                      else
-                         write "{";
-
-                      ListPair.foldlEq
-                         (fn (_, NONE, first) =>
-                                first
-                           | (symbol, SOME label, first) =>
-                                let
-                                   val tp =
-                                      (case D.find nonterminals symbol of
-                                          SOME (_, tp, _) => tp
-                                        | NONE =>
-                                             (case D.lookup terminals symbol of
-                                                 (NONE, _, _) =>
-                                                    (* We've already generated an error in this case. *)
-                                                    raise (Fail "invariant")
-                                               | (SOME tp, _, _) => tp))
-                                in
-                                   if first then
-                                      ()
-                                   else
-                                      write ", ";
-
-                                   if solearg then
-                                      ()
-                                   else
-                                      (
-                                      write (labelToString label);
-                                      write ":"
-                                      );
-
-                                   write (Symbol.toValue tp);
-                                   false
-                                end)
-                         true
-                         (rhs, args);
-                      
-                      if solearg then
-                         ()
-                      else
-                         write "}";
-
-                      write " -> ";
-                      write (Symbol.toValue lhstp);
-                      write "\n"
-                   end)
-               rules;
-*******)
 
             write "datatype terminal =\n";
             D.foldl
@@ -380,7 +330,7 @@ structure Codegen
                    write (Int.toString (length rhs));
                    write ",(fn ";
 
-                   ListPair.foldlEq
+                   ListPair.foldrEq
                       (fn (_, NONE, n) =>
                              (
                              write "_::";
@@ -402,7 +352,7 @@ structure Codegen
                                 n+1
                              end)
                       0
-                      (rev rhs, rev args);
+                      (rhs, args);
       
                    write "rest => Value.";
                    write (Symbol.toValue (#2 (D.lookup nonterminals lhs)));
@@ -410,6 +360,7 @@ structure Codegen
                    write (Symbol.toValue action);
                    write " ";
                    
+                   (* If solearg, we suppress generating a record pattern. *)
                    if solearg then
                       write "arg0"
                    else

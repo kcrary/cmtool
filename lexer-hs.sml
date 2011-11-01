@@ -12,69 +12,48 @@ structure Lexer
          
       val keywords : token option Table.table = Table.table 60
 
-      (* Illegal identifiers (most are SML reserved words). *)
+      (* Illegal identifiers (most are Haskell reserved words). *)
       val () =
          List.app
          (fn str => Table.insert keywords str NONE)
          [
-         "abstype",
-         "andalso",
-         "as",
          "case",
-         "datatype",
+         "class",
+         "default",
+         "deriving",
          "do",
          "else",
-         "end",
-         "exception",
-         "fn",
-         "fun",
-         "functor",
-         "handle",
+         "foreign",
          "if",
+         "import",
          "in",
          "infix",
+         "infixl",
          "infixr",
-         "include",
+         "instance",
          "let",
-         "local",
-         "nonfix",
-         "op",
-         "open",
-         "orelse",
-         "raise",
-         "sharing",
-         "sig",
-         "signature",
-         "struct",
-         "structure",
+         "module",
+         "newtype",
+         "of",
          "then",
-         "val",
-         "where",
-         "while",
-         "withtype",
          "type",
-
-         "before",
-         "div",
-         "mod",
-         "o",
+         "where",
 
          "error",
-         "exn",
-
-         "true",
-         "false",
-         "nil",
-         "ref"
+         "monad",
+         "Prelude",
+         "stream",
+         "Value"
          ]
-
 
       (* Reserved words in cmyacc. *)
       val () =
          List.app
          (fn (str, token) => Table.insert keywords str (SOME token))
          [
+         ("data", DATA),
          ("follower", FOLLOWER),
+         ("monadic", MONADIC),
          ("name", NAME),
          ("nonterminal", NONTERMINAL),
          ("noprec", NOPREC),
@@ -129,7 +108,10 @@ structure Lexer
                       in
                          (case Table.find keywords str of
                              NONE =>
-                                (IDENT str, pos)
+                                if Char.isUpper (List.hd chars) then
+                                   (UIDENT str, pos)
+                                else
+                                   (LIDENT str, pos)
                            | SOME NONE =>
                                 (
                                 print "Illegal identifier at ";
@@ -140,7 +122,7 @@ structure Lexer
                            | SOME (SOME token) =>
                                 (token, pos))
                       end)
-
+  
             val number = 
                action 
                (fn (chars, _, pos) =>
@@ -176,7 +158,7 @@ structure Lexer
                    
             val arrow = simple ARROW
             val colon = simple COLON
-            val dot = error
+            val dot = simple DOT
             val equal = simple EQUAL
             val lparen = simple LPAREN
             val rparen = simple RPAREN

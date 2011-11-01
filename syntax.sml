@@ -23,7 +23,7 @@ structure Syntax =
       type production = constituent list * symbol * precedence
 
       datatype directive =
-         Name of symbol
+         Option of symbol * string
        | Start of symbol
        | Terminal of symbol * symbol option * precedence
        | Nonterminal of symbol * symbol * production list
