@@ -13,7 +13,6 @@ structure Token =
        | COLON
        | EOS
        | EMPT
-       | ENABLE
        | EPSILON
        | EQUAL
        | FUNCTION

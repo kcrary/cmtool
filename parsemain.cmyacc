@@ -10,7 +10,6 @@ terminal ARROW
 terminal COLON
 terminal EOS
 terminal EMPT
-terminal ENABLE
 terminal EPSILON
 terminal EQUAL
 terminal FUNCTION
@@ -87,7 +86,6 @@ nonterminal Arms : arms =
 
 nonterminal Directive : directive =
    NAME 1:Ident => name_directive
-   ENABLE 1:Ident => enable_directive
    ALPHABET 1:Number => alphabet_directive
    REGEXP 1:Ident EQUAL 2:Regexp => regexp_directive
    SET 1:Ident EQUAL 2:Charset => set_directive

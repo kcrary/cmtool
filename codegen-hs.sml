@@ -1,8 +1,8 @@
 
-structure CodeGen
-   :> CODEGEN
-   =
+structure Codegen :> CODEGEN =
    struct
+
+      exception Error
 
       val () =
          if Word.wordSize < 16 then
@@ -210,7 +210,7 @@ structure CodeGen
             write moduleName;
             write ".ord=ord";
 
-            map
+            app
             (fn (actionName, _) =>
                 (
                 write ", ";
@@ -277,9 +277,18 @@ structure CodeGen
          end
             
 
-      fun writeProgram filename (moduleName, symbolLimit, types, actions, functions, options) =
+      fun writeProgram filename (options, symbolLimit, types, actions, functions) =
          let
-            val monadic = StringSet.member options "monadic"
+            val moduleName =
+                (case StringDict.find options "name" of
+                    SOME name => name
+                  | NONE =>
+                       (
+                       print "Error: no module name specified.\n";
+                       raise Error
+                       ))
+
+            val monadic = StringDict.member options "monadic"
          
             val outs = TextIO.openOut filename
             fun write str = TextIO.output (outs, str)

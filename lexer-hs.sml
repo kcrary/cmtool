@@ -36,7 +36,6 @@ structure Lexer
          "module",
          "newtype",
          "of",
-         "symbol",
          "then",
          "type",
          "where",
@@ -44,7 +43,8 @@ structure Lexer
          "monad",
          "ord",
          "Prelude",
-         "stream"
+         "stream",
+         "symbol"
          ]
 
       (* Reserved words in cmlex. *)
@@ -56,10 +56,10 @@ structure Lexer
          ("and", AND),
          ("any", ANY),
          ("empty", EMPT),
-         ("enable", ENABLE),
          ("eos", EOS),
          ("epsilon", EPSILON),
          ("function", FUNCTION),
+         ("monadic", MONADIC),
          ("name", NAME),
          ("or", OR),
          ("range", RANGE),

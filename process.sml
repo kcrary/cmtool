@@ -12,7 +12,7 @@ structure Process
 
 
       structure S = StringSet
-      structure D = SplayDict (structure Key = StringOrdered)
+      structure D = StringDict
       structure SS = SymbolSet
 
       open Syntax
@@ -25,13 +25,12 @@ structure Process
 
 
 
-      val modulename   : string option ref               = ref NONE
+      val options      : string D.dict ref               = ref D.empty
       val types        : S.set ref                       = ref S.empty
       val actions      : string D.dict ref               = ref D.empty
       val functions    : (string * int * (Regexp.regexp * (int * string)) list) D.dict ref = ref D.empty
       val patterns     : pattern D.dict ref              = ref D.empty
       val alphabet     : (int * SS.set) option ref       = ref NONE
-      val options      : S.set ref                       = ref S.empty
 
 
       fun processSet setname set =
@@ -192,7 +191,7 @@ structure Process
                  foldr 
                  (fn (re1, re2) => Regexp.Union (processRegexp errfn re1, re2))
                  Regexp.Empty res
-            | Option re1 =>
+            | Optional re1 =>
                  Regexp.Option (processRegexp errfn re1)
             | Closure re1 =>
                  Regexp.Closure (processRegexp errfn re1)
@@ -282,18 +281,21 @@ structure Process
            | directive :: rest =>
                 (
                 (case directive of
-                    Name name =>
-                       (case (!modulename) of
-                           SOME _ =>
-                              (
-                              print "Error: multiple functor names specified.\n";
-                              raise Error
-                              )
-                         | NONE =>
-                              modulename := SOME name)
-
-                  | Enable name =>
-                       options := S.insert (!options) name
+                    Option (name, value) =>
+                       (case D.find (!options) name of
+                           NONE =>
+                              options := D.insert (!options) name value
+                         | SOME _ =>
+                              if value = "" then
+                                 (* Nullary option, we'll allow it to be respecified. *)
+                                 ()
+                              else
+                                 (
+                                 print "Error: multiple specification of ";
+                                 print name;
+                                 print ".\n";
+                                 raise Error
+                                 ))
 
                   | Alphabet n =>
                        (case !alphabet of
@@ -470,7 +472,7 @@ structure Process
           let 
              val () =
                 (
-                modulename := NONE;
+                options := D.empty;
                 types := S.empty;
                 actions := D.empty;
                 functions := D.empty;
@@ -480,14 +482,7 @@ structure Process
 
              val () = processMain l
 
-             val modulename' =
-                (case !modulename of
-                    NONE =>
-                       (
-                       print "Error: no functor name specified.\n";
-                       raise Error
-                       )
-                  | SOME name => name)
+             (* Post-processing *)
 
              val () =
                 if D.isEmpty (!functions) then
@@ -551,8 +546,12 @@ structure Process
                        end)
                 (D.toList (!functions))
 
+             val types' =
+                (* S.toList produces these in sorted order. *)
+                S.toList (!types)
+
           in
-             (modulename', symbolLimit, S.toList (!types), D.toList (!actions), functions', !options)
+             (!options, symbolLimit, types', D.toList (!actions), functions')
           end
 
    end

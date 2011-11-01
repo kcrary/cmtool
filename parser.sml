@@ -55,7 +55,7 @@ structure Parser
             val concat_regexp = Concat
             val seq_regexp = Concat
             val union_regexp = Union
-            val option_regexp = Option
+            val option_regexp = Optional
             val closure_regexp = Closure
             val plus_regexp = Plus
             val equal_regexp = Exactly
@@ -75,8 +75,7 @@ structure Parser
             val cons_arms = op ::
 
             type directive = directive
-            val name_directive = Name
-            val enable_directive = Enable
+            fun name_directive str = Option ("name", str)
             val alphabet_directive = Alphabet
             val regexp_directive = Regexp
             val set_directive = Set

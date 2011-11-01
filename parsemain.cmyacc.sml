@@ -4,111 +4,97 @@ State 0:
 
 start -> . Directives  / 0
 36 : Directive -> . NAME Ident  / 1
-37 : Directive -> . ENABLE Ident  / 1
-38 : Directive -> . ALPHABET Number  / 1
-39 : Directive -> . REGEXP Ident EQUAL Regexp  / 1
-40 : Directive -> . SET Ident EQUAL Charset  / 1
-41 : Directive -> . FUNCTION Ident COLON Ident EQUAL Arms  / 1
-42 : Directives -> .  / 0
-43 : Directives -> . Directive Directives  / 0
+37 : Directive -> . ALPHABET Number  / 1
+38 : Directive -> . REGEXP Ident EQUAL Regexp  / 1
+39 : Directive -> . SET Ident EQUAL Charset  / 1
+40 : Directive -> . FUNCTION Ident COLON Ident EQUAL Arms  / 1
+41 : Directives -> .  / 0
+42 : Directives -> . Directive Directives  / 0
 
-$ => reduce 42
+$ => reduce 41
 ALPHABET => shift 4
-ENABLE => shift 3
-FUNCTION => shift 2
-NAME => shift 7
+FUNCTION => shift 3
+NAME => shift 5
 REGEXP => shift 6
-SET => shift 5
+SET => shift 2
 Directive => goto 1
-Directives => goto 8
+Directives => goto 7
 
 -----
 
 State 1:
 
 36 : Directive -> . NAME Ident  / 1
-37 : Directive -> . ENABLE Ident  / 1
-38 : Directive -> . ALPHABET Number  / 1
-39 : Directive -> . REGEXP Ident EQUAL Regexp  / 1
-40 : Directive -> . SET Ident EQUAL Charset  / 1
-41 : Directive -> . FUNCTION Ident COLON Ident EQUAL Arms  / 1
-42 : Directives -> .  / 0
-43 : Directives -> . Directive Directives  / 0
-43 : Directives -> Directive . Directives  / 0
+37 : Directive -> . ALPHABET Number  / 1
+38 : Directive -> . REGEXP Ident EQUAL Regexp  / 1
+39 : Directive -> . SET Ident EQUAL Charset  / 1
+40 : Directive -> . FUNCTION Ident COLON Ident EQUAL Arms  / 1
+41 : Directives -> .  / 0
+42 : Directives -> . Directive Directives  / 0
+42 : Directives -> Directive . Directives  / 0
 
-$ => reduce 42
+$ => reduce 41
 ALPHABET => shift 4
-ENABLE => shift 3
-FUNCTION => shift 2
-NAME => shift 7
+FUNCTION => shift 3
+NAME => shift 5
 REGEXP => shift 6
-SET => shift 5
+SET => shift 2
 Directive => goto 1
-Directives => goto 9
+Directives => goto 8
 
 -----
 
 State 2:
 
 0 : Ident -> . IDENT  / 2
-41 : Directive -> FUNCTION . Ident COLON Ident EQUAL Arms  / 1
+39 : Directive -> SET . Ident EQUAL Charset  / 1
 
-IDENT => shift 11
-Ident => goto 10
+IDENT => shift 10
+Ident => goto 9
 
 -----
 
 State 3:
 
-0 : Ident -> . IDENT  / 1
-37 : Directive -> ENABLE . Ident  / 1
+0 : Ident -> . IDENT  / 3
+40 : Directive -> FUNCTION . Ident COLON Ident EQUAL Arms  / 1
 
-IDENT => shift 11
-Ident => goto 12
+IDENT => shift 10
+Ident => goto 11
 
 -----
 
 State 4:
 
 1 : Number -> . NUMBER  / 1
-38 : Directive -> ALPHABET . Number  / 1
+37 : Directive -> ALPHABET . Number  / 1
 
-NUMBER => shift 14
-Number => goto 13
+NUMBER => shift 13
+Number => goto 12
 
 -----
 
 State 5:
 
-0 : Ident -> . IDENT  / 3
-40 : Directive -> SET . Ident EQUAL Charset  / 1
+0 : Ident -> . IDENT  / 1
+36 : Directive -> NAME . Ident  / 1
 
-IDENT => shift 11
-Ident => goto 15
+IDENT => shift 10
+Ident => goto 14
 
 -----
 
 State 6:
 
-0 : Ident -> . IDENT  / 3
-39 : Directive -> REGEXP . Ident EQUAL Regexp  / 1
+0 : Ident -> . IDENT  / 2
+38 : Directive -> REGEXP . Ident EQUAL Regexp  / 1
 
-IDENT => shift 11
-Ident => goto 16
+IDENT => shift 10
+Ident => goto 15
 
 -----
 
 State 7:
-
-0 : Ident -> . IDENT  / 1
-36 : Directive -> NAME . Ident  / 1
-
-IDENT => shift 11
-Ident => goto 17
-
------
-
-State 8:
 
 start -> Directives .  / 0
 
@@ -116,23 +102,23 @@ $ => accept
 
 -----
 
+State 8:
+
+42 : Directives -> Directive Directives .  / 0
+
+$ => reduce 42
+
+-----
+
 State 9:
 
-43 : Directives -> Directive Directives .  / 0
+39 : Directive -> SET Ident . EQUAL Charset  / 1
 
-$ => reduce 43
+EQUAL => shift 16
 
 -----
 
 State 10:
-
-41 : Directive -> FUNCTION Ident . COLON Ident EQUAL Arms  / 1
-
-COLON => shift 18
-
------
-
-State 11:
 
 0 : Ident -> IDENT .  / 4
 
@@ -146,7 +132,6 @@ ARROW => reduce 0
 COLON => reduce 0
 EOS => reduce 0
 EMPT => reduce 0
-ENABLE => reduce 0
 EPSILON => reduce 0
 EQUAL => reduce 0
 FUNCTION => reduce 0
@@ -158,13 +143,20 @@ SET => reduce 0
 
 -----
 
+State 11:
+
+40 : Directive -> FUNCTION Ident . COLON Ident EQUAL Arms  / 1
+
+COLON => shift 17
+
+-----
+
 State 12:
 
-37 : Directive -> ENABLE Ident .  / 1
+37 : Directive -> ALPHABET Number .  / 1
 
 $ => reduce 37
 ALPHABET => reduce 37
-ENABLE => reduce 37
 FUNCTION => reduce 37
 NAME => reduce 37
 REGEXP => reduce 37
@@ -173,20 +165,6 @@ SET => reduce 37
 -----
 
 State 13:
-
-38 : Directive -> ALPHABET Number .  / 1
-
-$ => reduce 38
-ALPHABET => reduce 38
-ENABLE => reduce 38
-FUNCTION => reduce 38
-NAME => reduce 38
-REGEXP => reduce 38
-SET => reduce 38
-
------
-
-State 14:
 
 1 : Number -> NUMBER .  / 5
 
@@ -199,7 +177,6 @@ ANY => reduce 1
 ARROW => reduce 1
 EOS => reduce 1
 EMPT => reduce 1
-ENABLE => reduce 1
 EPSILON => reduce 1
 FUNCTION => reduce 1
 LPAREN => reduce 1
@@ -210,29 +187,12 @@ SET => reduce 1
 
 -----
 
-State 15:
-
-40 : Directive -> SET Ident . EQUAL Charset  / 1
-
-EQUAL => shift 19
-
------
-
-State 16:
-
-39 : Directive -> REGEXP Ident . EQUAL Regexp  / 1
-
-EQUAL => shift 20
-
------
-
-State 17:
+State 14:
 
 36 : Directive -> NAME Ident .  / 1
 
 $ => reduce 36
 ALPHABET => reduce 36
-ENABLE => reduce 36
 FUNCTION => reduce 36
 NAME => reduce 36
 REGEXP => reduce 36
@@ -240,17 +200,15 @@ SET => reduce 36
 
 -----
 
-State 18:
+State 15:
 
-0 : Ident -> . IDENT  / 3
-41 : Directive -> FUNCTION Ident COLON . Ident EQUAL Arms  / 1
+38 : Directive -> REGEXP Ident . EQUAL Regexp  / 1
 
-IDENT => shift 11
-Ident => goto 21
+EQUAL => shift 18
 
 -----
 
-State 19:
+State 16:
 
 0 : Ident -> . IDENT  / 1
 1 : Number -> . NUMBER  / 1
@@ -263,20 +221,30 @@ State 19:
 10 : Charset -> . LPAREN MINUS Charset Charsets RPAREN  / 1
 11 : Charset -> . LPAREN TILDE Charsets RPAREN  / 1
 12 : Charset -> . ANY  / 1
-40 : Directive -> SET Ident EQUAL . Charset  / 1
+39 : Directive -> SET Ident EQUAL . Charset  / 1
 
-IDENT => shift 11
-NUMBER => shift 14
-ANY => shift 25
-EMPT => shift 24
-LPAREN => shift 27
-Ident => goto 26
-Number => goto 23
-Charset => goto 22
+IDENT => shift 10
+NUMBER => shift 13
+ANY => shift 22
+EMPT => shift 21
+LPAREN => shift 24
+Ident => goto 23
+Number => goto 20
+Charset => goto 19
 
 -----
 
-State 20:
+State 17:
+
+0 : Ident -> . IDENT  / 2
+40 : Directive -> FUNCTION Ident COLON . Ident EQUAL Arms  / 1
+
+IDENT => shift 10
+Ident => goto 25
+
+-----
+
+State 18:
 
 0 : Ident -> . IDENT  / 1
 1 : Number -> . NUMBER  / 1
@@ -296,45 +264,36 @@ State 20:
 28 : Regexp -> . LPAREN GEQ Number Regexp RPAREN  / 1
 29 : Regexp -> . LPAREN REPEAT Number Number Regexp RPAREN  / 1
 30 : Regexp -> . EOS  / 1
-39 : Directive -> REGEXP Ident EQUAL . Regexp  / 1
+38 : Directive -> REGEXP Ident EQUAL . Regexp  / 1
 
-IDENT => shift 11
-NUMBER => shift 14
-STRING => shift 32
-ANY => shift 31
-EOS => shift 30
-EMPT => shift 35
-EPSILON => shift 36
-LPAREN => shift 34
-Ident => goto 33
-Number => goto 29
-Regexp => goto 28
-
------
-
-State 21:
-
-41 : Directive -> FUNCTION Ident COLON Ident . EQUAL Arms  / 1
-
-EQUAL => shift 37
+IDENT => shift 10
+NUMBER => shift 13
+STRING => shift 30
+ANY => shift 29
+EOS => shift 28
+EMPT => shift 33
+EPSILON => shift 34
+LPAREN => shift 32
+Ident => goto 31
+Number => goto 27
+Regexp => goto 26
 
 -----
 
-State 22:
+State 19:
 
-40 : Directive -> SET Ident EQUAL Charset .  / 1
+39 : Directive -> SET Ident EQUAL Charset .  / 1
 
-$ => reduce 40
-ALPHABET => reduce 40
-ENABLE => reduce 40
-FUNCTION => reduce 40
-NAME => reduce 40
-REGEXP => reduce 40
-SET => reduce 40
+$ => reduce 39
+ALPHABET => reduce 39
+FUNCTION => reduce 39
+NAME => reduce 39
+REGEXP => reduce 39
+SET => reduce 39
 
 -----
 
-State 23:
+State 20:
 
 5 : Charset -> Number .  / 6
 
@@ -344,7 +303,6 @@ NUMBER => reduce 5
 ALPHABET => reduce 5
 ANY => reduce 5
 EMPT => reduce 5
-ENABLE => reduce 5
 FUNCTION => reduce 5
 LPAREN => reduce 5
 NAME => reduce 5
@@ -354,7 +312,7 @@ SET => reduce 5
 
 -----
 
-State 24:
+State 21:
 
 7 : Charset -> EMPT .  / 6
 
@@ -364,7 +322,6 @@ NUMBER => reduce 7
 ALPHABET => reduce 7
 ANY => reduce 7
 EMPT => reduce 7
-ENABLE => reduce 7
 FUNCTION => reduce 7
 LPAREN => reduce 7
 NAME => reduce 7
@@ -374,7 +331,7 @@ SET => reduce 7
 
 -----
 
-State 25:
+State 22:
 
 12 : Charset -> ANY .  / 6
 
@@ -384,7 +341,6 @@ NUMBER => reduce 12
 ALPHABET => reduce 12
 ANY => reduce 12
 EMPT => reduce 12
-ENABLE => reduce 12
 FUNCTION => reduce 12
 LPAREN => reduce 12
 NAME => reduce 12
@@ -394,7 +350,7 @@ SET => reduce 12
 
 -----
 
-State 26:
+State 23:
 
 4 : Charset -> Ident .  / 6
 
@@ -404,7 +360,6 @@ NUMBER => reduce 4
 ALPHABET => reduce 4
 ANY => reduce 4
 EMPT => reduce 4
-ENABLE => reduce 4
 FUNCTION => reduce 4
 LPAREN => reduce 4
 NAME => reduce 4
@@ -414,7 +369,7 @@ SET => reduce 4
 
 -----
 
-State 27:
+State 24:
 
 6 : Charset -> LPAREN . RANGE NumPairs RPAREN  / 6
 8 : Charset -> LPAREN . OR Charsets RPAREN  / 6
@@ -422,29 +377,36 @@ State 27:
 10 : Charset -> LPAREN . MINUS Charset Charsets RPAREN  / 6
 11 : Charset -> LPAREN . TILDE Charsets RPAREN  / 6
 
-AND => shift 42
-MINUS => shift 41
-OR => shift 40
-RANGE => shift 39
-TILDE => shift 38
+AND => shift 39
+MINUS => shift 38
+OR => shift 37
+RANGE => shift 36
+TILDE => shift 35
 
 -----
 
-State 28:
+State 25:
 
-39 : Directive -> REGEXP Ident EQUAL Regexp .  / 1
+40 : Directive -> FUNCTION Ident COLON Ident . EQUAL Arms  / 1
 
-$ => reduce 39
-ALPHABET => reduce 39
-ENABLE => reduce 39
-FUNCTION => reduce 39
-NAME => reduce 39
-REGEXP => reduce 39
-SET => reduce 39
+EQUAL => shift 40
 
 -----
 
-State 29:
+State 26:
+
+38 : Directive -> REGEXP Ident EQUAL Regexp .  / 1
+
+$ => reduce 38
+ALPHABET => reduce 38
+FUNCTION => reduce 38
+NAME => reduce 38
+REGEXP => reduce 38
+SET => reduce 38
+
+-----
+
+State 27:
 
 16 : Regexp -> Number .  / 5
 
@@ -457,7 +419,6 @@ ANY => reduce 16
 ARROW => reduce 16
 EOS => reduce 16
 EMPT => reduce 16
-ENABLE => reduce 16
 EPSILON => reduce 16
 FUNCTION => reduce 16
 LPAREN => reduce 16
@@ -468,7 +429,7 @@ SET => reduce 16
 
 -----
 
-State 30:
+State 28:
 
 30 : Regexp -> EOS .  / 5
 
@@ -481,7 +442,6 @@ ANY => reduce 30
 ARROW => reduce 30
 EOS => reduce 30
 EMPT => reduce 30
-ENABLE => reduce 30
 EPSILON => reduce 30
 FUNCTION => reduce 30
 LPAREN => reduce 30
@@ -492,7 +452,7 @@ SET => reduce 30
 
 -----
 
-State 31:
+State 29:
 
 18 : Regexp -> ANY .  / 5
 
@@ -505,7 +465,6 @@ ANY => reduce 18
 ARROW => reduce 18
 EOS => reduce 18
 EMPT => reduce 18
-ENABLE => reduce 18
 EPSILON => reduce 18
 FUNCTION => reduce 18
 LPAREN => reduce 18
@@ -516,7 +475,7 @@ SET => reduce 18
 
 -----
 
-State 32:
+State 30:
 
 17 : Regexp -> STRING .  / 5
 
@@ -529,7 +488,6 @@ ANY => reduce 17
 ARROW => reduce 17
 EOS => reduce 17
 EMPT => reduce 17
-ENABLE => reduce 17
 EPSILON => reduce 17
 FUNCTION => reduce 17
 LPAREN => reduce 17
@@ -540,7 +498,7 @@ SET => reduce 17
 
 -----
 
-State 33:
+State 31:
 
 15 : Regexp -> Ident .  / 5
 
@@ -553,7 +511,6 @@ ANY => reduce 15
 ARROW => reduce 15
 EOS => reduce 15
 EMPT => reduce 15
-ENABLE => reduce 15
 EPSILON => reduce 15
 FUNCTION => reduce 15
 LPAREN => reduce 15
@@ -564,7 +521,7 @@ SET => reduce 15
 
 -----
 
-State 34:
+State 32:
 
 21 : Regexp -> LPAREN . COLON Regexps RPAREN  / 5
 22 : Regexp -> LPAREN . SEQ Regexps RPAREN  / 5
@@ -576,19 +533,19 @@ State 34:
 28 : Regexp -> LPAREN . GEQ Number Regexp RPAREN  / 5
 29 : Regexp -> LPAREN . REPEAT Number Number Regexp RPAREN  / 5
 
-COLON => shift 46
-EQUAL => shift 45
-GEQ => shift 44
-OR => shift 48
-PLUS => shift 47
-QUESTION => shift 49
-REPEAT => shift 43
-SEQ => shift 50
-STAR => shift 51
+COLON => shift 44
+EQUAL => shift 43
+GEQ => shift 42
+OR => shift 46
+PLUS => shift 45
+QUESTION => shift 47
+REPEAT => shift 41
+SEQ => shift 48
+STAR => shift 49
 
 -----
 
-State 35:
+State 33:
 
 20 : Regexp -> EMPT .  / 5
 
@@ -601,7 +558,6 @@ ANY => reduce 20
 ARROW => reduce 20
 EOS => reduce 20
 EMPT => reduce 20
-ENABLE => reduce 20
 EPSILON => reduce 20
 FUNCTION => reduce 20
 LPAREN => reduce 20
@@ -612,7 +568,7 @@ SET => reduce 20
 
 -----
 
-State 36:
+State 34:
 
 19 : Regexp -> EPSILON .  / 5
 
@@ -625,7 +581,6 @@ ANY => reduce 19
 ARROW => reduce 19
 EOS => reduce 19
 EMPT => reduce 19
-ENABLE => reduce 19
 EPSILON => reduce 19
 FUNCTION => reduce 19
 LPAREN => reduce 19
@@ -636,208 +591,208 @@ SET => reduce 19
 
 -----
 
+State 35:
+
+0 : Ident -> . IDENT  / 7
+1 : Number -> . NUMBER  / 7
+4 : Charset -> . Ident  / 7
+5 : Charset -> . Number  / 7
+6 : Charset -> . LPAREN RANGE NumPairs RPAREN  / 7
+7 : Charset -> . EMPT  / 7
+8 : Charset -> . LPAREN OR Charsets RPAREN  / 7
+9 : Charset -> . LPAREN AND Charsets RPAREN  / 7
+10 : Charset -> . LPAREN MINUS Charset Charsets RPAREN  / 7
+11 : Charset -> . LPAREN TILDE Charsets RPAREN  / 7
+11 : Charset -> LPAREN TILDE . Charsets RPAREN  / 6
+12 : Charset -> . ANY  / 7
+13 : Charsets -> .  / 8
+14 : Charsets -> . Charset Charsets  / 8
+
+IDENT => shift 10
+NUMBER => shift 13
+ANY => shift 22
+EMPT => shift 21
+LPAREN => shift 24
+RPAREN => reduce 13
+Ident => goto 23
+Number => goto 20
+Charset => goto 50
+Charsets => goto 51
+
+-----
+
+State 36:
+
+1 : Number -> . NUMBER  / 9
+2 : NumPairs -> .  / 8
+3 : NumPairs -> . Number Number NumPairs  / 8
+6 : Charset -> LPAREN RANGE . NumPairs RPAREN  / 6
+
+NUMBER => shift 13
+RPAREN => reduce 2
+Number => goto 53
+NumPairs => goto 52
+
+-----
+
 State 37:
 
 0 : Ident -> . IDENT  / 7
 1 : Number -> . NUMBER  / 7
-15 : Regexp -> . Ident  / 7
-16 : Regexp -> . Number  / 7
-17 : Regexp -> . STRING  / 7
-18 : Regexp -> . ANY  / 7
-19 : Regexp -> . EPSILON  / 7
-20 : Regexp -> . EMPT  / 7
-21 : Regexp -> . LPAREN COLON Regexps RPAREN  / 7
-22 : Regexp -> . LPAREN SEQ Regexps RPAREN  / 7
-23 : Regexp -> . LPAREN OR Regexps RPAREN  / 7
-24 : Regexp -> . LPAREN QUESTION Regexp RPAREN  / 7
-25 : Regexp -> . LPAREN STAR Regexp RPAREN  / 7
-26 : Regexp -> . LPAREN PLUS Regexp RPAREN  / 7
-27 : Regexp -> . LPAREN EQUAL Number Regexp RPAREN  / 7
-28 : Regexp -> . LPAREN GEQ Number Regexp RPAREN  / 7
-29 : Regexp -> . LPAREN REPEAT Number Number Regexp RPAREN  / 7
-30 : Regexp -> . EOS  / 7
-33 : Arm -> . Regexp ARROW Ident  / 8
-34 : Arms -> . Arm  / 1
-35 : Arms -> . Arm Arms  / 1
-41 : Directive -> FUNCTION Ident COLON Ident EQUAL . Arms  / 1
+4 : Charset -> . Ident  / 7
+5 : Charset -> . Number  / 7
+6 : Charset -> . LPAREN RANGE NumPairs RPAREN  / 7
+7 : Charset -> . EMPT  / 7
+8 : Charset -> . LPAREN OR Charsets RPAREN  / 7
+8 : Charset -> LPAREN OR . Charsets RPAREN  / 6
+9 : Charset -> . LPAREN AND Charsets RPAREN  / 7
+10 : Charset -> . LPAREN MINUS Charset Charsets RPAREN  / 7
+11 : Charset -> . LPAREN TILDE Charsets RPAREN  / 7
+12 : Charset -> . ANY  / 7
+13 : Charsets -> .  / 8
+14 : Charsets -> . Charset Charsets  / 8
 
-IDENT => shift 11
-NUMBER => shift 14
-STRING => shift 32
-ANY => shift 31
-EOS => shift 30
-EMPT => shift 35
-EPSILON => shift 36
-LPAREN => shift 34
-Ident => goto 33
-Number => goto 29
-Regexp => goto 54
-Arm => goto 53
-Arms => goto 52
+IDENT => shift 10
+NUMBER => shift 13
+ANY => shift 22
+EMPT => shift 21
+LPAREN => shift 24
+RPAREN => reduce 13
+Ident => goto 23
+Number => goto 20
+Charset => goto 50
+Charsets => goto 54
 
 -----
 
 State 38:
 
-0 : Ident -> . IDENT  / 9
-1 : Number -> . NUMBER  / 9
-4 : Charset -> . Ident  / 9
-5 : Charset -> . Number  / 9
-6 : Charset -> . LPAREN RANGE NumPairs RPAREN  / 9
-7 : Charset -> . EMPT  / 9
-8 : Charset -> . LPAREN OR Charsets RPAREN  / 9
-9 : Charset -> . LPAREN AND Charsets RPAREN  / 9
-10 : Charset -> . LPAREN MINUS Charset Charsets RPAREN  / 9
-11 : Charset -> . LPAREN TILDE Charsets RPAREN  / 9
-11 : Charset -> LPAREN TILDE . Charsets RPAREN  / 6
-12 : Charset -> . ANY  / 9
-13 : Charsets -> .  / 10
-14 : Charsets -> . Charset Charsets  / 10
+0 : Ident -> . IDENT  / 7
+1 : Number -> . NUMBER  / 7
+4 : Charset -> . Ident  / 7
+5 : Charset -> . Number  / 7
+6 : Charset -> . LPAREN RANGE NumPairs RPAREN  / 7
+7 : Charset -> . EMPT  / 7
+8 : Charset -> . LPAREN OR Charsets RPAREN  / 7
+9 : Charset -> . LPAREN AND Charsets RPAREN  / 7
+10 : Charset -> . LPAREN MINUS Charset Charsets RPAREN  / 7
+10 : Charset -> LPAREN MINUS . Charset Charsets RPAREN  / 6
+11 : Charset -> . LPAREN TILDE Charsets RPAREN  / 7
+12 : Charset -> . ANY  / 7
 
-IDENT => shift 11
-NUMBER => shift 14
-ANY => shift 25
-EMPT => shift 24
-LPAREN => shift 27
-RPAREN => reduce 13
-Ident => goto 26
-Number => goto 23
+IDENT => shift 10
+NUMBER => shift 13
+ANY => shift 22
+EMPT => shift 21
+LPAREN => shift 24
+Ident => goto 23
+Number => goto 20
 Charset => goto 55
-Charsets => goto 56
 
 -----
 
 State 39:
 
-1 : Number -> . NUMBER  / 11
-2 : NumPairs -> .  / 10
-3 : NumPairs -> . Number Number NumPairs  / 10
-6 : Charset -> LPAREN RANGE . NumPairs RPAREN  / 6
+0 : Ident -> . IDENT  / 7
+1 : Number -> . NUMBER  / 7
+4 : Charset -> . Ident  / 7
+5 : Charset -> . Number  / 7
+6 : Charset -> . LPAREN RANGE NumPairs RPAREN  / 7
+7 : Charset -> . EMPT  / 7
+8 : Charset -> . LPAREN OR Charsets RPAREN  / 7
+9 : Charset -> . LPAREN AND Charsets RPAREN  / 7
+9 : Charset -> LPAREN AND . Charsets RPAREN  / 6
+10 : Charset -> . LPAREN MINUS Charset Charsets RPAREN  / 7
+11 : Charset -> . LPAREN TILDE Charsets RPAREN  / 7
+12 : Charset -> . ANY  / 7
+13 : Charsets -> .  / 8
+14 : Charsets -> . Charset Charsets  / 8
 
-NUMBER => shift 14
-RPAREN => reduce 2
-Number => goto 58
-NumPairs => goto 57
+IDENT => shift 10
+NUMBER => shift 13
+ANY => shift 22
+EMPT => shift 21
+LPAREN => shift 24
+RPAREN => reduce 13
+Ident => goto 23
+Number => goto 20
+Charset => goto 50
+Charsets => goto 56
 
 -----
 
 State 40:
 
-0 : Ident -> . IDENT  / 9
-1 : Number -> . NUMBER  / 9
-4 : Charset -> . Ident  / 9
-5 : Charset -> . Number  / 9
-6 : Charset -> . LPAREN RANGE NumPairs RPAREN  / 9
-7 : Charset -> . EMPT  / 9
-8 : Charset -> . LPAREN OR Charsets RPAREN  / 9
-8 : Charset -> LPAREN OR . Charsets RPAREN  / 6
-9 : Charset -> . LPAREN AND Charsets RPAREN  / 9
-10 : Charset -> . LPAREN MINUS Charset Charsets RPAREN  / 9
-11 : Charset -> . LPAREN TILDE Charsets RPAREN  / 9
-12 : Charset -> . ANY  / 9
-13 : Charsets -> .  / 10
-14 : Charsets -> . Charset Charsets  / 10
+0 : Ident -> . IDENT  / 10
+1 : Number -> . NUMBER  / 10
+15 : Regexp -> . Ident  / 10
+16 : Regexp -> . Number  / 10
+17 : Regexp -> . STRING  / 10
+18 : Regexp -> . ANY  / 10
+19 : Regexp -> . EPSILON  / 10
+20 : Regexp -> . EMPT  / 10
+21 : Regexp -> . LPAREN COLON Regexps RPAREN  / 10
+22 : Regexp -> . LPAREN SEQ Regexps RPAREN  / 10
+23 : Regexp -> . LPAREN OR Regexps RPAREN  / 10
+24 : Regexp -> . LPAREN QUESTION Regexp RPAREN  / 10
+25 : Regexp -> . LPAREN STAR Regexp RPAREN  / 10
+26 : Regexp -> . LPAREN PLUS Regexp RPAREN  / 10
+27 : Regexp -> . LPAREN EQUAL Number Regexp RPAREN  / 10
+28 : Regexp -> . LPAREN GEQ Number Regexp RPAREN  / 10
+29 : Regexp -> . LPAREN REPEAT Number Number Regexp RPAREN  / 10
+30 : Regexp -> . EOS  / 10
+33 : Arm -> . Regexp ARROW Ident  / 11
+34 : Arms -> . Arm  / 1
+35 : Arms -> . Arm Arms  / 1
+40 : Directive -> FUNCTION Ident COLON Ident EQUAL . Arms  / 1
 
-IDENT => shift 11
-NUMBER => shift 14
-ANY => shift 25
-EMPT => shift 24
-LPAREN => shift 27
-RPAREN => reduce 13
-Ident => goto 26
-Number => goto 23
-Charset => goto 55
-Charsets => goto 59
+IDENT => shift 10
+NUMBER => shift 13
+STRING => shift 30
+ANY => shift 29
+EOS => shift 28
+EMPT => shift 33
+EPSILON => shift 34
+LPAREN => shift 32
+Ident => goto 31
+Number => goto 27
+Regexp => goto 59
+Arm => goto 58
+Arms => goto 57
 
 -----
 
 State 41:
 
-0 : Ident -> . IDENT  / 9
 1 : Number -> . NUMBER  / 9
-4 : Charset -> . Ident  / 9
-5 : Charset -> . Number  / 9
-6 : Charset -> . LPAREN RANGE NumPairs RPAREN  / 9
-7 : Charset -> . EMPT  / 9
-8 : Charset -> . LPAREN OR Charsets RPAREN  / 9
-9 : Charset -> . LPAREN AND Charsets RPAREN  / 9
-10 : Charset -> . LPAREN MINUS Charset Charsets RPAREN  / 9
-10 : Charset -> LPAREN MINUS . Charset Charsets RPAREN  / 6
-11 : Charset -> . LPAREN TILDE Charsets RPAREN  / 9
-12 : Charset -> . ANY  / 9
+29 : Regexp -> LPAREN REPEAT . Number Number Regexp RPAREN  / 5
 
-IDENT => shift 11
-NUMBER => shift 14
-ANY => shift 25
-EMPT => shift 24
-LPAREN => shift 27
-Ident => goto 26
-Number => goto 23
-Charset => goto 60
+NUMBER => shift 13
+Number => goto 60
 
 -----
 
 State 42:
 
-0 : Ident -> . IDENT  / 9
-1 : Number -> . NUMBER  / 9
-4 : Charset -> . Ident  / 9
-5 : Charset -> . Number  / 9
-6 : Charset -> . LPAREN RANGE NumPairs RPAREN  / 9
-7 : Charset -> . EMPT  / 9
-8 : Charset -> . LPAREN OR Charsets RPAREN  / 9
-9 : Charset -> . LPAREN AND Charsets RPAREN  / 9
-9 : Charset -> LPAREN AND . Charsets RPAREN  / 6
-10 : Charset -> . LPAREN MINUS Charset Charsets RPAREN  / 9
-11 : Charset -> . LPAREN TILDE Charsets RPAREN  / 9
-12 : Charset -> . ANY  / 9
-13 : Charsets -> .  / 10
-14 : Charsets -> . Charset Charsets  / 10
+1 : Number -> . NUMBER  / 12
+28 : Regexp -> LPAREN GEQ . Number Regexp RPAREN  / 5
 
-IDENT => shift 11
-NUMBER => shift 14
-ANY => shift 25
-EMPT => shift 24
-LPAREN => shift 27
-RPAREN => reduce 13
-Ident => goto 26
-Number => goto 23
-Charset => goto 55
-Charsets => goto 61
+NUMBER => shift 13
+Number => goto 61
 
 -----
 
 State 43:
 
-1 : Number -> . NUMBER  / 11
-29 : Regexp -> LPAREN REPEAT . Number Number Regexp RPAREN  / 5
+1 : Number -> . NUMBER  / 12
+27 : Regexp -> LPAREN EQUAL . Number Regexp RPAREN  / 5
 
-NUMBER => shift 14
+NUMBER => shift 13
 Number => goto 62
 
 -----
 
 State 44:
-
-1 : Number -> . NUMBER  / 12
-28 : Regexp -> LPAREN GEQ . Number Regexp RPAREN  / 5
-
-NUMBER => shift 14
-Number => goto 63
-
------
-
-State 45:
-
-1 : Number -> . NUMBER  / 12
-27 : Regexp -> LPAREN EQUAL . Number Regexp RPAREN  / 5
-
-NUMBER => shift 14
-Number => goto 64
-
------
-
-State 46:
 
 0 : Ident -> . IDENT  / 13
 1 : Number -> . NUMBER  / 13
@@ -858,62 +813,62 @@ State 46:
 28 : Regexp -> . LPAREN GEQ Number Regexp RPAREN  / 13
 29 : Regexp -> . LPAREN REPEAT Number Number Regexp RPAREN  / 13
 30 : Regexp -> . EOS  / 13
-31 : Regexps -> .  / 10
-32 : Regexps -> . Regexp Regexps  / 10
+31 : Regexps -> .  / 8
+32 : Regexps -> . Regexp Regexps  / 8
 
-IDENT => shift 11
-NUMBER => shift 14
-STRING => shift 32
-ANY => shift 31
-EOS => shift 30
-EMPT => shift 35
-EPSILON => shift 36
-LPAREN => shift 34
+IDENT => shift 10
+NUMBER => shift 13
+STRING => shift 30
+ANY => shift 29
+EOS => shift 28
+EMPT => shift 33
+EPSILON => shift 34
+LPAREN => shift 32
 RPAREN => reduce 31
-Ident => goto 33
-Number => goto 29
-Regexp => goto 65
-Regexps => goto 66
+Ident => goto 31
+Number => goto 27
+Regexp => goto 63
+Regexps => goto 64
 
 -----
 
-State 47:
+State 45:
 
-0 : Ident -> . IDENT  / 10
-1 : Number -> . NUMBER  / 10
-15 : Regexp -> . Ident  / 10
-16 : Regexp -> . Number  / 10
-17 : Regexp -> . STRING  / 10
-18 : Regexp -> . ANY  / 10
-19 : Regexp -> . EPSILON  / 10
-20 : Regexp -> . EMPT  / 10
-21 : Regexp -> . LPAREN COLON Regexps RPAREN  / 10
-22 : Regexp -> . LPAREN SEQ Regexps RPAREN  / 10
-23 : Regexp -> . LPAREN OR Regexps RPAREN  / 10
-24 : Regexp -> . LPAREN QUESTION Regexp RPAREN  / 10
-25 : Regexp -> . LPAREN STAR Regexp RPAREN  / 10
-26 : Regexp -> . LPAREN PLUS Regexp RPAREN  / 10
+0 : Ident -> . IDENT  / 8
+1 : Number -> . NUMBER  / 8
+15 : Regexp -> . Ident  / 8
+16 : Regexp -> . Number  / 8
+17 : Regexp -> . STRING  / 8
+18 : Regexp -> . ANY  / 8
+19 : Regexp -> . EPSILON  / 8
+20 : Regexp -> . EMPT  / 8
+21 : Regexp -> . LPAREN COLON Regexps RPAREN  / 8
+22 : Regexp -> . LPAREN SEQ Regexps RPAREN  / 8
+23 : Regexp -> . LPAREN OR Regexps RPAREN  / 8
+24 : Regexp -> . LPAREN QUESTION Regexp RPAREN  / 8
+25 : Regexp -> . LPAREN STAR Regexp RPAREN  / 8
+26 : Regexp -> . LPAREN PLUS Regexp RPAREN  / 8
 26 : Regexp -> LPAREN PLUS . Regexp RPAREN  / 5
-27 : Regexp -> . LPAREN EQUAL Number Regexp RPAREN  / 10
-28 : Regexp -> . LPAREN GEQ Number Regexp RPAREN  / 10
-29 : Regexp -> . LPAREN REPEAT Number Number Regexp RPAREN  / 10
-30 : Regexp -> . EOS  / 10
+27 : Regexp -> . LPAREN EQUAL Number Regexp RPAREN  / 8
+28 : Regexp -> . LPAREN GEQ Number Regexp RPAREN  / 8
+29 : Regexp -> . LPAREN REPEAT Number Number Regexp RPAREN  / 8
+30 : Regexp -> . EOS  / 8
 
-IDENT => shift 11
-NUMBER => shift 14
-STRING => shift 32
-ANY => shift 31
-EOS => shift 30
-EMPT => shift 35
-EPSILON => shift 36
-LPAREN => shift 34
-Ident => goto 33
-Number => goto 29
-Regexp => goto 67
+IDENT => shift 10
+NUMBER => shift 13
+STRING => shift 30
+ANY => shift 29
+EOS => shift 28
+EMPT => shift 33
+EPSILON => shift 34
+LPAREN => shift 32
+Ident => goto 31
+Number => goto 27
+Regexp => goto 65
 
 -----
 
-State 48:
+State 46:
 
 0 : Ident -> . IDENT  / 13
 1 : Number -> . NUMBER  / 13
@@ -934,62 +889,62 @@ State 48:
 28 : Regexp -> . LPAREN GEQ Number Regexp RPAREN  / 13
 29 : Regexp -> . LPAREN REPEAT Number Number Regexp RPAREN  / 13
 30 : Regexp -> . EOS  / 13
-31 : Regexps -> .  / 10
-32 : Regexps -> . Regexp Regexps  / 10
+31 : Regexps -> .  / 8
+32 : Regexps -> . Regexp Regexps  / 8
 
-IDENT => shift 11
-NUMBER => shift 14
-STRING => shift 32
-ANY => shift 31
-EOS => shift 30
-EMPT => shift 35
-EPSILON => shift 36
-LPAREN => shift 34
+IDENT => shift 10
+NUMBER => shift 13
+STRING => shift 30
+ANY => shift 29
+EOS => shift 28
+EMPT => shift 33
+EPSILON => shift 34
+LPAREN => shift 32
 RPAREN => reduce 31
-Ident => goto 33
-Number => goto 29
-Regexp => goto 65
-Regexps => goto 68
+Ident => goto 31
+Number => goto 27
+Regexp => goto 63
+Regexps => goto 66
 
 -----
 
-State 49:
+State 47:
 
-0 : Ident -> . IDENT  / 10
-1 : Number -> . NUMBER  / 10
-15 : Regexp -> . Ident  / 10
-16 : Regexp -> . Number  / 10
-17 : Regexp -> . STRING  / 10
-18 : Regexp -> . ANY  / 10
-19 : Regexp -> . EPSILON  / 10
-20 : Regexp -> . EMPT  / 10
-21 : Regexp -> . LPAREN COLON Regexps RPAREN  / 10
-22 : Regexp -> . LPAREN SEQ Regexps RPAREN  / 10
-23 : Regexp -> . LPAREN OR Regexps RPAREN  / 10
-24 : Regexp -> . LPAREN QUESTION Regexp RPAREN  / 10
+0 : Ident -> . IDENT  / 8
+1 : Number -> . NUMBER  / 8
+15 : Regexp -> . Ident  / 8
+16 : Regexp -> . Number  / 8
+17 : Regexp -> . STRING  / 8
+18 : Regexp -> . ANY  / 8
+19 : Regexp -> . EPSILON  / 8
+20 : Regexp -> . EMPT  / 8
+21 : Regexp -> . LPAREN COLON Regexps RPAREN  / 8
+22 : Regexp -> . LPAREN SEQ Regexps RPAREN  / 8
+23 : Regexp -> . LPAREN OR Regexps RPAREN  / 8
+24 : Regexp -> . LPAREN QUESTION Regexp RPAREN  / 8
 24 : Regexp -> LPAREN QUESTION . Regexp RPAREN  / 5
-25 : Regexp -> . LPAREN STAR Regexp RPAREN  / 10
-26 : Regexp -> . LPAREN PLUS Regexp RPAREN  / 10
-27 : Regexp -> . LPAREN EQUAL Number Regexp RPAREN  / 10
-28 : Regexp -> . LPAREN GEQ Number Regexp RPAREN  / 10
-29 : Regexp -> . LPAREN REPEAT Number Number Regexp RPAREN  / 10
-30 : Regexp -> . EOS  / 10
+25 : Regexp -> . LPAREN STAR Regexp RPAREN  / 8
+26 : Regexp -> . LPAREN PLUS Regexp RPAREN  / 8
+27 : Regexp -> . LPAREN EQUAL Number Regexp RPAREN  / 8
+28 : Regexp -> . LPAREN GEQ Number Regexp RPAREN  / 8
+29 : Regexp -> . LPAREN REPEAT Number Number Regexp RPAREN  / 8
+30 : Regexp -> . EOS  / 8
 
-IDENT => shift 11
-NUMBER => shift 14
-STRING => shift 32
-ANY => shift 31
-EOS => shift 30
-EMPT => shift 35
-EPSILON => shift 36
-LPAREN => shift 34
-Ident => goto 33
-Number => goto 29
-Regexp => goto 69
+IDENT => shift 10
+NUMBER => shift 13
+STRING => shift 30
+ANY => shift 29
+EOS => shift 28
+EMPT => shift 33
+EPSILON => shift 34
+LPAREN => shift 32
+Ident => goto 31
+Number => goto 27
+Regexp => goto 67
 
 -----
 
-State 50:
+State 48:
 
 0 : Ident -> . IDENT  / 13
 1 : Number -> . NUMBER  / 13
@@ -1010,26 +965,177 @@ State 50:
 28 : Regexp -> . LPAREN GEQ Number Regexp RPAREN  / 13
 29 : Regexp -> . LPAREN REPEAT Number Number Regexp RPAREN  / 13
 30 : Regexp -> . EOS  / 13
-31 : Regexps -> .  / 10
-32 : Regexps -> . Regexp Regexps  / 10
+31 : Regexps -> .  / 8
+32 : Regexps -> . Regexp Regexps  / 8
 
-IDENT => shift 11
-NUMBER => shift 14
-STRING => shift 32
-ANY => shift 31
-EOS => shift 30
-EMPT => shift 35
-EPSILON => shift 36
-LPAREN => shift 34
+IDENT => shift 10
+NUMBER => shift 13
+STRING => shift 30
+ANY => shift 29
+EOS => shift 28
+EMPT => shift 33
+EPSILON => shift 34
+LPAREN => shift 32
 RPAREN => reduce 31
-Ident => goto 33
-Number => goto 29
-Regexp => goto 65
-Regexps => goto 70
+Ident => goto 31
+Number => goto 27
+Regexp => goto 63
+Regexps => goto 68
+
+-----
+
+State 49:
+
+0 : Ident -> . IDENT  / 8
+1 : Number -> . NUMBER  / 8
+15 : Regexp -> . Ident  / 8
+16 : Regexp -> . Number  / 8
+17 : Regexp -> . STRING  / 8
+18 : Regexp -> . ANY  / 8
+19 : Regexp -> . EPSILON  / 8
+20 : Regexp -> . EMPT  / 8
+21 : Regexp -> . LPAREN COLON Regexps RPAREN  / 8
+22 : Regexp -> . LPAREN SEQ Regexps RPAREN  / 8
+23 : Regexp -> . LPAREN OR Regexps RPAREN  / 8
+24 : Regexp -> . LPAREN QUESTION Regexp RPAREN  / 8
+25 : Regexp -> . LPAREN STAR Regexp RPAREN  / 8
+25 : Regexp -> LPAREN STAR . Regexp RPAREN  / 5
+26 : Regexp -> . LPAREN PLUS Regexp RPAREN  / 8
+27 : Regexp -> . LPAREN EQUAL Number Regexp RPAREN  / 8
+28 : Regexp -> . LPAREN GEQ Number Regexp RPAREN  / 8
+29 : Regexp -> . LPAREN REPEAT Number Number Regexp RPAREN  / 8
+30 : Regexp -> . EOS  / 8
+
+IDENT => shift 10
+NUMBER => shift 13
+STRING => shift 30
+ANY => shift 29
+EOS => shift 28
+EMPT => shift 33
+EPSILON => shift 34
+LPAREN => shift 32
+Ident => goto 31
+Number => goto 27
+Regexp => goto 69
+
+-----
+
+State 50:
+
+0 : Ident -> . IDENT  / 7
+1 : Number -> . NUMBER  / 7
+4 : Charset -> . Ident  / 7
+5 : Charset -> . Number  / 7
+6 : Charset -> . LPAREN RANGE NumPairs RPAREN  / 7
+7 : Charset -> . EMPT  / 7
+8 : Charset -> . LPAREN OR Charsets RPAREN  / 7
+9 : Charset -> . LPAREN AND Charsets RPAREN  / 7
+10 : Charset -> . LPAREN MINUS Charset Charsets RPAREN  / 7
+11 : Charset -> . LPAREN TILDE Charsets RPAREN  / 7
+12 : Charset -> . ANY  / 7
+13 : Charsets -> .  / 8
+14 : Charsets -> . Charset Charsets  / 8
+14 : Charsets -> Charset . Charsets  / 8
+
+IDENT => shift 10
+NUMBER => shift 13
+ANY => shift 22
+EMPT => shift 21
+LPAREN => shift 24
+RPAREN => reduce 13
+Ident => goto 23
+Number => goto 20
+Charset => goto 50
+Charsets => goto 70
 
 -----
 
 State 51:
+
+11 : Charset -> LPAREN TILDE Charsets . RPAREN  / 6
+
+RPAREN => shift 71
+
+-----
+
+State 52:
+
+6 : Charset -> LPAREN RANGE NumPairs . RPAREN  / 6
+
+RPAREN => shift 72
+
+-----
+
+State 53:
+
+1 : Number -> . NUMBER  / 14
+3 : NumPairs -> Number . Number NumPairs  / 8
+
+NUMBER => shift 13
+Number => goto 73
+
+-----
+
+State 54:
+
+8 : Charset -> LPAREN OR Charsets . RPAREN  / 6
+
+RPAREN => shift 74
+
+-----
+
+State 55:
+
+0 : Ident -> . IDENT  / 7
+1 : Number -> . NUMBER  / 7
+4 : Charset -> . Ident  / 7
+5 : Charset -> . Number  / 7
+6 : Charset -> . LPAREN RANGE NumPairs RPAREN  / 7
+7 : Charset -> . EMPT  / 7
+8 : Charset -> . LPAREN OR Charsets RPAREN  / 7
+9 : Charset -> . LPAREN AND Charsets RPAREN  / 7
+10 : Charset -> . LPAREN MINUS Charset Charsets RPAREN  / 7
+10 : Charset -> LPAREN MINUS Charset . Charsets RPAREN  / 6
+11 : Charset -> . LPAREN TILDE Charsets RPAREN  / 7
+12 : Charset -> . ANY  / 7
+13 : Charsets -> .  / 8
+14 : Charsets -> . Charset Charsets  / 8
+
+IDENT => shift 10
+NUMBER => shift 13
+ANY => shift 22
+EMPT => shift 21
+LPAREN => shift 24
+RPAREN => reduce 13
+Ident => goto 23
+Number => goto 20
+Charset => goto 50
+Charsets => goto 75
+
+-----
+
+State 56:
+
+9 : Charset -> LPAREN AND Charsets . RPAREN  / 6
+
+RPAREN => shift 76
+
+-----
+
+State 57:
+
+40 : Directive -> FUNCTION Ident COLON Ident EQUAL Arms .  / 1
+
+$ => reduce 40
+ALPHABET => reduce 40
+FUNCTION => reduce 40
+NAME => reduce 40
+REGEXP => reduce 40
+SET => reduce 40
+
+-----
+
+State 58:
 
 0 : Ident -> . IDENT  / 10
 1 : Number -> . NUMBER  / 10
@@ -1044,283 +1150,130 @@ State 51:
 23 : Regexp -> . LPAREN OR Regexps RPAREN  / 10
 24 : Regexp -> . LPAREN QUESTION Regexp RPAREN  / 10
 25 : Regexp -> . LPAREN STAR Regexp RPAREN  / 10
-25 : Regexp -> LPAREN STAR . Regexp RPAREN  / 5
 26 : Regexp -> . LPAREN PLUS Regexp RPAREN  / 10
 27 : Regexp -> . LPAREN EQUAL Number Regexp RPAREN  / 10
 28 : Regexp -> . LPAREN GEQ Number Regexp RPAREN  / 10
 29 : Regexp -> . LPAREN REPEAT Number Number Regexp RPAREN  / 10
 30 : Regexp -> . EOS  / 10
-
-IDENT => shift 11
-NUMBER => shift 14
-STRING => shift 32
-ANY => shift 31
-EOS => shift 30
-EMPT => shift 35
-EPSILON => shift 36
-LPAREN => shift 34
-Ident => goto 33
-Number => goto 29
-Regexp => goto 71
-
------
-
-State 52:
-
-41 : Directive -> FUNCTION Ident COLON Ident EQUAL Arms .  / 1
-
-$ => reduce 41
-ALPHABET => reduce 41
-ENABLE => reduce 41
-FUNCTION => reduce 41
-NAME => reduce 41
-REGEXP => reduce 41
-SET => reduce 41
-
------
-
-State 53:
-
-0 : Ident -> . IDENT  / 7
-1 : Number -> . NUMBER  / 7
-15 : Regexp -> . Ident  / 7
-16 : Regexp -> . Number  / 7
-17 : Regexp -> . STRING  / 7
-18 : Regexp -> . ANY  / 7
-19 : Regexp -> . EPSILON  / 7
-20 : Regexp -> . EMPT  / 7
-21 : Regexp -> . LPAREN COLON Regexps RPAREN  / 7
-22 : Regexp -> . LPAREN SEQ Regexps RPAREN  / 7
-23 : Regexp -> . LPAREN OR Regexps RPAREN  / 7
-24 : Regexp -> . LPAREN QUESTION Regexp RPAREN  / 7
-25 : Regexp -> . LPAREN STAR Regexp RPAREN  / 7
-26 : Regexp -> . LPAREN PLUS Regexp RPAREN  / 7
-27 : Regexp -> . LPAREN EQUAL Number Regexp RPAREN  / 7
-28 : Regexp -> . LPAREN GEQ Number Regexp RPAREN  / 7
-29 : Regexp -> . LPAREN REPEAT Number Number Regexp RPAREN  / 7
-30 : Regexp -> . EOS  / 7
-33 : Arm -> . Regexp ARROW Ident  / 8
+33 : Arm -> . Regexp ARROW Ident  / 11
 34 : Arms -> . Arm  / 1
 34 : Arms -> Arm .  / 1
 35 : Arms -> . Arm Arms  / 1
 35 : Arms -> Arm . Arms  / 1
 
 $ => reduce 34
-IDENT => shift 11
-NUMBER => shift 14
-STRING => shift 32
+IDENT => shift 10
+NUMBER => shift 13
+STRING => shift 30
 ALPHABET => reduce 34
-ANY => shift 31
-EOS => shift 30
-EMPT => shift 35
-ENABLE => reduce 34
-EPSILON => shift 36
+ANY => shift 29
+EOS => shift 28
+EMPT => shift 33
+EPSILON => shift 34
 FUNCTION => reduce 34
-LPAREN => shift 34
+LPAREN => shift 32
 NAME => reduce 34
 REGEXP => reduce 34
 SET => reduce 34
-Ident => goto 33
-Number => goto 29
-Regexp => goto 54
-Arm => goto 53
-Arms => goto 72
-
------
-
-State 54:
-
-33 : Arm -> Regexp . ARROW Ident  / 8
-
-ARROW => shift 73
-
------
-
-State 55:
-
-0 : Ident -> . IDENT  / 9
-1 : Number -> . NUMBER  / 9
-4 : Charset -> . Ident  / 9
-5 : Charset -> . Number  / 9
-6 : Charset -> . LPAREN RANGE NumPairs RPAREN  / 9
-7 : Charset -> . EMPT  / 9
-8 : Charset -> . LPAREN OR Charsets RPAREN  / 9
-9 : Charset -> . LPAREN AND Charsets RPAREN  / 9
-10 : Charset -> . LPAREN MINUS Charset Charsets RPAREN  / 9
-11 : Charset -> . LPAREN TILDE Charsets RPAREN  / 9
-12 : Charset -> . ANY  / 9
-13 : Charsets -> .  / 10
-14 : Charsets -> . Charset Charsets  / 10
-14 : Charsets -> Charset . Charsets  / 10
-
-IDENT => shift 11
-NUMBER => shift 14
-ANY => shift 25
-EMPT => shift 24
-LPAREN => shift 27
-RPAREN => reduce 13
-Ident => goto 26
-Number => goto 23
-Charset => goto 55
-Charsets => goto 74
-
------
-
-State 56:
-
-11 : Charset -> LPAREN TILDE Charsets . RPAREN  / 6
-
-RPAREN => shift 75
-
------
-
-State 57:
-
-6 : Charset -> LPAREN RANGE NumPairs . RPAREN  / 6
-
-RPAREN => shift 76
-
------
-
-State 58:
-
-1 : Number -> . NUMBER  / 14
-3 : NumPairs -> Number . Number NumPairs  / 10
-
-NUMBER => shift 14
-Number => goto 77
+Ident => goto 31
+Number => goto 27
+Regexp => goto 59
+Arm => goto 58
+Arms => goto 77
 
 -----
 
 State 59:
 
-8 : Charset -> LPAREN OR Charsets . RPAREN  / 6
+33 : Arm -> Regexp . ARROW Ident  / 11
 
-RPAREN => shift 78
+ARROW => shift 78
 
 -----
 
 State 60:
 
-0 : Ident -> . IDENT  / 9
-1 : Number -> . NUMBER  / 9
-4 : Charset -> . Ident  / 9
-5 : Charset -> . Number  / 9
-6 : Charset -> . LPAREN RANGE NumPairs RPAREN  / 9
-7 : Charset -> . EMPT  / 9
-8 : Charset -> . LPAREN OR Charsets RPAREN  / 9
-9 : Charset -> . LPAREN AND Charsets RPAREN  / 9
-10 : Charset -> . LPAREN MINUS Charset Charsets RPAREN  / 9
-10 : Charset -> LPAREN MINUS Charset . Charsets RPAREN  / 6
-11 : Charset -> . LPAREN TILDE Charsets RPAREN  / 9
-12 : Charset -> . ANY  / 9
-13 : Charsets -> .  / 10
-14 : Charsets -> . Charset Charsets  / 10
+1 : Number -> . NUMBER  / 12
+29 : Regexp -> LPAREN REPEAT Number . Number Regexp RPAREN  / 5
 
-IDENT => shift 11
-NUMBER => shift 14
-ANY => shift 25
-EMPT => shift 24
-LPAREN => shift 27
-RPAREN => reduce 13
-Ident => goto 26
-Number => goto 23
-Charset => goto 55
-Charsets => goto 79
+NUMBER => shift 13
+Number => goto 79
 
 -----
 
 State 61:
 
-9 : Charset -> LPAREN AND Charsets . RPAREN  / 6
+0 : Ident -> . IDENT  / 8
+1 : Number -> . NUMBER  / 8
+15 : Regexp -> . Ident  / 8
+16 : Regexp -> . Number  / 8
+17 : Regexp -> . STRING  / 8
+18 : Regexp -> . ANY  / 8
+19 : Regexp -> . EPSILON  / 8
+20 : Regexp -> . EMPT  / 8
+21 : Regexp -> . LPAREN COLON Regexps RPAREN  / 8
+22 : Regexp -> . LPAREN SEQ Regexps RPAREN  / 8
+23 : Regexp -> . LPAREN OR Regexps RPAREN  / 8
+24 : Regexp -> . LPAREN QUESTION Regexp RPAREN  / 8
+25 : Regexp -> . LPAREN STAR Regexp RPAREN  / 8
+26 : Regexp -> . LPAREN PLUS Regexp RPAREN  / 8
+27 : Regexp -> . LPAREN EQUAL Number Regexp RPAREN  / 8
+28 : Regexp -> . LPAREN GEQ Number Regexp RPAREN  / 8
+28 : Regexp -> LPAREN GEQ Number . Regexp RPAREN  / 5
+29 : Regexp -> . LPAREN REPEAT Number Number Regexp RPAREN  / 8
+30 : Regexp -> . EOS  / 8
 
-RPAREN => shift 80
+IDENT => shift 10
+NUMBER => shift 13
+STRING => shift 30
+ANY => shift 29
+EOS => shift 28
+EMPT => shift 33
+EPSILON => shift 34
+LPAREN => shift 32
+Ident => goto 31
+Number => goto 27
+Regexp => goto 80
 
 -----
 
 State 62:
 
-1 : Number -> . NUMBER  / 12
-29 : Regexp -> LPAREN REPEAT Number . Number Regexp RPAREN  / 5
+0 : Ident -> . IDENT  / 8
+1 : Number -> . NUMBER  / 8
+15 : Regexp -> . Ident  / 8
+16 : Regexp -> . Number  / 8
+17 : Regexp -> . STRING  / 8
+18 : Regexp -> . ANY  / 8
+19 : Regexp -> . EPSILON  / 8
+20 : Regexp -> . EMPT  / 8
+21 : Regexp -> . LPAREN COLON Regexps RPAREN  / 8
+22 : Regexp -> . LPAREN SEQ Regexps RPAREN  / 8
+23 : Regexp -> . LPAREN OR Regexps RPAREN  / 8
+24 : Regexp -> . LPAREN QUESTION Regexp RPAREN  / 8
+25 : Regexp -> . LPAREN STAR Regexp RPAREN  / 8
+26 : Regexp -> . LPAREN PLUS Regexp RPAREN  / 8
+27 : Regexp -> . LPAREN EQUAL Number Regexp RPAREN  / 8
+27 : Regexp -> LPAREN EQUAL Number . Regexp RPAREN  / 5
+28 : Regexp -> . LPAREN GEQ Number Regexp RPAREN  / 8
+29 : Regexp -> . LPAREN REPEAT Number Number Regexp RPAREN  / 8
+30 : Regexp -> . EOS  / 8
 
-NUMBER => shift 14
-Number => goto 81
+IDENT => shift 10
+NUMBER => shift 13
+STRING => shift 30
+ANY => shift 29
+EOS => shift 28
+EMPT => shift 33
+EPSILON => shift 34
+LPAREN => shift 32
+Ident => goto 31
+Number => goto 27
+Regexp => goto 81
 
 -----
 
 State 63:
-
-0 : Ident -> . IDENT  / 10
-1 : Number -> . NUMBER  / 10
-15 : Regexp -> . Ident  / 10
-16 : Regexp -> . Number  / 10
-17 : Regexp -> . STRING  / 10
-18 : Regexp -> . ANY  / 10
-19 : Regexp -> . EPSILON  / 10
-20 : Regexp -> . EMPT  / 10
-21 : Regexp -> . LPAREN COLON Regexps RPAREN  / 10
-22 : Regexp -> . LPAREN SEQ Regexps RPAREN  / 10
-23 : Regexp -> . LPAREN OR Regexps RPAREN  / 10
-24 : Regexp -> . LPAREN QUESTION Regexp RPAREN  / 10
-25 : Regexp -> . LPAREN STAR Regexp RPAREN  / 10
-26 : Regexp -> . LPAREN PLUS Regexp RPAREN  / 10
-27 : Regexp -> . LPAREN EQUAL Number Regexp RPAREN  / 10
-28 : Regexp -> . LPAREN GEQ Number Regexp RPAREN  / 10
-28 : Regexp -> LPAREN GEQ Number . Regexp RPAREN  / 5
-29 : Regexp -> . LPAREN REPEAT Number Number Regexp RPAREN  / 10
-30 : Regexp -> . EOS  / 10
-
-IDENT => shift 11
-NUMBER => shift 14
-STRING => shift 32
-ANY => shift 31
-EOS => shift 30
-EMPT => shift 35
-EPSILON => shift 36
-LPAREN => shift 34
-Ident => goto 33
-Number => goto 29
-Regexp => goto 82
-
------
-
-State 64:
-
-0 : Ident -> . IDENT  / 10
-1 : Number -> . NUMBER  / 10
-15 : Regexp -> . Ident  / 10
-16 : Regexp -> . Number  / 10
-17 : Regexp -> . STRING  / 10
-18 : Regexp -> . ANY  / 10
-19 : Regexp -> . EPSILON  / 10
-20 : Regexp -> . EMPT  / 10
-21 : Regexp -> . LPAREN COLON Regexps RPAREN  / 10
-22 : Regexp -> . LPAREN SEQ Regexps RPAREN  / 10
-23 : Regexp -> . LPAREN OR Regexps RPAREN  / 10
-24 : Regexp -> . LPAREN QUESTION Regexp RPAREN  / 10
-25 : Regexp -> . LPAREN STAR Regexp RPAREN  / 10
-26 : Regexp -> . LPAREN PLUS Regexp RPAREN  / 10
-27 : Regexp -> . LPAREN EQUAL Number Regexp RPAREN  / 10
-27 : Regexp -> LPAREN EQUAL Number . Regexp RPAREN  / 5
-28 : Regexp -> . LPAREN GEQ Number Regexp RPAREN  / 10
-29 : Regexp -> . LPAREN REPEAT Number Number Regexp RPAREN  / 10
-30 : Regexp -> . EOS  / 10
-
-IDENT => shift 11
-NUMBER => shift 14
-STRING => shift 32
-ANY => shift 31
-EOS => shift 30
-EMPT => shift 35
-EPSILON => shift 36
-LPAREN => shift 34
-Ident => goto 33
-Number => goto 29
-Regexp => goto 83
-
------
-
-State 65:
 
 0 : Ident -> . IDENT  / 13
 1 : Number -> . NUMBER  / 13
@@ -1340,29 +1293,45 @@ State 65:
 28 : Regexp -> . LPAREN GEQ Number Regexp RPAREN  / 13
 29 : Regexp -> . LPAREN REPEAT Number Number Regexp RPAREN  / 13
 30 : Regexp -> . EOS  / 13
-31 : Regexps -> .  / 10
-32 : Regexps -> . Regexp Regexps  / 10
-32 : Regexps -> Regexp . Regexps  / 10
+31 : Regexps -> .  / 8
+32 : Regexps -> . Regexp Regexps  / 8
+32 : Regexps -> Regexp . Regexps  / 8
 
-IDENT => shift 11
-NUMBER => shift 14
-STRING => shift 32
-ANY => shift 31
-EOS => shift 30
-EMPT => shift 35
-EPSILON => shift 36
-LPAREN => shift 34
+IDENT => shift 10
+NUMBER => shift 13
+STRING => shift 30
+ANY => shift 29
+EOS => shift 28
+EMPT => shift 33
+EPSILON => shift 34
+LPAREN => shift 32
 RPAREN => reduce 31
-Ident => goto 33
-Number => goto 29
-Regexp => goto 65
-Regexps => goto 84
+Ident => goto 31
+Number => goto 27
+Regexp => goto 63
+Regexps => goto 82
+
+-----
+
+State 64:
+
+21 : Regexp -> LPAREN COLON Regexps . RPAREN  / 5
+
+RPAREN => shift 83
+
+-----
+
+State 65:
+
+26 : Regexp -> LPAREN PLUS Regexp . RPAREN  / 5
+
+RPAREN => shift 84
 
 -----
 
 State 66:
 
-21 : Regexp -> LPAREN COLON Regexps . RPAREN  / 5
+23 : Regexp -> LPAREN OR Regexps . RPAREN  / 5
 
 RPAREN => shift 85
 
@@ -1370,7 +1339,7 @@ RPAREN => shift 85
 
 State 67:
 
-26 : Regexp -> LPAREN PLUS Regexp . RPAREN  / 5
+24 : Regexp -> LPAREN QUESTION Regexp . RPAREN  / 5
 
 RPAREN => shift 86
 
@@ -1378,7 +1347,7 @@ RPAREN => shift 86
 
 State 68:
 
-23 : Regexp -> LPAREN OR Regexps . RPAREN  / 5
+22 : Regexp -> LPAREN SEQ Regexps . RPAREN  / 5
 
 RPAREN => shift 87
 
@@ -1386,7 +1355,7 @@ RPAREN => shift 87
 
 State 69:
 
-24 : Regexp -> LPAREN QUESTION Regexp . RPAREN  / 5
+25 : Regexp -> LPAREN STAR Regexp . RPAREN  / 5
 
 RPAREN => shift 88
 
@@ -1394,53 +1363,13 @@ RPAREN => shift 88
 
 State 70:
 
-22 : Regexp -> LPAREN SEQ Regexps . RPAREN  / 5
-
-RPAREN => shift 89
-
------
-
-State 71:
-
-25 : Regexp -> LPAREN STAR Regexp . RPAREN  / 5
-
-RPAREN => shift 90
-
------
-
-State 72:
-
-35 : Arms -> Arm Arms .  / 1
-
-$ => reduce 35
-ALPHABET => reduce 35
-ENABLE => reduce 35
-FUNCTION => reduce 35
-NAME => reduce 35
-REGEXP => reduce 35
-SET => reduce 35
-
------
-
-State 73:
-
-0 : Ident -> . IDENT  / 8
-33 : Arm -> Regexp ARROW . Ident  / 8
-
-IDENT => shift 11
-Ident => goto 91
-
------
-
-State 74:
-
-14 : Charsets -> Charset Charsets .  / 10
+14 : Charsets -> Charset Charsets .  / 8
 
 RPAREN => reduce 14
 
 -----
 
-State 75:
+State 71:
 
 11 : Charset -> LPAREN TILDE Charsets RPAREN .  / 6
 
@@ -1450,7 +1379,6 @@ NUMBER => reduce 11
 ALPHABET => reduce 11
 ANY => reduce 11
 EMPT => reduce 11
-ENABLE => reduce 11
 FUNCTION => reduce 11
 LPAREN => reduce 11
 NAME => reduce 11
@@ -1460,7 +1388,7 @@ SET => reduce 11
 
 -----
 
-State 76:
+State 72:
 
 6 : Charset -> LPAREN RANGE NumPairs RPAREN .  / 6
 
@@ -1470,7 +1398,6 @@ NUMBER => reduce 6
 ALPHABET => reduce 6
 ANY => reduce 6
 EMPT => reduce 6
-ENABLE => reduce 6
 FUNCTION => reduce 6
 LPAREN => reduce 6
 NAME => reduce 6
@@ -1480,21 +1407,21 @@ SET => reduce 6
 
 -----
 
-State 77:
+State 73:
 
-1 : Number -> . NUMBER  / 11
-2 : NumPairs -> .  / 10
-3 : NumPairs -> . Number Number NumPairs  / 10
-3 : NumPairs -> Number Number . NumPairs  / 10
+1 : Number -> . NUMBER  / 9
+2 : NumPairs -> .  / 8
+3 : NumPairs -> . Number Number NumPairs  / 8
+3 : NumPairs -> Number Number . NumPairs  / 8
 
-NUMBER => shift 14
+NUMBER => shift 13
 RPAREN => reduce 2
-Number => goto 58
-NumPairs => goto 92
+Number => goto 53
+NumPairs => goto 89
 
 -----
 
-State 78:
+State 74:
 
 8 : Charset -> LPAREN OR Charsets RPAREN .  / 6
 
@@ -1504,7 +1431,6 @@ NUMBER => reduce 8
 ALPHABET => reduce 8
 ANY => reduce 8
 EMPT => reduce 8
-ENABLE => reduce 8
 FUNCTION => reduce 8
 LPAREN => reduce 8
 NAME => reduce 8
@@ -1514,15 +1440,15 @@ SET => reduce 8
 
 -----
 
-State 79:
+State 75:
 
 10 : Charset -> LPAREN MINUS Charset Charsets . RPAREN  / 6
 
-RPAREN => shift 93
+RPAREN => shift 90
 
 -----
 
-State 80:
+State 76:
 
 9 : Charset -> LPAREN AND Charsets RPAREN .  / 6
 
@@ -1532,7 +1458,6 @@ NUMBER => reduce 9
 ALPHABET => reduce 9
 ANY => reduce 9
 EMPT => reduce 9
-ENABLE => reduce 9
 FUNCTION => reduce 9
 LPAREN => reduce 9
 NAME => reduce 9
@@ -1542,67 +1467,90 @@ SET => reduce 9
 
 -----
 
+State 77:
+
+35 : Arms -> Arm Arms .  / 1
+
+$ => reduce 35
+ALPHABET => reduce 35
+FUNCTION => reduce 35
+NAME => reduce 35
+REGEXP => reduce 35
+SET => reduce 35
+
+-----
+
+State 78:
+
+0 : Ident -> . IDENT  / 11
+33 : Arm -> Regexp ARROW . Ident  / 11
+
+IDENT => shift 10
+Ident => goto 91
+
+-----
+
+State 79:
+
+0 : Ident -> . IDENT  / 8
+1 : Number -> . NUMBER  / 8
+15 : Regexp -> . Ident  / 8
+16 : Regexp -> . Number  / 8
+17 : Regexp -> . STRING  / 8
+18 : Regexp -> . ANY  / 8
+19 : Regexp -> . EPSILON  / 8
+20 : Regexp -> . EMPT  / 8
+21 : Regexp -> . LPAREN COLON Regexps RPAREN  / 8
+22 : Regexp -> . LPAREN SEQ Regexps RPAREN  / 8
+23 : Regexp -> . LPAREN OR Regexps RPAREN  / 8
+24 : Regexp -> . LPAREN QUESTION Regexp RPAREN  / 8
+25 : Regexp -> . LPAREN STAR Regexp RPAREN  / 8
+26 : Regexp -> . LPAREN PLUS Regexp RPAREN  / 8
+27 : Regexp -> . LPAREN EQUAL Number Regexp RPAREN  / 8
+28 : Regexp -> . LPAREN GEQ Number Regexp RPAREN  / 8
+29 : Regexp -> . LPAREN REPEAT Number Number Regexp RPAREN  / 8
+29 : Regexp -> LPAREN REPEAT Number Number . Regexp RPAREN  / 5
+30 : Regexp -> . EOS  / 8
+
+IDENT => shift 10
+NUMBER => shift 13
+STRING => shift 30
+ANY => shift 29
+EOS => shift 28
+EMPT => shift 33
+EPSILON => shift 34
+LPAREN => shift 32
+Ident => goto 31
+Number => goto 27
+Regexp => goto 92
+
+-----
+
+State 80:
+
+28 : Regexp -> LPAREN GEQ Number Regexp . RPAREN  / 5
+
+RPAREN => shift 93
+
+-----
+
 State 81:
 
-0 : Ident -> . IDENT  / 10
-1 : Number -> . NUMBER  / 10
-15 : Regexp -> . Ident  / 10
-16 : Regexp -> . Number  / 10
-17 : Regexp -> . STRING  / 10
-18 : Regexp -> . ANY  / 10
-19 : Regexp -> . EPSILON  / 10
-20 : Regexp -> . EMPT  / 10
-21 : Regexp -> . LPAREN COLON Regexps RPAREN  / 10
-22 : Regexp -> . LPAREN SEQ Regexps RPAREN  / 10
-23 : Regexp -> . LPAREN OR Regexps RPAREN  / 10
-24 : Regexp -> . LPAREN QUESTION Regexp RPAREN  / 10
-25 : Regexp -> . LPAREN STAR Regexp RPAREN  / 10
-26 : Regexp -> . LPAREN PLUS Regexp RPAREN  / 10
-27 : Regexp -> . LPAREN EQUAL Number Regexp RPAREN  / 10
-28 : Regexp -> . LPAREN GEQ Number Regexp RPAREN  / 10
-29 : Regexp -> . LPAREN REPEAT Number Number Regexp RPAREN  / 10
-29 : Regexp -> LPAREN REPEAT Number Number . Regexp RPAREN  / 5
-30 : Regexp -> . EOS  / 10
+27 : Regexp -> LPAREN EQUAL Number Regexp . RPAREN  / 5
 
-IDENT => shift 11
-NUMBER => shift 14
-STRING => shift 32
-ANY => shift 31
-EOS => shift 30
-EMPT => shift 35
-EPSILON => shift 36
-LPAREN => shift 34
-Ident => goto 33
-Number => goto 29
-Regexp => goto 94
+RPAREN => shift 94
 
 -----
 
 State 82:
 
-28 : Regexp -> LPAREN GEQ Number Regexp . RPAREN  / 5
-
-RPAREN => shift 95
-
------
-
-State 83:
-
-27 : Regexp -> LPAREN EQUAL Number Regexp . RPAREN  / 5
-
-RPAREN => shift 96
-
------
-
-State 84:
-
-32 : Regexps -> Regexp Regexps .  / 10
+32 : Regexps -> Regexp Regexps .  / 8
 
 RPAREN => reduce 32
 
 -----
 
-State 85:
+State 83:
 
 21 : Regexp -> LPAREN COLON Regexps RPAREN .  / 5
 
@@ -1615,7 +1563,6 @@ ANY => reduce 21
 ARROW => reduce 21
 EOS => reduce 21
 EMPT => reduce 21
-ENABLE => reduce 21
 EPSILON => reduce 21
 FUNCTION => reduce 21
 LPAREN => reduce 21
@@ -1626,7 +1573,7 @@ SET => reduce 21
 
 -----
 
-State 86:
+State 84:
 
 26 : Regexp -> LPAREN PLUS Regexp RPAREN .  / 5
 
@@ -1639,7 +1586,6 @@ ANY => reduce 26
 ARROW => reduce 26
 EOS => reduce 26
 EMPT => reduce 26
-ENABLE => reduce 26
 EPSILON => reduce 26
 FUNCTION => reduce 26
 LPAREN => reduce 26
@@ -1650,7 +1596,7 @@ SET => reduce 26
 
 -----
 
-State 87:
+State 85:
 
 23 : Regexp -> LPAREN OR Regexps RPAREN .  / 5
 
@@ -1663,7 +1609,6 @@ ANY => reduce 23
 ARROW => reduce 23
 EOS => reduce 23
 EMPT => reduce 23
-ENABLE => reduce 23
 EPSILON => reduce 23
 FUNCTION => reduce 23
 LPAREN => reduce 23
@@ -1674,7 +1619,7 @@ SET => reduce 23
 
 -----
 
-State 88:
+State 86:
 
 24 : Regexp -> LPAREN QUESTION Regexp RPAREN .  / 5
 
@@ -1687,7 +1632,6 @@ ANY => reduce 24
 ARROW => reduce 24
 EOS => reduce 24
 EMPT => reduce 24
-ENABLE => reduce 24
 EPSILON => reduce 24
 FUNCTION => reduce 24
 LPAREN => reduce 24
@@ -1698,7 +1642,7 @@ SET => reduce 24
 
 -----
 
-State 89:
+State 87:
 
 22 : Regexp -> LPAREN SEQ Regexps RPAREN .  / 5
 
@@ -1711,7 +1655,6 @@ ANY => reduce 22
 ARROW => reduce 22
 EOS => reduce 22
 EMPT => reduce 22
-ENABLE => reduce 22
 EPSILON => reduce 22
 FUNCTION => reduce 22
 LPAREN => reduce 22
@@ -1722,7 +1665,7 @@ SET => reduce 22
 
 -----
 
-State 90:
+State 88:
 
 25 : Regexp -> LPAREN STAR Regexp RPAREN .  / 5
 
@@ -1735,7 +1678,6 @@ ANY => reduce 25
 ARROW => reduce 25
 EOS => reduce 25
 EMPT => reduce 25
-ENABLE => reduce 25
 EPSILON => reduce 25
 FUNCTION => reduce 25
 LPAREN => reduce 25
@@ -1746,9 +1688,36 @@ SET => reduce 25
 
 -----
 
+State 89:
+
+3 : NumPairs -> Number Number NumPairs .  / 8
+
+RPAREN => reduce 3
+
+-----
+
+State 90:
+
+10 : Charset -> LPAREN MINUS Charset Charsets RPAREN .  / 6
+
+$ => reduce 10
+IDENT => reduce 10
+NUMBER => reduce 10
+ALPHABET => reduce 10
+ANY => reduce 10
+EMPT => reduce 10
+FUNCTION => reduce 10
+LPAREN => reduce 10
+NAME => reduce 10
+REGEXP => reduce 10
+RPAREN => reduce 10
+SET => reduce 10
+
+-----
+
 State 91:
 
-33 : Arm -> Regexp ARROW Ident .  / 8
+33 : Arm -> Regexp ARROW Ident .  / 11
 
 $ => reduce 33
 IDENT => reduce 33
@@ -1758,7 +1727,6 @@ ALPHABET => reduce 33
 ANY => reduce 33
 EOS => reduce 33
 EMPT => reduce 33
-ENABLE => reduce 33
 EPSILON => reduce 33
 FUNCTION => reduce 33
 LPAREN => reduce 33
@@ -1770,41 +1738,13 @@ SET => reduce 33
 
 State 92:
 
-3 : NumPairs -> Number Number NumPairs .  / 10
+29 : Regexp -> LPAREN REPEAT Number Number Regexp . RPAREN  / 5
 
-RPAREN => reduce 3
+RPAREN => shift 95
 
 -----
 
 State 93:
-
-10 : Charset -> LPAREN MINUS Charset Charsets RPAREN .  / 6
-
-$ => reduce 10
-IDENT => reduce 10
-NUMBER => reduce 10
-ALPHABET => reduce 10
-ANY => reduce 10
-EMPT => reduce 10
-ENABLE => reduce 10
-FUNCTION => reduce 10
-LPAREN => reduce 10
-NAME => reduce 10
-REGEXP => reduce 10
-RPAREN => reduce 10
-SET => reduce 10
-
------
-
-State 94:
-
-29 : Regexp -> LPAREN REPEAT Number Number Regexp . RPAREN  / 5
-
-RPAREN => shift 97
-
------
-
-State 95:
 
 28 : Regexp -> LPAREN GEQ Number Regexp RPAREN .  / 5
 
@@ -1817,7 +1757,6 @@ ANY => reduce 28
 ARROW => reduce 28
 EOS => reduce 28
 EMPT => reduce 28
-ENABLE => reduce 28
 EPSILON => reduce 28
 FUNCTION => reduce 28
 LPAREN => reduce 28
@@ -1828,7 +1767,7 @@ SET => reduce 28
 
 -----
 
-State 96:
+State 94:
 
 27 : Regexp -> LPAREN EQUAL Number Regexp RPAREN .  / 5
 
@@ -1841,7 +1780,6 @@ ANY => reduce 27
 ARROW => reduce 27
 EOS => reduce 27
 EMPT => reduce 27
-ENABLE => reduce 27
 EPSILON => reduce 27
 FUNCTION => reduce 27
 LPAREN => reduce 27
@@ -1852,7 +1790,7 @@ SET => reduce 27
 
 -----
 
-State 97:
+State 95:
 
 29 : Regexp -> LPAREN REPEAT Number Number Regexp RPAREN .  / 5
 
@@ -1865,7 +1803,6 @@ ANY => reduce 29
 ARROW => reduce 29
 EOS => reduce 29
 EMPT => reduce 29
-ENABLE => reduce 29
 EPSILON => reduce 29
 FUNCTION => reduce 29
 LPAREN => reduce 29
@@ -1877,17 +1814,17 @@ SET => reduce 29
 -----
 
 lookahead 0 = $ 
-lookahead 1 = $ ALPHABET ENABLE FUNCTION NAME REGEXP SET 
-lookahead 2 = COLON 
-lookahead 3 = EQUAL 
-lookahead 4 = $ IDENT NUMBER STRING ALPHABET ANY ARROW COLON EOS EMPT ENABLE EPSILON EQUAL FUNCTION LPAREN NAME REGEXP RPAREN SET 
-lookahead 5 = $ IDENT NUMBER STRING ALPHABET ANY ARROW EOS EMPT ENABLE EPSILON FUNCTION LPAREN NAME REGEXP RPAREN SET 
-lookahead 6 = $ IDENT NUMBER ALPHABET ANY EMPT ENABLE FUNCTION LPAREN NAME REGEXP RPAREN SET 
-lookahead 7 = ARROW 
-lookahead 8 = $ IDENT NUMBER STRING ALPHABET ANY EOS EMPT ENABLE EPSILON FUNCTION LPAREN NAME REGEXP SET 
-lookahead 9 = IDENT NUMBER ANY EMPT LPAREN RPAREN 
-lookahead 10 = RPAREN 
-lookahead 11 = NUMBER 
+lookahead 1 = $ ALPHABET FUNCTION NAME REGEXP SET 
+lookahead 2 = EQUAL 
+lookahead 3 = COLON 
+lookahead 4 = $ IDENT NUMBER STRING ALPHABET ANY ARROW COLON EOS EMPT EPSILON EQUAL FUNCTION LPAREN NAME REGEXP RPAREN SET 
+lookahead 5 = $ IDENT NUMBER STRING ALPHABET ANY ARROW EOS EMPT EPSILON FUNCTION LPAREN NAME REGEXP RPAREN SET 
+lookahead 6 = $ IDENT NUMBER ALPHABET ANY EMPT FUNCTION LPAREN NAME REGEXP RPAREN SET 
+lookahead 7 = IDENT NUMBER ANY EMPT LPAREN RPAREN 
+lookahead 8 = RPAREN 
+lookahead 9 = NUMBER 
+lookahead 10 = ARROW 
+lookahead 11 = $ IDENT NUMBER STRING ALPHABET ANY EOS EMPT EPSILON FUNCTION LPAREN NAME REGEXP SET 
 lookahead 12 = IDENT NUMBER STRING ANY EOS EMPT EPSILON LPAREN 
 lookahead 13 = IDENT NUMBER STRING ANY EOS EMPT EPSILON LPAREN RPAREN 
 lookahead 14 = NUMBER RPAREN 
@@ -1914,7 +1851,6 @@ val function_directive : {1:string, 2:string, 3:arms} -> directive
 val set_directive : {1:string, 2:charset} -> directive
 val regexp_directive : {1:string, 2:regexp} -> directive
 val alphabet_directive : int -> directive
-val enable_directive : string -> directive
 val name_directive : string -> directive
 val cons_arms : {1:arm, 2:arms} -> arms
 val sing_arms : arm -> arms
@@ -1963,7 +1899,6 @@ IDENT of string
 | COLON
 | EOS
 | EMPT
-| ENABLE
 | EPSILON
 | EQUAL
 | FUNCTION
@@ -2019,31 +1954,30 @@ Arg.IDENT x => (1, Value.string x)
 | Arg.COLON => (8, Value.nonterminal)
 | Arg.EOS => (9, Value.nonterminal)
 | Arg.EMPT => (10, Value.nonterminal)
-| Arg.ENABLE => (11, Value.nonterminal)
-| Arg.EPSILON => (12, Value.nonterminal)
-| Arg.EQUAL => (13, Value.nonterminal)
-| Arg.FUNCTION => (14, Value.nonterminal)
-| Arg.GEQ => (15, Value.nonterminal)
-| Arg.LPAREN => (16, Value.nonterminal)
-| Arg.MINUS => (17, Value.nonterminal)
-| Arg.NAME => (18, Value.nonterminal)
-| Arg.OR => (19, Value.nonterminal)
-| Arg.PLUS => (20, Value.nonterminal)
-| Arg.QUESTION => (21, Value.nonterminal)
-| Arg.RANGE => (22, Value.nonterminal)
-| Arg.REGEXP => (23, Value.nonterminal)
-| Arg.REPEAT => (24, Value.nonterminal)
-| Arg.RPAREN => (25, Value.nonterminal)
-| Arg.SEQ => (26, Value.nonterminal)
-| Arg.SET => (27, Value.nonterminal)
-| Arg.STAR => (28, Value.nonterminal)
-| Arg.TILDE => (29, Value.nonterminal)
+| Arg.EPSILON => (11, Value.nonterminal)
+| Arg.EQUAL => (12, Value.nonterminal)
+| Arg.FUNCTION => (13, Value.nonterminal)
+| Arg.GEQ => (14, Value.nonterminal)
+| Arg.LPAREN => (15, Value.nonterminal)
+| Arg.MINUS => (16, Value.nonterminal)
+| Arg.NAME => (17, Value.nonterminal)
+| Arg.OR => (18, Value.nonterminal)
+| Arg.PLUS => (19, Value.nonterminal)
+| Arg.QUESTION => (20, Value.nonterminal)
+| Arg.RANGE => (21, Value.nonterminal)
+| Arg.REGEXP => (22, Value.nonterminal)
+| Arg.REPEAT => (23, Value.nonterminal)
+| Arg.RPAREN => (24, Value.nonterminal)
+| Arg.SEQ => (25, Value.nonterminal)
+| Arg.SET => (26, Value.nonterminal)
+| Arg.STAR => (27, Value.nonterminal)
+| Arg.TILDE => (28, Value.nonterminal)
 )
 )
 in
 val parse = ParseEngine.parse (
-ParseEngine.next5x1 "T\128\128\128\133\128\128\128\128\128\128\132\128\128\131\128\128\128\136\128\128\128\128\135\128\128\128\134\128\128\128\128T\128\128\128\133\128\128\128\128\128\128\132\128\128\131\128\128\128\136\128\128\128\128\135\128\128\128\134\128\128\128\128\128\140\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\140\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\143\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\140\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\140\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\140\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\127\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128S\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\147\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128~~~~~\128~~~~~~~~~\128~\128~\128\128\128\128~\128~\128~\128\128\128\128Y\128\128\128Y\128\128\128\128\128\128Y\128\128Y\128\128\128Y\128\128\128\128Y\128\128\128Y\128\128\128\128X\128\128\128X\128\128\128\128\128\128X\128\128X\128\128\128X\128\128\128\128X\128\128\128X\128\128\128\128}}}}}\128}}\128}}}}\128}\128}\128}\128\128\128\128}\128}\128}\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\148\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\149\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128Z\128\128\128Z\128\128\128\128\128\128Z\128\128Z\128\128\128Z\128\128\128\128Z\128\128\128Z\128\128\128\128\128\140\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\140\143\128\128\128\154\128\128\128\153\128\128\128\128\128\156\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\140\143\161\128\128\160\128\128\159\164\128\165\128\128\128\163\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\166\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128V\128\128\128V\128\128\128\128\128\128V\128\128V\128\128\128V\128\128\128\128V\128\128\128V\128\128\128\128yyy\128y\128y\128\128\128yy\128\128y\128y\128y\128\128\128\128y\128y\128y\128\128\128\128www\128w\128w\128\128\128ww\128\128w\128w\128w\128\128\128\128w\128w\128w\128\128\128\128rrr\128r\128r\128\128\128rr\128\128r\128r\128r\128\128\128\128r\128r\128r\128\128\128\128zzz\128z\128z\128\128\128zz\128\128z\128z\128z\128\128\128\128z\128z\128z\128\128\128\128\128\128\128\128\128\171\128\128\128\128\128\128\128\128\128\128\128\170\128\169\128\128\168\128\128\128\128\128\128\167\128\128W\128\128\128W\128\128\128\128\128\128W\128\128W\128\128\128W\128\128\128\128W\128\128\128W\128\128\128\128nnnnn\128nn\128nnnn\128n\128n\128n\128\128\128\128n\128n\128n\128\128\128\128`````\128``\128````\128`\128`\128`\128\128\128\128`\128`\128`\128\128\128\128lllll\128ll\128llll\128l\128l\128l\128\128\128\128l\128l\128l\128\128\128\128mmmmm\128mm\128mmmm\128m\128m\128m\128\128\128\128m\128m\128m\128\128\128\128ooooo\128oo\128oooo\128o\128o\128o\128\128\128\128o\128o\128o\128\128\128\128\128\128\128\128\128\128\128\128\175\128\128\128\128\174\128\173\128\128\128\177\176\178\128\128\172\128\179\128\180\128\128\128jjjjj\128jj\128jjjj\128j\128j\128j\128\128\128\128j\128j\128j\128\128\128\128kkkkk\128kk\128kkkk\128k\128k\128k\128\128\128\128k\128k\128k\128\128\128\128\128\140\143\161\128\128\160\128\128\159\164\128\165\128\128\128\163\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\140\143\128\128\128\154\128\128\128\153\128\128\128\128\128\156\128\128\128\128\128\128\128\128q\128\128\128\128\128\128\128\128\143\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128|\128\128\128\128\128\128\128\140\143\128\128\128\154\128\128\128\153\128\128\128\128\128\156\128\128\128\128\128\128\128\128q\128\128\128\128\128\128\128\140\143\128\128\128\154\128\128\128\153\128\128\128\128\128\156\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\140\143\128\128\128\154\128\128\128\153\128\128\128\128\128\156\128\128\128\128\128\128\128\128q\128\128\128\128\128\128\128\128\143\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\143\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\143\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\140\143\161\128\128\160\128\128\159\164\128\165\128\128\128\163\128\128\128\128\128\128\128\128_\128\128\128\128\128\128\128\140\143\161\128\128\160\128\128\159\164\128\165\128\128\128\163\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\140\143\161\128\128\160\128\128\159\164\128\165\128\128\128\163\128\128\128\128\128\128\128\128_\128\128\128\128\128\128\128\140\143\161\128\128\160\128\128\159\164\128\165\128\128\128\163\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\140\143\161\128\128\160\128\128\159\164\128\165\128\128\128\163\128\128\128\128\128\128\128\128_\128\128\128\128\128\128\128\140\143\161\128\128\160\128\128\159\164\128\165\128\128\128\163\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128U\128\128\128U\128\128\128\128\128\128U\128\128U\128\128\128U\128\128\128\128U\128\128\128U\128\128\128\128\\\140\143\161\\\128\160\128\128\159\164\\\165\128\\\128\163\128\\\128\128\128\128\\\128\128\128\\\128\128\128\128\128\128\128\128\128\128\128\202\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\140\143\128\128\128\154\128\128\128\153\128\128\128\128\128\156\128\128\128\128\128\128\128\128q\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\204\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\205\128\128\128\128\128\128\128\128\143\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\207\128\128\128\128\128\128\128\140\143\128\128\128\154\128\128\128\153\128\128\128\128\128\156\128\128\128\128\128\128\128\128q\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\209\128\128\128\128\128\128\128\128\143\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\140\143\161\128\128\160\128\128\159\164\128\165\128\128\128\163\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\140\143\161\128\128\160\128\128\159\164\128\165\128\128\128\163\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\140\143\161\128\128\160\128\128\159\164\128\165\128\128\128\163\128\128\128\128\128\128\128\128_\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\214\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\215\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\216\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\217\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\218\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\219\128\128\128\128\128\128[\128\128\128[\128\128\128\128\128\128[\128\128[\128\128\128[\128\128\128\128[\128\128\128[\128\128\128\128\128\140\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128p\128\128\128\128\128\128sss\128s\128s\128\128\128ss\128\128s\128s\128s\128\128\128\128s\128s\128s\128\128\128\128xxx\128x\128x\128\128\128xx\128\128x\128x\128x\128\128\128\128x\128x\128x\128\128\128\128\128\128\143\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128|\128\128\128\128\128\128vvv\128v\128v\128\128\128vv\128\128v\128v\128v\128\128\128\128v\128v\128v\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\222\128\128\128\128\128\128uuu\128u\128u\128\128\128uu\128\128u\128u\128u\128\128\128\128u\128u\128u\128\128\128\128\128\140\143\161\128\128\160\128\128\159\164\128\165\128\128\128\163\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\224\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\225\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128^\128\128\128\128\128\128iiiii\128ii\128iiii\128i\128i\128i\128\128\128\128i\128i\128i\128\128\128\128ddddd\128dd\128dddd\128d\128d\128d\128\128\128\128d\128d\128d\128\128\128\128ggggg\128gg\128gggg\128g\128g\128g\128\128\128\128g\128g\128g\128\128\128\128fffff\128ff\128ffff\128f\128f\128f\128\128\128\128f\128f\128f\128\128\128\128hhhhh\128hh\128hhhh\128h\128h\128h\128\128\128\128h\128h\128h\128\128\128\128eeeee\128ee\128eeee\128e\128e\128e\128\128\128\128e\128e\128e\128\128\128\128]]]]]\128]\128\128]]]]\128]\128]\128]\128\128\128\128]\128\128\128]\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128{\128\128\128\128\128\128ttt\128t\128t\128\128\128tt\128\128t\128t\128t\128\128\128\128t\128t\128t\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\226\128\128\128\128\128\128bbbbb\128bb\128bbbb\128b\128b\128b\128\128\128\128b\128b\128b\128\128\128\128ccccc\128cc\128cccc\128c\128c\128c\128\128\128\128c\128c\128c\128\128\128\128aaaaa\128aa\128aaaa\128a\128a\128a\128\128\128\128a\128a\128a\128\128\128\128",
-ParseEngine.next5x1 "\128\128\128\128\128\128\128\128\128\129\136\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\129\137\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\138\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\140\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\141\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\143\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\144\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\145\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\149\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\154\151\128\150\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\161\157\128\128\128\156\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\161\157\128\128\128\182\128\181\180\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\154\151\128\183\184\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\186\185\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\154\151\128\183\187\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\154\151\128\188\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\154\151\128\183\189\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\190\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\191\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\192\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\161\157\128\128\128\193\194\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\161\157\128\128\128\195\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\161\157\128\128\128\193\196\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\161\157\128\128\128\197\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\161\157\128\128\128\193\198\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\161\157\128\128\128\199\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\161\157\128\128\128\182\128\181\200\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\154\151\128\183\202\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\205\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\154\151\128\183\207\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\209\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\161\157\128\128\128\210\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\161\157\128\128\128\211\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\161\157\128\128\128\193\212\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\219\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\186\220\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\161\157\128\128\128\222\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128",
+ParseEngine.next5x1 "U\128\128\128\133\128\128\128\128\128\128\128\128\132\128\128\128\134\128\128\128\128\135\128\128\128\131\128\128\128\128\128U\128\128\128\133\128\128\128\128\128\128\128\128\132\128\128\128\134\128\128\128\128\135\128\128\128\131\128\128\128\128\128\128\139\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\139\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\142\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\139\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\139\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\127\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128T\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\145\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128~~~~~\128~~~~~~~~\128~\128~\128\128\128\128~\128~\128~\128\128\128\128\128\128\128\128\128\128\128\128\128\146\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128Y\128\128\128Y\128\128\128\128\128\128\128\128Y\128\128\128Y\128\128\128\128Y\128\128\128Y\128\128\128\128\128}}}}}\128}}\128}}}\128}\128}\128}\128\128\128\128}\128}\128}\128\128\128\128\128Z\128\128\128Z\128\128\128\128\128\128\128\128Z\128\128\128Z\128\128\128\128Z\128\128\128Z\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\147\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\139\142\128\128\128\151\128\128\128\150\128\128\128\128\153\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\139\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\139\142\159\128\128\158\128\128\157\162\163\128\128\128\161\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128W\128\128\128W\128\128\128\128\128\128\128\128W\128\128\128W\128\128\128\128W\128\128\128W\128\128\128\128\128yyy\128y\128y\128\128\128y\128\128y\128y\128y\128\128\128\128y\128y\128y\128\128\128\128\128www\128w\128w\128\128\128w\128\128w\128w\128w\128\128\128\128w\128w\128w\128\128\128\128\128rrr\128r\128r\128\128\128r\128\128r\128r\128r\128\128\128\128r\128r\128r\128\128\128\128\128zzz\128z\128z\128\128\128z\128\128z\128z\128z\128\128\128\128z\128z\128z\128\128\128\128\128\128\128\128\128\128\168\128\128\128\128\128\128\128\128\128\128\167\128\166\128\128\165\128\128\128\128\128\128\164\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\169\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128X\128\128\128X\128\128\128\128\128\128\128\128X\128\128\128X\128\128\128\128X\128\128\128X\128\128\128\128\128nnnnn\128nn\128nnn\128n\128n\128n\128\128\128\128n\128n\128n\128\128\128\128\128`````\128``\128```\128`\128`\128`\128\128\128\128`\128`\128`\128\128\128\128\128lllll\128ll\128lll\128l\128l\128l\128\128\128\128l\128l\128l\128\128\128\128\128mmmmm\128mm\128mmm\128m\128m\128m\128\128\128\128m\128m\128m\128\128\128\128\128ooooo\128oo\128ooo\128o\128o\128o\128\128\128\128o\128o\128o\128\128\128\128\128\128\128\128\128\128\128\128\128\173\128\128\128\172\128\171\128\128\128\175\174\176\128\128\170\128\177\128\178\128\128\128\128jjjjj\128jj\128jjj\128j\128j\128j\128\128\128\128j\128j\128j\128\128\128\128\128kkkkk\128kk\128kkk\128k\128k\128k\128\128\128\128k\128k\128k\128\128\128\128\128\128\139\142\128\128\128\151\128\128\128\150\128\128\128\128\153\128\128\128\128\128\128\128\128q\128\128\128\128\128\128\128\128\128\142\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128|\128\128\128\128\128\128\128\128\139\142\128\128\128\151\128\128\128\150\128\128\128\128\153\128\128\128\128\128\128\128\128q\128\128\128\128\128\128\128\128\139\142\128\128\128\151\128\128\128\150\128\128\128\128\153\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\139\142\128\128\128\151\128\128\128\150\128\128\128\128\153\128\128\128\128\128\128\128\128q\128\128\128\128\128\128\128\128\139\142\159\128\128\158\128\128\157\162\163\128\128\128\161\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\142\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\142\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\142\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\139\142\159\128\128\158\128\128\157\162\163\128\128\128\161\128\128\128\128\128\128\128\128_\128\128\128\128\128\128\128\128\139\142\159\128\128\158\128\128\157\162\163\128\128\128\161\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\139\142\159\128\128\158\128\128\157\162\163\128\128\128\161\128\128\128\128\128\128\128\128_\128\128\128\128\128\128\128\128\139\142\159\128\128\158\128\128\157\162\163\128\128\128\161\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\139\142\159\128\128\158\128\128\157\162\163\128\128\128\161\128\128\128\128\128\128\128\128_\128\128\128\128\128\128\128\128\139\142\159\128\128\158\128\128\157\162\163\128\128\128\161\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\139\142\128\128\128\151\128\128\128\150\128\128\128\128\153\128\128\128\128\128\128\128\128q\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\200\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\201\128\128\128\128\128\128\128\128\128\142\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\203\128\128\128\128\128\128\128\128\139\142\128\128\128\151\128\128\128\150\128\128\128\128\153\128\128\128\128\128\128\128\128q\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\205\128\128\128\128\128\128\128V\128\128\128V\128\128\128\128\128\128\128\128V\128\128\128V\128\128\128\128V\128\128\128V\128\128\128\128\128\\\139\142\159\\\128\158\128\128\157\162\163\128\\\128\161\128\\\128\128\128\128\\\128\128\128\\\128\128\128\128\128\128\128\128\128\128\128\128\207\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\142\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\139\142\159\128\128\158\128\128\157\162\163\128\128\128\161\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\139\142\159\128\128\158\128\128\157\162\163\128\128\128\161\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\139\142\159\128\128\158\128\128\157\162\163\128\128\128\161\128\128\128\128\128\128\128\128_\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\212\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\213\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\214\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\215\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\216\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\217\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128p\128\128\128\128\128\128\128sss\128s\128s\128\128\128s\128\128s\128s\128s\128\128\128\128s\128s\128s\128\128\128\128\128xxx\128x\128x\128\128\128x\128\128x\128x\128x\128\128\128\128x\128x\128x\128\128\128\128\128\128\128\142\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128|\128\128\128\128\128\128\128vvv\128v\128v\128\128\128v\128\128v\128v\128v\128\128\128\128v\128v\128v\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\219\128\128\128\128\128\128\128uuu\128u\128u\128\128\128u\128\128u\128u\128u\128\128\128\128u\128u\128u\128\128\128\128\128[\128\128\128[\128\128\128\128\128\128\128\128[\128\128\128[\128\128\128\128[\128\128\128[\128\128\128\128\128\128\139\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\139\142\159\128\128\158\128\128\157\162\163\128\128\128\161\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\222\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\223\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128^\128\128\128\128\128\128\128iiiii\128ii\128iii\128i\128i\128i\128\128\128\128i\128i\128i\128\128\128\128\128ddddd\128dd\128ddd\128d\128d\128d\128\128\128\128d\128d\128d\128\128\128\128\128ggggg\128gg\128ggg\128g\128g\128g\128\128\128\128g\128g\128g\128\128\128\128\128fffff\128ff\128fff\128f\128f\128f\128\128\128\128f\128f\128f\128\128\128\128\128hhhhh\128hh\128hhh\128h\128h\128h\128\128\128\128h\128h\128h\128\128\128\128\128eeeee\128ee\128eee\128e\128e\128e\128\128\128\128e\128e\128e\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128{\128\128\128\128\128\128\128ttt\128t\128t\128\128\128t\128\128t\128t\128t\128\128\128\128t\128t\128t\128\128\128\128\128]]]]]\128]\128\128]]]\128]\128]\128]\128\128\128\128]\128\128\128]\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\224\128\128\128\128\128\128\128bbbbb\128bb\128bbb\128b\128b\128b\128\128\128\128b\128b\128b\128\128\128\128\128ccccc\128cc\128ccc\128c\128c\128c\128\128\128\128c\128c\128c\128\128\128\128\128aaaaa\128aa\128aaa\128a\128a\128a\128\128\128\128a\128a\128a\128\128\128\128\128",
+ParseEngine.next5x1 "\128\128\128\128\128\128\128\128\128\129\135\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\129\136\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\137\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\139\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\140\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\142\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\143\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\151\148\128\147\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\153\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\159\155\128\128\128\154\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\151\148\128\178\179\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\181\180\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\151\148\128\178\182\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\151\148\128\183\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\151\148\128\178\184\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\159\155\128\128\128\187\128\186\185\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\188\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\189\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\190\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\159\155\128\128\128\191\192\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\159\155\128\128\128\193\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\159\155\128\128\128\191\194\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\159\155\128\128\128\195\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\159\155\128\128\128\191\196\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\159\155\128\128\128\197\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\151\148\128\178\198\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\201\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\151\148\128\178\203\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\159\155\128\128\128\187\128\186\205\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\207\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\159\155\128\128\128\208\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\159\155\128\128\128\209\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\159\155\128\128\128\191\210\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\181\217\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\219\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\159\155\128\128\128\220\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128\128",
 Vector.fromList [(0,1,(fn Value.string(arg0)::rest => Value.string(Arg.ident arg0)::rest|_=>raise (Fail "bad parser"))),
 (1,1,(fn Value.int(arg0)::rest => Value.int(Arg.number arg0)::rest|_=>raise (Fail "bad parser"))),
 (2,0,(fn rest => Value.numpairs(Arg.nil_numpairs {})::rest)),
@@ -2081,7 +2015,6 @@ Vector.fromList [(0,1,(fn Value.string(arg0)::rest => Value.string(Arg.ident arg
 (8,1,(fn Value.arm(arg0)::rest => Value.arms(Arg.sing_arms arg0)::rest|_=>raise (Fail "bad parser"))),
 (8,2,(fn Value.arms(arg0)::Value.arm(arg1)::rest => Value.arms(Arg.cons_arms {2=arg0,1=arg1})::rest|_=>raise (Fail "bad parser"))),
 (9,2,(fn Value.string(arg0)::_::rest => Value.directive(Arg.name_directive arg0)::rest|_=>raise (Fail "bad parser"))),
-(9,2,(fn Value.string(arg0)::_::rest => Value.directive(Arg.enable_directive arg0)::rest|_=>raise (Fail "bad parser"))),
 (9,2,(fn Value.int(arg0)::_::rest => Value.directive(Arg.alphabet_directive arg0)::rest|_=>raise (Fail "bad parser"))),
 (9,4,(fn Value.regexp(arg0)::_::Value.string(arg1)::_::rest => Value.directive(Arg.regexp_directive {2=arg0,1=arg1})::rest|_=>raise (Fail "bad parser"))),
 (9,4,(fn Value.charset(arg0)::_::Value.string(arg1)::_::rest => Value.directive(Arg.set_directive {2=arg0,1=arg1})::rest|_=>raise (Fail "bad parser"))),

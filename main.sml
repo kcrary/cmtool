@@ -1,6 +1,6 @@
 
 functor MainFun (structure Parser : PARSER
-                 structure CodeGen : CODEGEN) =
+                 structure Codegen : CODEGEN) =
    struct
 
       exception Error = Process.Error
@@ -19,7 +19,7 @@ functor MainFun (structure Parser : PARSER
 
              val () = TextIO.closeIn ins
           in
-             CodeGen.writeProgram outfile (Process.process program)
+             Codegen.writeProgram outfile (Process.process program)
           end
 
       exception Quit of string
@@ -50,6 +50,7 @@ functor MainFun (structure Parser : PARSER
              main infile outfile; OS.Process.success
           end handle Process.Error => OS.Process.failure
                    | Parser.Error => OS.Process.failure
+                   | Codegen.Error => OS.Process.failure
                    | Quit msg => 
                      (print ("Error: " ^ msg ^ "\n\
                              \Usage: cmlex file.cmlex [-o file." ^ extension ^ "]\n\

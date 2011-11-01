@@ -1,7 +1,8 @@
 
-structure SymbolDict = SplayDict (structure Key = IntOrdered)
 structure SymbolSet = SplaySet (structure Elem = IntOrdered)
+structure SymbolDict = SplayDict (structure Key = IntOrdered)
 structure StringSet = SplaySet (structure Elem = StringOrdered)
+structure StringDict = SplayDict (structure Key = StringOrdered)
 
 
 structure Automata =
@@ -42,16 +43,14 @@ structure Automata =
          int array          (* end-of-stream transition function *)
 
       type lexer =
-         string                                         (* functor name *)
+         string StringDict.dict                         (* functor name *)
          *
          int                                            (* alphabet size *)
          *
-         string list                                    (* type arguments *)
+         string list                                    (* type arguments, sorted *)
          *
          (string * string) list                         (* action arguments *)
          *
          (string * string * automaton) list             (* lexing functions *)
-         *
-         StringSet.set                                  (* options *)
 
    end

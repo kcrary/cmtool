@@ -81,7 +81,6 @@ structure Lexer
          ("and", AND),
          ("any", ANY),
          ("empty", EMPT),
-         ("enable", ENABLE),
          ("eos", EOS),
          ("epsilon", EPSILON),
          ("function", FUNCTION),

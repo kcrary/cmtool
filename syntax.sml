@@ -22,7 +22,7 @@ structure Syntax =
        | Empty
        | Concat of regexp list
        | Union of regexp list
-       | Option of regexp
+       | Optional of regexp
        | Closure of regexp
        | Plus of regexp
        | Exactly of regexp * int
@@ -31,8 +31,7 @@ structure Syntax =
        | Eos
 
       datatype directive =
-         Name of string
-       | Enable of string
+         Option of string * string
        | Alphabet of int
        | Function of string * string * (regexp * string) list
        | Regexp of string * regexp

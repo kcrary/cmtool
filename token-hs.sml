@@ -13,7 +13,6 @@ structure Token =
        | ARROW
        | COLON
        | DOT
-       | ENABLE
        | EOS
        | EMPT
        | EPSILON
@@ -22,6 +21,7 @@ structure Token =
        | GEQ
        | LPAREN
        | MINUS
+       | MONADIC
        | NAME
        | OR
        | PLUS

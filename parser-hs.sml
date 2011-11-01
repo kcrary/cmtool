@@ -55,7 +55,7 @@ structure Parser
             val concat_regexp = Concat
             val seq_regexp = Concat
             val union_regexp = Union
-            val option_regexp = Option
+            val option_regexp = Optional
             val closure_regexp = Closure
             val plus_regexp = Plus
             val equal_regexp = Exactly
@@ -80,8 +80,8 @@ structure Parser
 
             type directive = directive
 
-            fun name_directive l = Name (String.concat l)
-            val enable_directive = Enable
+            fun name_directive l = Option ("name", String.concat l)
+            val monadic_directive = lift (Option ("monadic", ""))
             val alphabet_directive = Alphabet
             val regexp_directive = Regexp
             val set_directive = Set
