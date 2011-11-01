@@ -41,9 +41,10 @@ structure Lexer
 
          "error",
          "monad",
-         "Prelude",
          "stream",
-         "Value"
+         "parse",
+         "Prelude",
+         "Arg"
          ]
 
       (* Reserved words in cmyacc. *)
@@ -108,7 +109,15 @@ structure Lexer
                       in
                          (case Table.find keywords str of
                              NONE =>
-                                if Char.isUpper (List.hd chars) then
+                                (* UGH: Don't allow any identifiers starting with VVV. *)
+                                if String.isPrefix "VVV" str then
+                                   (
+                                   print "Illegal identifier at ";
+                                   print (Int.toString pos);
+                                   print ".\n";
+                                   raise Error
+                                   )
+                                else if Char.isUpper (List.hd chars) then
                                    (UIDENT str, pos)
                                 else
                                    (LIDENT str, pos)

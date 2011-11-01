@@ -171,6 +171,8 @@ structure Codegen
             write "module ";
             write moduleName;
             write " (";
+            write moduleName;
+            write ".";
             write terminalName;
             write "(..), Arg(..), parse) where {\nimport qualified Array;\nimport qualified Control.Exception;\n";
             if monadic then
@@ -259,14 +261,14 @@ structure Codegen
                actions;
 
             write " }\n;\n";
-            write "data Value";
+            write "data VVV";
             app (fn tp => (write " "; write tp)) allTypes;
-            write " =\nVNONE\n";
+            write " =\nVVV\n";
 
             S.app
                (fn tp =>
                    (
-                   write "| V";
+                   write "| VVV";
                    write (Symbol.toValue tp);
                    write " ";
                    write (Symbol.toValue tp);
@@ -274,13 +276,13 @@ structure Codegen
                    ))
                types;
 
-            write ";\ninput :: (";
+            write ";\nterminal :: (";
             write terminalName;
             app (fn tp => (write " "; write tp)) terminalTypes;
-            write ") -> (Int, Value";
+            write ") -> (Int, VVV";
             app (fn tp => (write " "; write tp)) allTypes;
             write ");\n";
-            write "input terminal = case terminal of {";
+            write "terminal t = case t of {";
 
             D.foldl
                (fn (terminal, (tpo, _, _), first) =>
@@ -295,14 +297,14 @@ structure Codegen
                           write (Symbol.toValue terminal);
                           write " -> (";
                           write (Int.toString (D.lookup terminalOrdinals terminal));
-                          write ", VNONE)"
+                          write ", VVV)"
                           )
                      | SOME tp =>
                           (
                           write (Symbol.toValue terminal);
                           write " x -> (";
                           write (Int.toString (D.lookup terminalOrdinals terminal));
-                          write ", V";
+                          write ", VVV";
                           write (Symbol.toValue tp);
                           write " x)"
                           ));
@@ -340,12 +342,12 @@ structure Codegen
             write terminalName;
             app (fn tp => (write " "; write tp)) terminalTypes;
             write "));\n";
-            write "parse arg stream = ";
+            write "parse arg = ";
             if monadic then
                ()
             else
                write "Control.Monad.Identity.runIdentity $ ";
-            write "ParseEngine.parse (input, ParseEngine.next";
+            write "ParseEngine.parse (terminal, ParseEngine.next";
             write minorSize;
             write "x";
             write (Int.toString majorSize);
@@ -426,7 +428,7 @@ structure Codegen
                                            | NONE =>
                                                 valOf (#1 (D.lookup terminals symbol)))
                                    in
-                                      write "V";
+                                      write "VVV";
                                       write (Symbol.toValue tp);
                                       write "(arg";
                                       write (Int.toString n);
@@ -438,7 +440,7 @@ structure Codegen
 
                       val permutation = Array.array (len, ~1)
                    in
-                      write "rest) -> V";
+                      write "rest) -> VVV";
                       write (Symbol.toValue (#2 (D.lookup nonterminals lhs)));
                       write "(Test.";
                       write (Symbol.toValue action);
@@ -473,7 +475,7 @@ structure Codegen
                true
                rules;
 
-            write "],\n(\\ (V";
+            write "],\n(\\ (VVV";
             write (Symbol.toValue (#2 (D.lookup nonterminals start)));
             write " x) -> x), ";
 
@@ -481,7 +483,7 @@ structure Codegen
                write "Test.error arg"
             else
                write "return . Test.error arg";
-            write ") stream;\n";
+            write ");\n";
 
             write "}\n";
             TextIO.closeOut outs

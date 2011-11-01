@@ -59,13 +59,13 @@ structure Lexer
          "mod",
          "o",
 
-         "error",
-         "exn",
-
          "true",
          "false",
          "nil",
-         "ref"
+         "ref",
+
+         "error",
+         "exn"
          ]
 
 
