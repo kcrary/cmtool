@@ -41,10 +41,11 @@ structure Lexer
          "where",
 
          "monad",
+         "stream",
+         "symbol",
          "ord",
          "Prelude",
-         "stream",
-         "symbol"
+         "Arg"
          ]
 
       (* Reserved words in cmlex. *)

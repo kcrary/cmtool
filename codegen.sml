@@ -186,7 +186,7 @@ structure Codegen :> CODEGEN =
             appArraySeparated
                (fn name =>
                    if name = "" then
-                      write "error"
+                      write "epsilon"
                    else
                       (
                       write "Arg.";
@@ -290,7 +290,7 @@ structure Codegen :> CODEGEN =
                     ))
              actions;
 
-             write "end)\n=\nstruct\nlocal\nstructure LexEngine = LexEngineFun (structure Streamable = Streamable\ntype symbol = Arg.symbol\nval ord = Arg.ord)\nstructure Tables = struct\nfun error _ = raise (Fail \"Illegal lexeme\")\n";
+             write "end)\n=\nstruct\nlocal\nstructure LexEngine = LexEngineFun (structure Streamable = Streamable\ntype symbol = Arg.symbol\nval ord = Arg.ord)\nstructure Tables = struct\nfun epsilon _ = raise (Fail \"Illegal lexeme\")\n";
              app (writeTable outs symbolLimit functions) functions;
              write "end\nin\n";
 

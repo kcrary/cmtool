@@ -60,15 +60,15 @@ structure Lexer
          "mod",
          "o",
 
-         "int",
-         "list",
-         "ord",
-         "symbol",
-
          "true",
          "false",
          "nil",
-         "ref"
+         "ref",
+
+         "int",
+         "list",
+         "ord",
+         "symbol"
          ]
 
 

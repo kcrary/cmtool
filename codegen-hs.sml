@@ -178,7 +178,7 @@ structure Codegen :> CODEGEN =
             if monadic then
                write "monad "
             else
-               write "Identity ";
+               write "Control.Monad.Identity.Identity ";
             write "=> ";
             write moduleName;
             write ".Arg stream ";
@@ -202,32 +202,16 @@ structure Codegen :> CODEGEN =
             else
                ();
             write tp;
-            write "\n";
+            write ";\n";
             write name;
-            write " (";
-            write moduleName;
-            write ".Arg { ";
-            write moduleName;
-            write ".ord=ord";
-
-            app
-            (fn (actionName, _) =>
-                (
-                write ", ";
-                write moduleName;
-                write ".";
-                write actionName;
-                write "=";
-                write actionName
-                ))
-            actions;
-
-            write " }) seq = ";
+            write " arg s = ";
             if monadic then
                ()
             else
-               write "runIdentity $ ";
-            write "LexEngine.lex (ord, ";
+               write "Control.Monad.Identity.runIdentity $ ";
+            write "LexEngine.lex (";
+            write moduleName;
+            write ".ord arg, ";
             write (Int.toString initial);
             write ", ";
             write (Int.toString lastFinalSink);
@@ -238,15 +222,30 @@ structure Codegen :> CODEGEN =
             write ") [";
             if monadic then
                appArraySeparated
-                  (fn name =>
-                      if name = "" then
+                  (fn action =>
+                      if action = "" then
                          write "epsilon"
                       else
-                         write name)
-                  (fn () =>  write ", ")
+                         (
+                         write moduleName;
+                         write ".";
+                         write action;
+                         write " arg"
+                         ))
+                  (fn () => write ", ")
                   final
             else
-               appArraySeparated (fn action => (write "Identity . " ; write action)) (fn () =>  write ", ") final;
+               appArraySeparated
+                  (fn action => 
+                      (
+                      write "Control.Monad.Identity.Identity . "; 
+                      write moduleName;
+                      write ".";
+                      write action;
+                      write " arg"
+                      ))
+                  (fn () => write ", ") 
+                  final;
             write "], LexEngine.next";
             write minorstr;
             write "x";
@@ -272,7 +271,7 @@ structure Codegen :> CODEGEN =
                          ))
             (genEosTable stateSize count transEos);
 
-            write "\") seq\n"
+            write "\") s;\n"
                 
          end
             
@@ -306,12 +305,24 @@ structure Codegen :> CODEGEN =
 
             write "module ";
             write moduleName;
-            write " where\nimport qualified Array\nimport qualified Char\n";
+            write "(Arg(..)";
+
+            app
+               (fn (fname, _, _) =>
+                   (
+                   write ", ";
+                   write moduleName;
+                   write ".";
+                   write fname
+                   ))
+               functions;
+
+            write ") where {\nimport qualified Array;\nimport qualified Char;\n";
             if monadic then
                ()
             else
-               write "import Control.Monad.Identity\n";
-            write "import qualified Data.ByteString\nimport qualified Data.ByteString.Char8\nimport qualified Util.LexEngine as LexEngine\ndata Arg stream ";
+               write "import qualified Control.Monad.Identity;\n";
+            write "import qualified Data.ByteString;\nimport qualified Data.ByteString.Char8;\nimport qualified Util.LexEngine as LexEngine;\ndata Arg stream ";
             if monadic then
                write "monad "
             else
@@ -356,9 +367,10 @@ structure Codegen :> CODEGEN =
                 ))
             actions;
 
-            write " }\nepsilon _ = Prelude.error \"Illegal lexeme\"\n";
+            write " };\nepsilon _ = Prelude.error \"Illegal lexeme\";\n";
             app (writeFunction outs moduleName symbolLimit monadic types actions) functions;
 
+            write "}\n";
             TextIO.closeOut outs
 
          end
