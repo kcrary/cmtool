@@ -1,3 +1,80 @@
+
+functor ParseMainFun
+   (structure Streamable : STREAMABLE
+    structure Arg :
+       sig
+          type string
+          type int
+          type symbol
+          type label
+          type constituent
+          type constituents
+          type precedence
+          type production
+          type productions
+          type qident
+          type directive
+          type directives
+
+          val cons_directives : directive * directives -> directives
+          val nil_directives : unit -> directives
+          val follower_directive : symbol -> directive
+          val start_directive : symbol -> directive
+          val nonterminal_directive : symbol * symbol * productions -> directive
+          val terminal_of_directive : symbol * symbol * precedence -> directive
+          val terminal_directive : symbol * precedence -> directive
+          val monadic_directive : unit -> directive
+          val data_directive : string -> directive
+          val name_directive : qident -> directive
+          val cons_qident : string * qident -> qident
+          val sing_qident : string -> qident
+          val cons_productions : production * productions -> productions
+          val nil_productions : unit -> productions
+          val sole_production : constituents * symbol * precedence -> production
+          val no_precedence : unit -> precedence
+          val right_precedence : int -> precedence
+          val left_precedence : int -> precedence
+          val empty_precedence : unit -> precedence
+          val cons_constituents : constituent * constituents -> constituents
+          val nil_constituents : unit -> constituents
+          val paren_item : constituent -> constituent
+          val labeled_item : label * symbol -> constituent
+          val unlabeled_item : symbol -> constituent
+          val number_label : int -> label
+          val sole_number : int -> int
+          val sole_uident : string -> symbol
+          val sole_lident : string -> symbol
+
+          datatype terminal =
+             LIDENT of string
+           | UIDENT of string
+           | NUMBER of int
+           | ARROW
+           | COLON
+           | DATA
+           | DOT
+           | EQUAL
+           | FOLLOWER
+           | MONADIC
+           | NAME
+           | NONTERMINAL
+           | NOPREC
+           | LPAREN
+           | OF
+           | PRECL
+           | PRECR
+           | RPAREN
+           | START
+           | TERMINAL
+
+          val error : terminal Streamable.t -> exn
+       end)
+   :>
+   sig
+      val parse : Arg.terminal Streamable.t -> Arg.directives * Arg.terminal Streamable.t
+   end
+=
+
 (*
 
 State 0:
@@ -815,72 +892,6 @@ lookahead 14 = $ UIDENT NUMBER ARROW DATA FOLLOWER MONADIC NAME NONTERMINAL NOPR
 
 *)
 
-functor ParseMainFun (structure Streamable : STREAMABLE
-structure Arg : sig
-type string
-type int
-type symbol
-type label
-type constituent
-type constituents
-type precedence
-type production
-type productions
-type qident
-type directive
-type directives
-val cons_directives : {1:directive, 2:directives} -> directives
-val nil_directives : {} -> directives
-val follower_directive : symbol -> directive
-val start_directive : symbol -> directive
-val nonterminal_directive : {1:symbol, 2:symbol, 3:productions} -> directive
-val terminal_of_directive : {1:symbol, 2:symbol, 3:precedence} -> directive
-val terminal_directive : {1:symbol, 2:precedence} -> directive
-val monadic_directive : {} -> directive
-val data_directive : string -> directive
-val name_directive : qident -> directive
-val cons_qident : {1:string, 2:qident} -> qident
-val sing_qident : string -> qident
-val cons_productions : {1:production, 2:productions} -> productions
-val nil_productions : {} -> productions
-val sole_production : {1:constituents, 2:symbol, 3:precedence} -> production
-val no_precedence : {} -> precedence
-val right_precedence : int -> precedence
-val left_precedence : int -> precedence
-val empty_precedence : {} -> precedence
-val cons_constituents : {1:constituent, 2:constituents} -> constituents
-val nil_constituents : {} -> constituents
-val paren_item : constituent -> constituent
-val labeled_item : {1:label, 2:symbol} -> constituent
-val unlabeled_item : symbol -> constituent
-val number_label : int -> label
-val sole_number : int -> int
-val sole_uident : string -> symbol
-val sole_lident : string -> symbol
-datatype terminal =
-LIDENT of string
-| UIDENT of string
-| NUMBER of int
-| ARROW
-| COLON
-| DATA
-| DOT
-| EQUAL
-| FOLLOWER
-| MONADIC
-| NAME
-| NONTERMINAL
-| NOPREC
-| LPAREN
-| OF
-| PRECL
-| PRECR
-| RPAREN
-| START
-| TERMINAL
-val error : terminal Streamable.t -> exn
-end)
-=
 struct
 local
 structure Value = struct

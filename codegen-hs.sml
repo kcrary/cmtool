@@ -233,7 +233,7 @@ structure Codegen
             allTypes;
 
             app
-               (fn (actionName, dom, _, cod) =>
+               (fn (actionName, dom, cod) =>
                    let
                       val dom' =
                          Mergesort.sort

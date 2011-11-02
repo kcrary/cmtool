@@ -59,7 +59,7 @@ structure Process
 
       (* (nonterminal, rule of nonterminal, arguments (for each argument, the label and nonterminal
          (not the nonterminal's type, because don't know it yet)), sole argument?, result type) *)
-      val actions      : (symbol * int * (label * symbol) list * bool * symbol) list  D.dict ref = ref D.empty
+      val actions      : (symbol * int * (label * symbol) list * symbol) list  D.dict ref = ref D.empty
 
       val rules        : rule list ref                              = ref []
       val start        : symbol option ref                          = ref NONE
@@ -124,6 +124,17 @@ structure Process
                           )
                        else
                           let
+                             val () =
+                                if D.member (!actions) name then
+                                   (
+                                   print "Error: terminal identifier ";
+                                   print (Symbol.toValue name);
+                                   print " already used for an action.\n";
+                                   raise Error
+                                   )
+                                else
+                                   ()
+
                              val () =
                                 (case tpo of
                                     NONE => ()
@@ -326,6 +337,17 @@ structure Process
                                                     print " already used for a type.\n";
                                                     raise Error
                                                     )
+                                                 else if D.member (!terminals) action then
+                                                    (
+                                                    print "Error: action identifier ";
+                                                    print (Symbol.toValue action);
+                                                    print " in rule ";
+                                                    print (Int.toString localnumber);
+                                                    print " of nonterminal ";
+                                                    print (toValue name);
+                                                    print " already used for a terminal.\n";
+                                                    raise Error
+                                                    )
                                                  else
                                                     let
                                                        val actioninfo =
@@ -335,7 +357,7 @@ structure Process
                                                             | SOME l => l)
                                                           
                                                        val actioninfo' =
-                                                          (name, localnumber, actionargs, solearg, tp)
+                                                          (name, localnumber, actionargs, tp)
                                                           ::
                                                           actioninfo
                                                     in
@@ -549,13 +571,13 @@ structure Process
                        [] =>
                           (* Can't be empty; wouldn't be in the dict in the first place. *)
                           raise (Fail "invariant")
-                     | (_, _, args, solearg, cod) :: rest =>
+                     | (_, _, args, cod) :: rest =>
                           let
                              val dom = argsToDom args
 
                              val () =
                                 app
-                                (fn (nonterminal, localnumber, args', _, cod') =>
+                                (fn (nonterminal, localnumber, args', cod') =>
                                     let
                                        val dom' = argsToDom args'
                                     in
@@ -582,7 +604,7 @@ structure Process
                                     end)
                                 rest
                           in
-                             (action, dom, solearg, cod) :: actions'
+                             (action, dom, cod) :: actions'
                           end))
                []
                (!actions)                          

@@ -74,7 +74,7 @@ structure Automaton =
          *
          (int list * Symbol.symbol * bool ref) SymbolDict.dict              (* nonterminals *)
          *
-         (Symbol.symbol * (Syntax.label * Symbol.symbol) list * bool * Symbol.symbol) list  (* actions *)
+         (Symbol.symbol * (Syntax.label * Symbol.symbol) list * Symbol.symbol) list  (* actions *)
          *
          automaton                                                          (* the automaton *)
 

@@ -21,6 +21,19 @@ structure Codegen
                 Int.toString n)
 
 
+      fun isUnit dom = List.null dom
+
+      fun isSolearg dom =
+         (case dom of
+             [(Syntax.NumericLabel _, _)] => true
+           | _ => false)
+
+      fun isTuple dom =
+         (case dom of
+             (Syntax.NumericLabel _, _) :: _ :: _ => true
+           | _ => false)
+
+
       (* Converts a word to a big-endian byte list. *)
       fun wordToBytelist w acc =
          if w = 0w0 then
@@ -136,75 +149,84 @@ structure Codegen
             val outs = TextIO.openOut outfile
             fun write str = TextIO.output (outs, str)
          in
-            write "(*\n\n";
-            WriteAutomaton.writeAutomaton outs automaton;
-            write "\n*)\n\n";
-
-            write "functor ";
+            write "\nfunctor ";
             write functorName;
-            write " (structure Streamable : STREAMABLE\nstructure Arg : sig\n";
+            write "\n   (structure Streamable : STREAMABLE\n    structure Arg :\n       sig\n";
 
             S.app
                (fn tp =>
                    (
-                   write "type ";
+                   write "          type ";
                    write (Symbol.toValue tp);
                    write "\n"
                    ))
                types;
 
+            write "\n";
+
             app
-               (fn (action, dom, solearg, cod) =>
+               (fn (action, dom, cod) =>
                    (
-                   write "val ";
+                   write "          val ";
                    write (Symbol.toValue action);
                    write " : ";
                    
-                   (* If solearg, we suppress generating a record. *)
-                   if solearg then
-                      ()
-                   else
-                      write "{";
-
-                   foldl
-                      (fn ((l, t), first) =>
-                          (
-                          if first then
-                             ()
-                          else
-                             write ", ";
-
-                          if solearg then
-                             ()
-                          else
+                   if isUnit dom then
+                      write "unit"
+                   else if isSolearg dom then
+                      write (Symbol.toValue (#2 (hd dom)))
+                   else if isTuple dom then
+                      (
+                      foldl
+                         (fn ((_, t), first) =>
+                             (* Ignore the label, because we know the list is sorted and complete. *)
                              (
-                             write (labelToString l);
-                             write ":"
-                             );
-
-                          write (Symbol.toValue t);
-                          false
-                          ))
-                      true
-                      dom;
-
-                   if solearg then
+                             if first then
+                                ()
+                             else
+                                write " * ";
+                             write (Symbol.toValue t);
+                             false
+                             ))
+                         true
+                         dom;
                       ()
+                      )
                    else
-                      write "}";
+                      (
+                      write "{ ";
 
+                      foldl
+                         (fn ((l, t), first) =>
+                             (
+                             if first then
+                                ()
+                             else
+                                write ", ";
+                             write (labelToString l);
+                             write ":";
+                             write (Symbol.toValue t);
+                             false
+                             ))
+                         true
+                         dom;
+
+                      write " }"
+                      );
+   
                    write " -> ";
                    write (Symbol.toValue cod);
                    write "\n"
                    ))
                actions;
 
-            write "datatype terminal =\n";
+            write "\n          datatype terminal =\n";
             D.foldl
                (fn (symbol, (tpo, _, _), first) =>
                       (
+                      write "           ";
                       if first then
-                         ()
+                         write "  "
                       else
                          write "| ";
                       write (Symbol.toValue symbol);
@@ -221,7 +243,15 @@ structure Codegen
                true
                terminals;
 
-            write "val error : terminal Streamable.t -> exn\nend)\n=\nstruct\nlocal\nstructure Value = struct\ndatatype nonterminal =\nnonterminal\n";
+            write "\n          val error : terminal Streamable.t -> exn\n       end)\n   :>\n   sig\n      val parse : Arg.terminal Streamable.t -> Arg.";
+            write (Symbol.toValue (#2 (D.lookup nonterminals start)));
+            write " * Arg.terminal Streamable.t\n   end\n=\n\n";
+
+            write "(*\n\n";
+            WriteAutomaton.writeAutomaton outs automaton;
+            write "\n*)\n\n";
+
+            write "struct\nlocal\nstructure Value = struct\ndatatype nonterminal =\nnonterminal\n";
 
             S.app
                (fn tp =>
