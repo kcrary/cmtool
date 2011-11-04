@@ -11,6 +11,16 @@ structure CodegenHs :> CODEGEN =
             ()
 
 
+      fun writeSpaces outs n =
+         if n = 0 then
+            ()
+         else
+            (
+            TextIO.output1 (outs, #" ");
+            writeSpaces outs (n-1)
+            )
+
+
       fun appSeparated f g l =
           (case l of
               [] =>
@@ -166,19 +176,17 @@ structure CodegenHs :> CODEGEN =
             raise (Fail "Table too large.")
 
 
-      fun writeFunction outs moduleName symbolLimit monadic types actions (name, tp, (count, initial, lastFinalSink, lastFinal, final, trans, transEos)) =
+      fun writeFunctionSpec outs moduleName monadic types (name, tp, _) =
          let
             fun write str = TextIO.output (outs, str)
-            val (symbolLimit', minorstr) = tableSizeMinor symbolLimit
-            val stateSize = tableSizeMajor count
-            val majorstr = Int.toString stateSize
          in
             write name;
             write " :: LexEngine.Streamable stream ";
             if monadic then
-               write "monad "
+               write "monad\n"
             else
-               write "Control.Monad.Identity.Identity ";
+               write "Control.Monad.Identity.Identity\n";
+            writeSpaces outs (String.size name + 4);
             write "=> ";
             write moduleName;
             write ".Arg stream ";
@@ -201,7 +209,18 @@ structure CodegenHs :> CODEGEN =
                write "monad "
             else
                ();
-            write tp;
+
+            write tp
+         end
+
+      fun writeFunction outs moduleName symbolLimit monadic types actions (function as (name, tp, (count, initial, lastFinalSink, lastFinal, final, trans, transEos))) =
+         let
+            fun write str = TextIO.output (outs, str)
+            val (symbolLimit', minorstr) = tableSizeMinor symbolLimit
+            val stateSize = tableSizeMajor count
+            val majorstr = Int.toString stateSize
+         in
+            writeFunctionSpec outs moduleName monadic types function;
             write ";\n";
             write name;
             write " arg s = ";
@@ -300,6 +319,62 @@ structure CodegenHs :> CODEGEN =
             write " #-}\n\n";
 
             write "{-\n\n";
+
+            write "module ";
+            write moduleName;
+            write " exports:\n\ndata Arg stream ";
+            if monadic then
+               write "monad "
+            else
+               ();
+            write "symbol ";
+
+            app
+               (fn typeName =>
+                   (
+                   write typeName;
+                   write " "
+                   ))
+               types;
+
+            write "=\n   Arg { ord :: symbol -> Int,\n\n         {- type arguments -}\n";
+
+            app
+               (fn typeName =>
+                   (
+                   write "         ";
+                   write typeName;
+                   write " :: ";
+                   if monadic then
+                      write "monad "
+                   else
+                      ();
+                   write typeName;
+                   write ",\n"
+                   ))
+               types;
+
+            write "\n         {- action arguments -}\n";
+
+            appSeparated
+               (fn (actionName, actionType) =>
+                   (
+                   write "         ";
+                   write actionName;
+                   write " :: LexEngine.LexInfo stream symbol -> ";
+                   if monadic then
+                      write "monad "
+                   else
+                      ();
+                   write actionType
+                   ))
+               (fn () => write ",\n")
+               actions;
+
+            write " }\n\n";
+            app (writeFunctionSpec outs moduleName monadic types) functions;
+
+            write "\n\n\n";
             WriteAutomata.writeAutomata outs functions;
             write "\n-}\n\n";
 
