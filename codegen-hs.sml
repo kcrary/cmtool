@@ -9,6 +9,16 @@ structure CodegenHs
 
       open Automaton
 
+      fun appSeparated f g l =
+          (case l of
+              [] =>
+                 ()
+            | h :: t =>
+                 (
+                 f h;
+                 app (fn x => (g (); f x)) t
+                 ))
+
       (* Converts a word to a big-endian byte list. *)
       fun wordToBytelist w acc =
          if w = 0w0 then
@@ -165,6 +175,125 @@ structure CodegenHs
             write " #-}\n\n";
 
             write "{-\n\n";
+
+            write "module ";
+            write moduleName;
+            write " exports:\n\ndata ";
+            write terminalName;
+            app (fn tp => (write " "; write tp)) terminalTypes;
+            write " =\n";
+
+            D.foldl
+               (fn (symbol, (tpo, _, _), first) =>
+                      (
+                      if first then
+                         write "   "
+                      else
+                         write " | ";
+                      write (Symbol.toValue symbol);
+                      (case tpo of
+                          NONE => ()
+                        | SOME tp =>
+                             (
+                             write " ";
+                             write (Symbol.toValue tp)
+                             ));
+                      write "\n";
+                      false
+                      ))
+               true
+               terminals;
+
+            write "\n";
+
+            write "data Arg stream";
+            if monadic then
+               write " monad"
+            else
+               ();
+            app (fn tp => (write " "; write tp)) allTypes;
+            write " =\n   Arg { error :: stream (";
+            write terminalName;
+            app (fn tp => (write " "; write tp)) terminalTypes;
+            write ") ->";
+            if monadic then
+               write " monad"
+            else
+               ();
+            write " Control.Exception.SomeException,\n\n         {- type arguments -}\n";
+            
+            appSeparated
+               (fn typeName =>
+                   (
+                   write "         ";
+                   write typeName;
+                   write " :: ";
+                   write typeName
+                   ))
+               (fn () => write ",\n")
+               allTypes;
+
+            write "\n\n         {- action arguments -}\n";
+
+            appSeparated
+               (fn (actionName, dom, cod) =>
+                   let
+                      val dom' =
+                         Mergesort.sort
+                         (fn ((Syntax.NumericLabel n, _), (Syntax.NumericLabel n', _)) => Int.compare (n, n')
+                           | _ =>
+                                (* Ident labels aren't permitted for Haskell. *)
+                                raise (Fail "invariant"))
+                         dom
+                   in
+                      write "         ";
+                      write (Symbol.toValue actionName);
+                      write " :: ";
+   
+                      (* By construction, we have a complete, no-duplicate sequence from 1 to some n. *)
+                      app
+                         (fn (_, tp) =>
+                             (
+                             write (Symbol.toValue tp);
+                             write " -> "
+                             ))
+                         dom';
+   
+                      write (Symbol.toValue cod)
+                   end)
+               (fn () => write ",\n")
+               actions;
+
+            write " }\n\n";
+            write "parse :: ParseEngine.Streamable stream ";
+            if monadic then
+               write "monad "
+            else
+               write "Control.Monad.Identity.Identity ";
+            write "\n         => ";
+            write moduleName;
+            write ".Arg stream";
+            if monadic then
+               write " monad"
+            else
+               ();
+            app (fn tp => (write " "; write tp)) allTypes;
+            write " -> stream (";
+            write terminalName;
+            app (fn tp => (write " "; write tp)) terminalTypes;
+            write ") -> ";
+            if monadic then
+               write "monad "
+            else
+               ();
+            write "(";
+            write (Symbol.toValue (#2 (D.lookup nonterminals start)));
+            write ", stream (";
+            write terminalName;
+            app (fn tp => (write " "; write tp)) terminalTypes;
+            write "))";
+
+            write "\n\n\n";
             WriteAutomaton.writeAutomaton outs automaton;
             write "\n-}\n\n";
 
@@ -342,7 +471,7 @@ structure CodegenHs
             write terminalName;
             app (fn tp => (write " "; write tp)) terminalTypes;
             write "));\n";
-            write "parse arg = ";
+            write "parse arg s = ";
             if monadic then
                ()
             else
@@ -483,7 +612,7 @@ structure CodegenHs
                write "Test.error arg"
             else
                write "return . Test.error arg";
-            write ");\n";
+            write ") s;\n";
 
             write "}\n";
             TextIO.closeOut outs
