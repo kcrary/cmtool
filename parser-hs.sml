@@ -1,10 +1,10 @@
 
-structure Parser
+structure ParserHs
    :> PARSER
    =
    struct
 
-      exception Error = Lexer.Error
+      exception Error = LexerHs.Error
 
       open Syntax
 
@@ -91,7 +91,7 @@ structure Parser
             val nil_directives = null
             val cons_directives = op ::
 
-            datatype terminal = datatype Token.token
+            datatype terminal = datatype TokenHs.token
 
             fun error s =
                (case Stream.front s of
@@ -115,11 +115,11 @@ structure Parser
                             fun coerce (x, _) = x)
 
       structure ParseMain =
-         ParseMainFun
+         ParseMainFunHs
          (structure Streamable = StreamWithPos
           structure Arg = Arg)
 
       fun parse s =
-         #1 (ParseMain.parse (Lexer.lex s))
+         #1 (ParseMain.parse (LexerHs.lex s))
 
    end

@@ -1,11 +1,11 @@
 
-structure Lexer
+structure LexerHs
    :> LEXER 
-      where type token = Token.token
+      where type token = TokenHs.token
    =
    struct
 
-      open Token
+      open TokenHs
 
       structure Table =
          HashTable (structure Key = StringHashable)
@@ -81,18 +81,18 @@ structure Lexer
       type self = { lexmain : char stream -> t,
                     skipcomment : char stream -> u }
 
-      type arg = { match : char list,
-                   len : int, 
-                   start : char stream,
-                   follow : char stream,
-                   self : self }
+      type info = { match : char list,
+                    len : int, 
+                    start : char stream,
+                    follow : char stream,
+                    self : self }
 
       exception Error
 
-      fun action f ({ match, len, follow, self, ... }:arg) pos =
+      fun action f ({ match, len, follow, self, ... }:info) pos =
          Cons (f (match, len, pos), lazy (fn () => #lexmain self follow (pos+len)))
 
-      fun simple token ({ len, follow, self, ... }:arg) pos =
+      fun simple token ({ len, follow, self, ... }:info) pos =
          Cons ((token, pos), lazy (fn () => #lexmain self follow (pos+len)))
 
       structure Arg =
@@ -102,6 +102,8 @@ structure Lexer
   
             type t = t
             type u = u
+            type self = self
+            type info = info
 
             fun eof _ _ = Nil
   
@@ -144,7 +146,7 @@ structure Lexer
                                  raise Error
                                  )))
 
-            fun skip ({ len, follow, self, ... }:arg) pos = #lexmain self follow (pos+len)
+            fun skip ({ len, follow, self, ... }:info) pos = #lexmain self follow (pos+len)
   
             val char = 
                action
@@ -156,7 +158,7 @@ structure Lexer
                         | _ =>
                              raise (Fail "invariant")))
   
-            fun lcomment ({ len, follow, self, ...}:arg) pos =
+            fun lcomment ({ len, follow, self, ...}:info) pos =
                 let
                    val (follow', pos') = #skipcomment self follow (pos+len)
                 in
@@ -194,17 +196,17 @@ structure Lexer
             val geq = simple GEQ
             val starstar = simple REPEAT
   
-            fun comment_open ({ len, follow, self, ... }:arg) pos =
+            fun comment_open ({ len, follow, self, ... }:info) pos =
                 let
                    val (follow', pos') = #skipcomment self follow (pos+len)
                 in
                    #skipcomment self follow' pos'
                 end
   
-            fun comment_close ({ len, follow, ...}:arg) pos = 
+            fun comment_close ({ len, follow, ...}:info) pos = 
                 (follow, pos+len)
   
-            fun comment_skip ({ len, follow, self, ... }:arg) pos =
+            fun comment_skip ({ len, follow, self, ... }:info) pos =
                 #skipcomment self follow (pos+len)
   
             fun comment_error _ pos =

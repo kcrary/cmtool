@@ -250,47 +250,64 @@ structure Codegen :> CODEGEN =
              val outs = TextIO.openOut filename
              fun write str = TextIO.output (outs, str)
           in
-             write "(*\n\n";
+             write "\nfunctor ";
+             write functorName;
+             write "\n   (structure Streamable : STREAMABLE\n    structure Arg :\n       sig\n          type symbol\n          val ord : symbol -> int\n\n";
+
+             app 
+                (fn typeName =>
+                       (
+                       write "          type ";
+                       write typeName;
+                       write "\n"
+                       ))
+                types;
+
+             write "\n          type self = { ";
+
+             appSeparated
+                (fn (fname, tp, _) =>
+                    (
+                    write fname;
+                    write " : symbol Streamable.t -> ";
+                    write tp
+                    ))
+                (fn () => write ",\n                        ")
+                functions;
+
+             write " }\n          type info = { match : symbol list,\n                        len : int,\n                        start : symbol Streamable.t,\n                        follow : symbol Streamable.t,\n                        self : self }\n\n";
+
+             app
+                (fn (actionName, actionType) =>
+                       (
+                       write "          val ";
+                       write actionName;
+                       write " : info -> ";
+                       write actionType;
+                       write "\n"
+                       ))
+                actions;
+
+             write "       end)\n   :>\n   sig\n";
+
+             app
+                (fn (fname, tp, _) =>
+                    (
+                    write "      val ";
+                    write fname;
+                    write " : Arg.symbol Streamable.t -> Arg.";
+                    write tp;
+                    write "\n"
+                    ))
+                functions;
+
+             write "   end\n=\n";
+
+             write "\n(*\n\n";
              WriteAutomata.writeAutomata outs functions;
              write "\n*)\n\n";
 
-             write "functor ";
-             write functorName;
-             write " (structure Streamable : STREAMABLE\nstructure Arg : sig\ntype symbol\nval ord : symbol -> int\n";
-
-             app 
-             (fn typeName =>
-                    (
-                    write "type ";
-                    write typeName;
-                    write "\n"
-                    ))
-             types;
-
-             app
-             (fn (actionName, actionType) =>
-                    (
-                    write "val ";
-                    write actionName;
-                    write " : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {";
-
-                    appSeparated
-                    (fn (fname, tp, _) =>
-                           (
-                           write fname;
-                           write " : symbol Streamable.t -> ";
-                           write tp
-                           ))
-                    (fn () => write ", ")
-                    functions;
-
-                    write "} } -> ";
-                    write actionType;
-                    write "\n"
-                    ))
-             actions;
-
-             write "end)\n=\nstruct\nlocal\nstructure LexEngine = LexEngineFun (structure Streamable = Streamable\ntype symbol = Arg.symbol\nval ord = Arg.ord)\nstructure Tables = struct\nfun epsilon _ = raise (Fail \"Illegal lexeme\")\n";
+             write "struct\nlocal\nstructure LexEngine = LexEngineFun (structure Streamable = Streamable\ntype symbol = Arg.symbol\nval ord = Arg.ord)\nstructure Tables = struct\nfun epsilon _ = raise (Fail \"Illegal lexeme\")\n";
              app (writeTable outs symbolLimit functions) functions;
              write "end\nin\n";
 

@@ -1,5 +1,5 @@
 
-structure Token =
+structure TokenHs =
    struct
 
       datatype token =

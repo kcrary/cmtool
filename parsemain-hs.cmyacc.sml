@@ -1,3 +1,110 @@
+
+functor ParseMainFunHs
+   (structure Streamable : STREAMABLE
+    structure Arg :
+       sig
+          type string
+          type int
+          type intlist
+          type numpairs
+          type charset
+          type charsets
+          type regexp
+          type regexps
+          type arm
+          type arms
+          type qident
+          type directive
+          type directives
+
+          val cons_directives : directive * directives -> directives
+          val nil_directives : unit -> directives
+          val function_directive : string * string * arms -> directive
+          val set_directive : string * charset -> directive
+          val regexp_directive : string * regexp -> directive
+          val alphabet_directive : int -> directive
+          val monadic_directive : unit -> directive
+          val name_directive : qident -> directive
+          val cons_qident : string * qident -> qident
+          val sing_qident : string -> qident
+          val cons_arms : arm * arms -> arms
+          val sing_arms : arm -> arms
+          val sole_arm : regexp * string -> arm
+          val cons_regexps : regexp * regexps -> regexps
+          val nil_regexps : unit -> regexps
+          val eos_regexp : unit -> regexp
+          val repeat_regexp : regexp * int * int -> regexp
+          val geq_regexp : regexp * int -> regexp
+          val equal_regexp : regexp * int -> regexp
+          val plus_regexp : regexp -> regexp
+          val closure_regexp : regexp -> regexp
+          val option_regexp : regexp -> regexp
+          val union_regexp : regexps -> regexp
+          val seq_regexp : regexps -> regexp
+          val concat_regexp : regexps -> regexp
+          val empty_regexp : unit -> regexp
+          val epsilon_regexp : unit -> regexp
+          val any_regexp : unit -> regexp
+          val string_regexp : intlist -> regexp
+          val number_regexp : int -> regexp
+          val ident_regexp : string -> regexp
+          val cons_charsets : charset * charsets -> charsets
+          val nil_charsets : unit -> charsets
+          val any_charset : unit -> charset
+          val comp_charset : charsets -> charset
+          val diff_charset : charset * charsets -> charset
+          val intersect_charset : charsets -> charset
+          val union_charset : charsets -> charset
+          val empty_charset : unit -> charset
+          val range_charset : numpairs -> charset
+          val number_charset : int -> charset
+          val ident_charset : string -> charset
+          val cons_numpairs : int * int * numpairs -> numpairs
+          val nil_numpairs : unit -> numpairs
+          val number : int -> int
+          val ident : string -> string
+
+          datatype terminal =
+             LIDENT of string
+           | UIDENT of string
+           | NUMBER of int
+           | STRING of intlist
+           | ALPHABET
+           | AND
+           | ANY
+           | ARROW
+           | COLON
+           | DOT
+           | EOS
+           | EMPT
+           | EPSILON
+           | EQUAL
+           | FUNCTION
+           | GEQ
+           | LPAREN
+           | MINUS
+           | MONADIC
+           | NAME
+           | OR
+           | PLUS
+           | QUESTION
+           | RANGE
+           | REGEXP
+           | REPEAT
+           | RPAREN
+           | SEQ
+           | SET
+           | STAR
+           | TILDE
+
+          val error : terminal Streamable.t -> exn
+       end)
+   :>
+   sig
+      val parse : Arg.terminal Streamable.t -> Arg.directives * Arg.terminal Streamable.t
+   end
+=
+
 (*
 
 State 0:
@@ -1926,102 +2033,6 @@ lookahead 14 = NUMBER RPAREN
 
 *)
 
-functor ParseMainFun (structure Streamable : STREAMABLE
-structure Arg : sig
-type string
-type int
-type intlist
-type numpairs
-type charset
-type charsets
-type regexp
-type regexps
-type arm
-type arms
-type qident
-type directive
-type directives
-val cons_directives : {1:directive, 2:directives} -> directives
-val nil_directives : {} -> directives
-val function_directive : {1:string, 2:string, 3:arms} -> directive
-val set_directive : {1:string, 2:charset} -> directive
-val regexp_directive : {1:string, 2:regexp} -> directive
-val alphabet_directive : int -> directive
-val monadic_directive : {} -> directive
-val name_directive : qident -> directive
-val cons_qident : {1:string, 2:qident} -> qident
-val sing_qident : string -> qident
-val cons_arms : {1:arm, 2:arms} -> arms
-val sing_arms : arm -> arms
-val sole_arm : {1:regexp, 2:string} -> arm
-val cons_regexps : {1:regexp, 2:regexps} -> regexps
-val nil_regexps : {} -> regexps
-val eos_regexp : {} -> regexp
-val repeat_regexp : {1:regexp, 2:int, 3:int} -> regexp
-val geq_regexp : {1:regexp, 2:int} -> regexp
-val equal_regexp : {1:regexp, 2:int} -> regexp
-val plus_regexp : regexp -> regexp
-val closure_regexp : regexp -> regexp
-val option_regexp : regexp -> regexp
-val union_regexp : regexps -> regexp
-val seq_regexp : regexps -> regexp
-val concat_regexp : regexps -> regexp
-val empty_regexp : {} -> regexp
-val epsilon_regexp : {} -> regexp
-val any_regexp : {} -> regexp
-val string_regexp : intlist -> regexp
-val number_regexp : int -> regexp
-val ident_regexp : string -> regexp
-val cons_charsets : {1:charset, 2:charsets} -> charsets
-val nil_charsets : {} -> charsets
-val any_charset : {} -> charset
-val comp_charset : charsets -> charset
-val diff_charset : {1:charset, 2:charsets} -> charset
-val intersect_charset : charsets -> charset
-val union_charset : charsets -> charset
-val empty_charset : {} -> charset
-val range_charset : numpairs -> charset
-val number_charset : int -> charset
-val ident_charset : string -> charset
-val cons_numpairs : {1:int, 2:int, 3:numpairs} -> numpairs
-val nil_numpairs : {} -> numpairs
-val number : int -> int
-val ident : string -> string
-datatype terminal =
-LIDENT of string
-| UIDENT of string
-| NUMBER of int
-| STRING of intlist
-| ALPHABET
-| AND
-| ANY
-| ARROW
-| COLON
-| DOT
-| EOS
-| EMPT
-| EPSILON
-| EQUAL
-| FUNCTION
-| GEQ
-| LPAREN
-| MINUS
-| MONADIC
-| NAME
-| OR
-| PLUS
-| QUESTION
-| RANGE
-| REGEXP
-| REPEAT
-| RPAREN
-| SEQ
-| SET
-| STAR
-| TILDE
-val error : terminal Streamable.t -> exn
-end)
-=
 struct
 local
 structure Value = struct

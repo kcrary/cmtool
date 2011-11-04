@@ -1,4 +1,4 @@
-name ParseMainFun
+name ParseMainFunHs
 
 terminal LIDENT of string
 terminal UIDENT of string

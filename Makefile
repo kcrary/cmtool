@@ -16,12 +16,12 @@ smlnj:
 .PHONY : win+smlnj
 win+smlnj:
 	sml export-smlnj.sml
-	bin/mknjexec `which sml` `pwd`/bin cmlex-heapimg.x86-win32 cmlex 
+	bin/mknjexec-win `which sml` `pwd`/bin cmlex-heapimg.x86-win32 cmlex 
 
 .PHONY : win+smlnj+hs
 win+smlnj+hs:
 	sml export-smlnj-hs.sml
-	bin/mknjexec `which sml` `pwd`/bin cmlex-hs-heapimg.x86-win32 cmlex-hs
+	bin/mknjexec-win `which sml` `pwd`/bin cmlex-hs-heapimg.x86-win32 cmlex-hs
 
 install:
 	rm -f $(DESTDIR)/bin/cmlex.new

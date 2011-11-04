@@ -1,20 +1,76 @@
+
+functor LexMainFun
+   (structure Streamable : STREAMABLE
+    structure Arg :
+       sig
+          type symbol
+          val ord : symbol -> int
+
+          type t
+          type u
+
+          type self = { lexmain : symbol Streamable.t -> t,
+                        skipcomment : symbol Streamable.t -> u }
+          type info = { match : symbol list,
+                        len : int,
+                        start : symbol Streamable.t,
+                        follow : symbol Streamable.t,
+                        self : self }
+
+          val ampersand : info -> t
+          val arrow : info -> t
+          val bar : info -> t
+          val char : info -> t
+          val colon : info -> t
+          val comment_close : info -> u
+          val comment_error : info -> u
+          val comment_open : info -> u
+          val comment_skip : info -> u
+          val dot : info -> t
+          val eof : info -> t
+          val equal : info -> t
+          val error : info -> t
+          val geq : info -> t
+          val ident : info -> t
+          val lcomment : info -> t
+          val lparen : info -> t
+          val minus : info -> t
+          val number : info -> t
+          val plus : info -> t
+          val question : info -> t
+          val rparen : info -> t
+          val skip : info -> t
+          val slash : info -> t
+          val star : info -> t
+          val starstar : info -> t
+          val string : info -> t
+          val tilde : info -> t
+       end)
+   :>
+   sig
+      val lexmain : Arg.symbol Streamable.t -> Arg.t
+      val skipcomment : Arg.symbol Streamable.t -> Arg.u
+   end
+=
+
 (*
 
-lexmain
+AUTOMATON LISTINGS
+==================
+
+Automaton lexmain
 initial state = 19
 total states = 28
 
 -----
 
-lexmain
-state 18 (final:number):
+lexmain state 18 (final:number):
 
 48-57 => state 18   (final:number)
 
 -----
 
-lexmain
-state 19 (initial, final:error):
+lexmain state 19 (initial, final:error):
 
 9-10 => state 24   (final:skip)
 13 => state 24   (final:skip)
@@ -42,22 +98,19 @@ EOS => state 17   (sink:eof)
 
 -----
 
-lexmain
-state 20 (final:star):
+lexmain state 20 (final:star):
 
 42 => state 1   (sink:starstar)
 
 -----
 
-lexmain
-state 21 (final:slash):
+lexmain state 21 (final:slash):
 
 42 => state 13   (sink:lcomment)
 
 -----
 
-lexmain
-state 22 (final:ident):
+lexmain state 22 (final:ident):
 
 39 => state 22   (final:ident)
 48-57 => state 22   (final:ident)
@@ -67,15 +120,13 @@ state 22 (final:ident):
 
 -----
 
-lexmain
-state 23 (final:equal):
+lexmain state 23 (final:equal):
 
 62 => state 14   (sink:arrow)
 
 -----
 
-lexmain
-state 24 (final:skip):
+lexmain state 24 (final:skip):
 
 9-10 => state 24   (final:skip)
 13 => state 24   (final:skip)
@@ -83,8 +134,7 @@ state 24 (final:skip):
 
 -----
 
-lexmain
-state 25:
+lexmain state 25:
 
 0-33 => state 25
 34 => state 2   (sink:string)
@@ -92,35 +142,31 @@ state 25:
 
 -----
 
-lexmain
-state 26:
+lexmain state 26:
 
 33-126 => state 6   (sink:char)
 
 -----
 
-lexmain
-state 27:
+lexmain state 27:
 
 61 => state 9   (sink:geq)
 
 =====
 
-skipcomment
+Automaton skipcomment
 initial state = 5
 total states = 7
 
 -----
 
-skipcomment
-state 4 (final:comment_skip):
+skipcomment state 4 (final:comment_skip):
 
 42 => state 3   (sink:comment_open)
 
 -----
 
-skipcomment
-state 5 (initial, final:comment_error):
+skipcomment state 5 (initial, final:comment_error):
 
 0-41 => state 1   (sink:comment_skip)
 42 => state 6   (final:comment_skip)
@@ -130,49 +176,12 @@ state 5 (initial, final:comment_error):
 
 -----
 
-skipcomment
-state 6 (final:comment_skip):
+skipcomment state 6 (final:comment_skip):
 
 47 => state 2   (sink:comment_close)
 
 *)
 
-functor LexMainFun (structure Streamable : STREAMABLE
-structure Arg : sig
-type symbol
-val ord : symbol -> int
-type t
-type u
-val ampersand : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
-val arrow : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
-val bar : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
-val char : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
-val colon : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
-val comment_close : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> u
-val comment_error : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> u
-val comment_open : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> u
-val comment_skip : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> u
-val dot : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
-val eof : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
-val equal : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
-val error : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
-val geq : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
-val ident : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
-val lcomment : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
-val lparen : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
-val minus : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
-val number : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
-val plus : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
-val question : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
-val rparen : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
-val skip : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
-val slash : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
-val star : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
-val starstar : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
-val string : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
-val tilde : { match : symbol list, len : int, start : symbol Streamable.t, follow : symbol Streamable.t, self : {lexmain : symbol Streamable.t -> t, skipcomment : symbol Streamable.t -> u} } -> t
-end)
-=
 struct
 local
 structure LexEngine = LexEngineFun (structure Streamable = Streamable

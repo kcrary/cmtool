@@ -1,6 +1,7 @@
 
 functor MainFun (structure Parser : PARSER
-                 structure Codegen : CODEGEN) =
+                 structure Codegen : CODEGEN
+                 val extension : string) =
    struct
 
       exception Error = Process.Error
@@ -23,7 +24,7 @@ functor MainFun (structure Parser : PARSER
           end
 
       exception Quit of string
-      fun mainCmd extension (name, args) =
+      fun mainCmd (name, args) =
           let 
              (* Parse arguments *)
              val infile: string option ref = ref NONE

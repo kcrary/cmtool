@@ -1,5 +1,5 @@
 
-structure Codegen :> CODEGEN =
+structure CodegenHs :> CODEGEN =
    struct
 
       exception Error

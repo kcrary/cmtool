@@ -100,7 +100,7 @@ structure WriteAutomata
                   (
                   write "\n-----\n\n";
                   write name;
-                  write "\nstate ";
+                  write " state ";
                   write (Int.toString state);
                   writeSort " " state;
                   write ":\n\n";
@@ -124,6 +124,7 @@ structure WriteAutomata
                   loop last (state+1)
                   )
          in
+            write "Automaton ";
             write name;
             write "\ninitial state = ";
             write (Int.toString initial);
@@ -136,9 +137,12 @@ structure WriteAutomata
          end
 
       fun writeAutomata outs l =
+         (
+         TextIO.output (outs, "AUTOMATON LISTINGS\n==================\n\n");
          appSeparated
-         (fn (name, _, automaton) => writeAutomaton outs name automaton)
-         (fn () => TextIO.output (outs, "\n=====\n\n"))
-         l
+            (fn (name, _, automaton) => writeAutomaton outs name automaton)
+            (fn () => TextIO.output (outs, "\n=====\n\n"))
+            l
+         )
 
    end
