@@ -146,6 +146,8 @@ structure WriteAutomaton
          let
             fun write str = TextIO.output (outs, str)
 
+            val () = write "AUTOMATON LISTING\n=================\n\n"
+
             val lookaheadList = ref []
 
             val ctx =
