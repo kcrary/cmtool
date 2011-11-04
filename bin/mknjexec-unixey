@@ -5,9 +5,10 @@
 # Arguments:
 # $1 = SMLNJ runtime
 # $2 = Directory of binaries and heap image
+# $3 = Name of heap image
 # $3 = Name of executable (e.g. cmlex)
-cat > "$2/bin/$3" <<EOF
+cat > "$2/$4" <<EOF
 #! /bin/sh
-exec "$1" @SMLload="$2/bin/$3" @SMLdebug=/dev/null "\$@"
+exec "$1" @SMLload="$2/$3" @SMLdebug=/dev/null "\$@"
 EOF
-chmod a+x "$2/bin/$3"
+chmod a+x "$2/$4"
