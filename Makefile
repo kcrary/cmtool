@@ -21,3 +21,8 @@ win+smlnj:
 win+smlnj+hs:
 	sml export-smlnj-hs.sml
 	bin/mknjexec `which sml` `pwd`/bin cmlex-hs.x86-win32 cmlex-hs
+
+install:
+	rm -f $(DESTDIR)/bin/cmlex.new
+	cp bin/cmlex $(DESTDIR)/bin/cmlex.new
+	mv $(DESTDIR)/bin/cmlex.new $(DESTDIR)/bin/cmlex
