@@ -1,5 +1,5 @@
 
-functor ParseMainFun
+functor ParseMainFunHs
    (structure Streamable : STREAMABLE
     structure Arg :
        sig

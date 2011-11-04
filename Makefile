@@ -6,9 +6,9 @@ all:
 .PHONY : win+smlnj
 win+smlnj:
 	sml export-smlnj.sml
-	bin/mknjexec `which sml` `pwd`/bin cmyacc.x86-win32 cmyacc
+	bin/mknjexec-win `which sml` `pwd`/bin cmyacc.x86-win32 cmyacc
 
 .PHONY : win+smlnj+hs
 win+smlnj+hs:
 	sml export-smlnj-hs.sml
-	bin/mknjexec `which sml` `pwd`/bin cmyacc-hs.x86-win32 cmyacc-hs
+	bin/mknjexec-win `which sml` `pwd`/bin cmyacc-hs.x86-win32 cmyacc-hs

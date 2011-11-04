@@ -1,3 +1,3 @@
 
 CM.make "sources.cm";
-SMLofNJ.exportFn ("bin/cmyacc", Main.mainCmd "sml");
+SMLofNJ.exportFn ("bin/cmyacc", Main.mainCmd);

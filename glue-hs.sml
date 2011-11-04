@@ -1,3 +1,4 @@
 
-structure Main = MainFun (structure Parser = Parser
-                          structure Codegen = Codegen)
+structure MainHs = MainFun (structure Parser = ParserHs
+                            structure Codegen = CodegenHs
+                            val extension = "hs")

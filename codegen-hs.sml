@@ -1,5 +1,5 @@
 
-structure Codegen
+structure CodegenHs
    :> CODEGEN
    =
    struct

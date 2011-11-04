@@ -1,5 +1,5 @@
 
-structure Token =
+structure TokenHs =
    struct
 
       type pos = int

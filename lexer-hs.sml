@@ -1,11 +1,11 @@
 
-structure Lexer
+structure LexerHs
    :> LEXER 
-      where type token = Token.token
+      where type token = TokenHs.token
    =
    struct
 
-      open Token
+      open TokenHs
 
       structure Table =
          HashTable (structure Key = StringHashable)
