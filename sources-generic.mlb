@@ -1,4 +1,4 @@
-$(SMACKAGE)/cmlib/v0/cmlib.mlb
+$(SMACKAGE)/cmlib/v1/cmlib.mlb
 
 automata.sml
 codegen.sig

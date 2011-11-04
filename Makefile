@@ -3,6 +3,15 @@ all:
 	@echo "Run 'make win+smlnj' or 'make win+smlnj+hs'".
 	@echo Other platforms coming soon.
 
+.PHONY : mlton
+mlton: 
+	mlton -output bin/cmlex cmlex.mlb
+
+.PHONY : smlnj
+smlnj:
+	sml < export-smlnj.sml
+	bin/mknjexec-unixey `which sml` `pwd` cmlex cmlex
+
 .PHONY : win+smlnj
 win+smlnj:
 	sml export-smlnj.sml

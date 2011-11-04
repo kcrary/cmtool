@@ -1,0 +1,4 @@
+description: CMlex, a lexer generator
+maintainer: Karl Crary
+keywords: lexer, lexer generator
+requires: cmlib v1
