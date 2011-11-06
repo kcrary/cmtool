@@ -46,7 +46,7 @@ install:
 	cp bin/cmlex $(DESTDIR)/bin/cmlex.new
 	mv $(DESTDIR)/bin/cmlex.new $(DESTDIR)/bin/cmlex
 
-install-hs:
+install+hs:
 	rm -f $(DESTDIR)/bin/cmlex-hs.new
 	cp bin/cmlex $(DESTDIR)/bin/cmlex-hs.new
 	mv $(DESTDIR)/bin/cmlex-hs.new $(DESTDIR)/bin/cmlex-hs

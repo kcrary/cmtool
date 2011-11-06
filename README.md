@@ -22,7 +22,7 @@ To install CM-Lex (for Standard ML)
 To install CM-Lex-HS (for Haskell)
 
     $ smackage make cmlex mlton+hs (or smlnj+hs or win+smlnj+hs)
-    $ smackage make cmlex install-hs
+    $ smackage make cmlex install+hs
     $ cmlex
     Error: not enough input files
     Usage: cmlex-hs file.cmlex [-o file.hs]
