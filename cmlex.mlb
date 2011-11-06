@@ -4,7 +4,6 @@ codegen.sml
 parsemain.cmyacc.sml
 token.sml
 
-lexer.sig
 lexer.sml
 parser.sml
 
