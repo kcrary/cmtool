@@ -24,7 +24,7 @@ functor MainFun (structure Parser : PARSER
           end
 
       exception Quit of string
-      fun mainCmd (name, args) =
+      fun mainCmd name (_, args) =
           let 
              (* Parse arguments *)
              val infile: string option ref = ref NONE
@@ -54,7 +54,7 @@ functor MainFun (structure Parser : PARSER
                    | Codegen.Error => OS.Process.failure
                    | Quit msg => 
                      (print ("Error: " ^ msg ^ "\n\
-                             \Usage: cmlex file.cmlex [-o file." ^ extension ^ "]\n\
+                             \Usage: " ^ name ^ " file.cmlex [-o file." ^ extension ^ "]\n\
                              \(Default output file is file.cmlex." ^ extension ^ ")\n")
                      ; OS.Process.failure) 
                    | exn =>  
