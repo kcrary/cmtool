@@ -1,15 +1,16 @@
-CMlex: A lexer generator for Standard ML and Haskell
+CM-Lex: A lexer generator for Standard ML and Haskell
+=====================================================
 
 Installing
-==========
-CMlex should be installed through Smackage, an ML package manager
+----------
+CM-Lex should be installed through Smackage, an ML package manager
 (see http://github.com/standardml/smackage). 
 
     $ smackage 
     $ smackage get cmlex
     $ smackage make cmlex (this will just display the various options)
 
-For CMlex (for Standard ML)
+To install CM-Lex (for Standard ML)
 
     $ smackage make cmlex mlton (or smlnj or win+smlnj)
     $ smackage make cmlex install
@@ -18,9 +19,9 @@ For CMlex (for Standard ML)
     Usage: cmlex file.cmlex [-o file.sml]
     (Default output file is file.cmlex.sml)
 
-For CMlex-HS (for Haskell)
+To install CM-Lex-HS (for Haskell)
 
-    $ smackage make cmlex mlton-hs (or smlnj or win+smlnj)
+    $ smackage make cmlex mlton+hs (or smlnj+hs or win+smlnj+hs)
     $ smackage make cmlex install-hs
     $ cmlex
     Error: not enough input files
