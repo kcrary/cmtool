@@ -1,25 +1,11 @@
-$(SMACKAGE)/cmlib/v0/cmlib.mlb
+sources-generic.mlb
 
-lexmain.cmlex.sml
+codegen.sml
 parsemain.cmyacc.sml
-syntax.sml
 token.sml
 
-automaton.sml 
-lexer.sig
 lexer.sml
-make-automaton.sig
-make-automaton.sml
-parser.sig
 parser.sml
-process.sig
-process.sml
-write-automaton.sig
-write-automaton.sml
 
-codegen.sig
-codegen.sml
-
-main.sml
-
+glue.sml
 go.sml
