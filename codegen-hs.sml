@@ -372,7 +372,7 @@ structure CodegenHs :> CODEGEN =
                actions;
 
             write " }\n\n";
-            app (writeFunctionSpec outs moduleName monadic types) functions;
+            app (fn func => (writeFunctionSpec outs moduleName monadic types func; write "\n")) functions;
 
             write "\n\n\n";
             WriteAutomata.writeAutomata outs functions;
