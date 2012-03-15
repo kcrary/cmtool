@@ -1,4 +1,3 @@
-#! /bin/sh
 #
 # Batch File Creator
 #
@@ -9,7 +8,6 @@
 # $4 = Name of executable
 v=`cygpath -w $2`
 cat > "$2/$4" <<EOF
-#! /bin/sh
 exec "$1" @SMLload="$v/$3" "\$@"
 EOF
 chmod a+x "$2/$4"
