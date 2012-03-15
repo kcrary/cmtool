@@ -33,5 +33,6 @@ popd
 
 popd
 tar czf cmtools.tgz cmtools
+rm -Rf cmtools
 
 
