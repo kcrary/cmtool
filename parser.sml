@@ -53,7 +53,6 @@ structure Parser
             val epsilon_regexp = lift Epsilon
             val empty_regexp = lift Empty
             val concat_regexp = Concat
-            val seq_regexp = Concat
             val union_regexp = Union
             val option_regexp = Optional
             val closure_regexp = Closure

@@ -36,7 +36,6 @@ functor ParseMainFun
           val closure_regexp : regexp -> regexp
           val option_regexp : regexp -> regexp
           val union_regexp : regexps -> regexp
-          val seq_regexp : regexps -> regexp
           val concat_regexp : regexps -> regexp
           val empty_regexp : unit -> regexp
           val epsilon_regexp : unit -> regexp
@@ -99,6 +98,9 @@ functor ParseMainFun
 =
 
 (*
+
+AUTOMATON LISTING
+=================
 
 State 0:
 
@@ -2011,7 +2013,7 @@ Vector.fromList [(0,1,(fn Value.string(arg0)::rest => Value.string(Arg.ident arg
 (5,1,(fn _::rest => Value.regexp(Arg.epsilon_regexp {})::rest|_=>raise (Fail "bad parser"))),
 (5,1,(fn _::rest => Value.regexp(Arg.empty_regexp {})::rest|_=>raise (Fail "bad parser"))),
 (5,4,(fn _::Value.regexps(arg0)::_::_::rest => Value.regexp(Arg.concat_regexp arg0)::rest|_=>raise (Fail "bad parser"))),
-(5,4,(fn _::Value.regexps(arg0)::_::_::rest => Value.regexp(Arg.seq_regexp arg0)::rest|_=>raise (Fail "bad parser"))),
+(5,4,(fn _::Value.regexps(arg0)::_::_::rest => Value.regexp(Arg.concat_regexp arg0)::rest|_=>raise (Fail "bad parser"))),
 (5,4,(fn _::Value.regexps(arg0)::_::_::rest => Value.regexp(Arg.union_regexp arg0)::rest|_=>raise (Fail "bad parser"))),
 (5,4,(fn _::Value.regexp(arg0)::_::_::rest => Value.regexp(Arg.option_regexp arg0)::rest|_=>raise (Fail "bad parser"))),
 (5,4,(fn _::Value.regexp(arg0)::_::_::rest => Value.regexp(Arg.closure_regexp arg0)::rest|_=>raise (Fail "bad parser"))),
