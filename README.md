@@ -10,7 +10,7 @@ CM-Yacc should be installed through Smackage, an ML package manager
     $ smackage get cmyacc
     $ smackage make cmyacc (this will just display the various options)
 
-To install CM-Lex (for Standard ML)
+To install CM-Yacc (for Standard ML)
 
     $ smackage make cmyacc mlton (or smlnj or win+smlnj)
     $ smackage make cmyacc install
