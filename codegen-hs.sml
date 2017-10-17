@@ -185,7 +185,7 @@ structure CodegenHs :> CODEGEN =
             if monadic then
                write "monad\n"
             else
-               write "Control.Monad.Identity.Identity\n";
+               write "Data.Functor.Identity.Identity\n";
             writeSpaces outs (String.size name + 4);
             write "=> ";
             write moduleName;
@@ -227,7 +227,7 @@ structure CodegenHs :> CODEGEN =
             if monadic then
                ()
             else
-               write "Control.Monad.Identity.runIdentity $ ";
+               write "Data.Functor.Identity.runIdentity $ ";
             write "LexEngine.lex (";
             write moduleName;
             write ".ord arg, ";
@@ -257,7 +257,7 @@ structure CodegenHs :> CODEGEN =
                appArraySeparated
                   (fn action => 
                       (
-                      write "Control.Monad.Identity.Identity . "; 
+                      write "Data.Functor.Identity.Identity . "; 
                       write moduleName;
                       write ".";
                       write action;
@@ -392,11 +392,11 @@ structure CodegenHs :> CODEGEN =
                    ))
                functions;
 
-            write ") where {\nimport qualified Array;\nimport qualified Char;\n";
+            write ") where {\nimport qualified Data.Array as Array;\nimport qualified Data.Char as Char;\n";
             if monadic then
                ()
             else
-               write "import qualified Control.Monad.Identity;\n";
+               write "import qualified Data.Functor.Identity;\n";
             write "import qualified Data.ByteString;\nimport qualified Data.ByteString.Char8;\nimport qualified Util.LexEngine as LexEngine;\ndata Arg stream ";
             if monadic then
                write "monad "
