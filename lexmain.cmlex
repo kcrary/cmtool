@@ -1,0 +1,44 @@
+name LexMainFun
+alphabet 128
+
+set alpha = (range 'a 'z 'A 'Z)
+set digit = (range '0 '9)
+set alphanumeric = (| alpha digit '_ '')
+set white = (| 32 9 10 13)  /* space, tab, lf, cr */
+set printable = (range '! '~)
+set not_dquote = (~ '")
+
+regexp ident = (seq alpha (* alphanumeric))
+regexp ws = (+ white)
+
+function lexmain : t =
+   eos => eof
+   ident => ident
+   (+ digit) => number
+   ws => skip
+   (seq '' printable) => char
+   "/*" => lcomment
+   (seq '" (* not_dquote) '") => string
+   '& => ampersand
+   "=>" => arrow
+   '| => bar
+   ': => colon
+   '. => dot
+   '= => equal
+   '( => lparen
+   '- => minus
+   '+ => plus
+   '? => question
+   ') => rparen
+   '/ => slash
+   '* => star
+   "**" => starstar
+   ">=" => geq
+   '~ => tilde
+   epsilon => error
+
+function skipcomment : u =
+   "/*" => comment_open
+   "*/" => comment_close
+   any => comment_skip
+   epsilon => comment_error

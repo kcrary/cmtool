@@ -1,0 +1,27 @@
+Group
+        source(-)
+        library($CMLIB/cmlib.cm)
+is
+        (* Not specific to any language. *)
+        automata.sml
+        codegen.sig
+        determinize.sig
+        determinize.sml
+        lexer.sig
+        lexmain.cmlex.sml
+        main.sml
+        make-automaton.sig
+        make-automaton.sml
+        make-nfa.sig
+        make-nfa.sml
+        parser.sig
+        process.sig
+        process.sml
+        regexp.sml
+        reverse-dfa.sig
+        reverse-dfa.sml
+        syntax.sml
+        write-automata.sig
+        write-automata.sml
+        
+        $CMLIB/cmlib.cm

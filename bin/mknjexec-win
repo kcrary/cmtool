@@ -1,0 +1,13 @@
+#
+# Batch File Creator
+#
+# Arguments:
+# $1 = SMLNJ runtime
+# $2 = Directory of binaries and heap image
+# $3 = Name of heap image
+# $4 = Name of executable
+v=`cygpath -w $2`
+cat > "$2/$4" <<EOF
+exec "$1" @SMLload="$v/$3" "\$@"
+EOF
+chmod a+x "$2/$4"

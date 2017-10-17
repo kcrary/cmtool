@@ -1,0 +1,106 @@
+name ParseMainFunHs
+
+terminal LIDENT of string
+terminal UIDENT of string
+terminal NUMBER of int
+terminal STRING of intlist
+terminal ALPHABET
+terminal AND
+terminal ANY
+terminal ARROW
+terminal COLON
+terminal DOT
+terminal EOS
+terminal EMPT
+terminal EPSILON
+terminal EQUAL
+terminal FUNCTION
+terminal GEQ
+terminal LPAREN
+terminal MINUS
+terminal MONADIC
+terminal NAME
+terminal OR
+terminal PLUS
+terminal QUESTION
+terminal RANGE
+terminal REGEXP
+terminal REPEAT
+terminal RPAREN
+terminal SEQ
+terminal SET
+terminal STAR
+terminal TILDE
+
+
+nonterminal Ident : string =
+   1:LIDENT => ident
+
+nonterminal Number : int =
+   1:NUMBER => number
+
+nonterminal NumPairs : numpairs =
+   => nil_numpairs
+   1:Number 2:Number 3:NumPairs => cons_numpairs
+
+nonterminal Charset : charset =
+   1:Ident => ident_charset
+   1:Number => number_charset
+   LPAREN RANGE 1:NumPairs RPAREN => range_charset
+   EMPT => empty_charset
+   LPAREN OR 1:Charsets RPAREN => union_charset
+   LPAREN AND 1:Charsets RPAREN => intersect_charset
+   LPAREN MINUS 1:Charset 2:Charsets RPAREN => diff_charset
+   LPAREN TILDE 1:Charsets RPAREN => comp_charset
+   ANY => any_charset
+
+nonterminal Charsets : charsets =
+   => nil_charsets
+   1:Charset 2:Charsets => cons_charsets
+   
+nonterminal Regexp : regexp =
+   1:Ident => ident_regexp
+   1:Number => number_regexp
+   1:STRING => string_regexp
+   ANY => any_regexp
+   EPSILON => epsilon_regexp
+   EMPT => empty_regexp
+   LPAREN COLON 1:Regexps RPAREN => concat_regexp
+   LPAREN SEQ 1:Regexps RPAREN => seq_regexp
+   LPAREN OR 1:Regexps RPAREN => union_regexp
+   LPAREN QUESTION 1:Regexp RPAREN => option_regexp
+   LPAREN STAR 1:Regexp RPAREN => closure_regexp
+   LPAREN PLUS 1:Regexp RPAREN => plus_regexp
+   LPAREN EQUAL 2:Number 1:Regexp RPAREN => equal_regexp
+   LPAREN GEQ 2:Number 1:Regexp RPAREN => geq_regexp
+   LPAREN REPEAT 2:Number 3:Number 1:Regexp RPAREN => repeat_regexp
+   EOS => eos_regexp
+
+nonterminal Regexps : regexps =
+   => nil_regexps
+   1:Regexp 2:Regexps => cons_regexps
+   
+nonterminal Arm : arm =
+   1:Regexp ARROW 2:Ident => sole_arm
+
+nonterminal Arms : arms =
+   1:Arm => sing_arms
+   1:Arm 2:Arms => cons_arms
+
+nonterminal QIdent : qident =
+   1:UIDENT => sing_qident
+   1:UIDENT DOT 2:QIdent => cons_qident
+
+nonterminal Directive : directive =
+   NAME 1:QIdent => name_directive
+   MONADIC => monadic_directive
+   ALPHABET 1:Number => alphabet_directive
+   REGEXP 1:Ident EQUAL 2:Regexp => regexp_directive
+   SET 1:Ident EQUAL 2:Charset => set_directive
+   FUNCTION 1:Ident COLON 2:Ident EQUAL 3:Arms => function_directive
+
+nonterminal Directives : directives =
+   => nil_directives
+   1:Directive 2:Directives => cons_directives
+
+start Directives
