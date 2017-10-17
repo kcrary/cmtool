@@ -1,0 +1,17 @@
+$(SMACKAGE)/cmlib/v1/cmlib.mlb
+
+lexer.sig
+lexmain.cmlex.sml
+syntax.sml
+
+automaton.sml
+codegen.sig
+make-automaton.sig
+make-automaton.sml
+parser.sig
+process.sig
+process.sml
+write-automaton.sig
+write-automaton.sml
+
+main.sml
