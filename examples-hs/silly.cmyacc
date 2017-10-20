@@ -1,0 +1,18 @@
+
+name ParserFun
+
+terminal NUMBER of t
+terminal PLUS
+terminal TIMES
+
+nonterminal Factor : t =
+  1:NUMBER => number_factor
+  1:NUMBER TIMES 2:Factor => times_factor
+
+nonterminal Term : t =
+  1:Factor => factor_term
+  1:Factor PLUS 2:Term => plus_term
+
+start Term
+
+data Terminal
