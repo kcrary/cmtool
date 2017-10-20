@@ -1,4 +1,4 @@
-$(SMACKAGE)/cmlib/v1/cmlib.mlb
+../cmlib/cmlib.mlb
 
 lexer.sig
 lexmain.cmlex.sml
