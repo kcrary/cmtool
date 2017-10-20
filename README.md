@@ -15,6 +15,8 @@ instructions appear in the INSTALL file.  On Linux platforms you will
 need either MLton or Standard ML of New Jersey.  On Windows platforms
 you will need Standard ML of New Jersey.
 
+The user's manual is included here as manual.pdf.
+
 The project uses a submodule (github.com/standardml/cmlib), so it
 should be cloned using the `--recursive` option.
 
