@@ -20,5 +20,5 @@ The user's manual is included here as manual.pdf.
 The project uses a submodule (github.com/standardml/cmlib), so it
 should be cloned using the `--recursive` option.
 
-You can read more about hygienic source code generation functors at
+You can read more about hygienic source code generation using functors at
 www.cs.cmu.edu/~crary/papers/2018/cmtool.pdf.
