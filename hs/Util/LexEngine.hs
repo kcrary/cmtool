@@ -17,7 +17,7 @@ module Util.LexEngine
    ) where
 
 import qualified Data.ByteString as B
-import Array
+import Data.Array as Array
 import Util.Stream as Stream
 
 next7x1 :: Int -> B.ByteString -> Int -> Int -> Int

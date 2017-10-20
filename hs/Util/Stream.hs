@@ -10,7 +10,7 @@ module Util.Stream
    ) where
 
 import Control.Monad
-import IO
+import System.IO
 import Util.Memo
 
 
@@ -24,7 +24,7 @@ instance Show a => Show (Front a b) where
 
 
 
-newtype Monad m => Stream m a =
+newtype Stream m a =
    Stream (m (Front a (Stream m a)))
 
 

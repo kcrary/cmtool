@@ -20,7 +20,7 @@ import qualified Data.ByteString as B
 import Data.List
 import Control.Exception
 import Control.Monad
-import Array
+import Data.Array as Array
 import Util.Stream as Stream
 
 next5x1 :: B.ByteString -> Int -> Int -> Int

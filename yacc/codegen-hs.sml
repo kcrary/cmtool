@@ -228,6 +228,10 @@ structure CodegenHs
                    write "         ";
                    write typeName;
                    write " :: ";
+                   if monadic then
+                      write "monad "
+                   else
+                      ();
                    write typeName
                    ))
                (fn () => write ",\n")
@@ -269,7 +273,7 @@ structure CodegenHs
             if monadic then
                write "monad "
             else
-               write "Control.Monad.Identity.Identity ";
+               write "Data.Functor.Identity.Identity ";
             write "\n         => ";
             write moduleName;
             write ".Arg stream";
@@ -303,11 +307,11 @@ structure CodegenHs
             write moduleName;
             write ".";
             write terminalName;
-            write "(..), Arg(..), parse) where {\nimport qualified Array;\nimport qualified Control.Exception;\n";
+            write "(..), Arg(..), parse) where {\nimport qualified Data.Array as Array;\nimport qualified Control.Exception;\n";
             if monadic then
                ()
             else
-               write "import qualified Control.Monad.Identity;\n";
+               write "import qualified Data.Functor.Identity;\n";
             write "import qualified Data.ByteString;\nimport qualified Data.ByteString.Char8;\nimport qualified Util.ParseEngine as ParseEngine;\n";
             write "data ";
             write terminalName;
@@ -357,6 +361,10 @@ structure CodegenHs
                 write ",\n";
                 write typeName;
                 write " :: ";
+                if monadic then
+                   write "monad "
+                else
+                   ();
                 write typeName
                 ))
             allTypes;
@@ -390,14 +398,14 @@ structure CodegenHs
                actions;
 
             write " }\n;\n";
-            write "data VVV";
+            write "data Value";
             app (fn tp => (write " "; write tp)) allTypes;
-            write " =\nVVV\n";
+            write " =\nValue\n";
 
             S.app
                (fn tp =>
                    (
-                   write "| VVV";
+                   write "| Value";
                    write (Symbol.toValue tp);
                    write " ";
                    write (Symbol.toValue tp);
@@ -408,7 +416,7 @@ structure CodegenHs
             write ";\nterminal :: (";
             write terminalName;
             app (fn tp => (write " "; write tp)) terminalTypes;
-            write ") -> (Int, VVV";
+            write ") -> (Int, Value";
             app (fn tp => (write " "; write tp)) allTypes;
             write ");\n";
             write "terminal t = case t of {";
@@ -426,14 +434,14 @@ structure CodegenHs
                           write (Symbol.toValue terminal);
                           write " -> (";
                           write (Int.toString (D.lookup terminalOrdinals terminal));
-                          write ", VVV)"
+                          write ", Value)"
                           )
                      | SOME tp =>
                           (
                           write (Symbol.toValue terminal);
                           write " x -> (";
                           write (Int.toString (D.lookup terminalOrdinals terminal));
-                          write ", VVV";
+                          write ", Value";
                           write (Symbol.toValue tp);
                           write " x)"
                           ));
@@ -448,7 +456,7 @@ structure CodegenHs
             if monadic then
                write "monad "
             else
-               write "Control.Monad.Identity.Identity ";
+               write "Data.Functor.Identity.Identity ";
             write "=> ";
             write moduleName;
             write ".Arg stream";
@@ -475,7 +483,7 @@ structure CodegenHs
             if monadic then
                ()
             else
-               write "Control.Monad.Identity.runIdentity $ ";
+               write "Data.Functor.Identity.runIdentity $ ";
             write "ParseEngine.parse (terminal, ParseEngine.next";
             write minorSize;
             write "x";
@@ -557,7 +565,7 @@ structure CodegenHs
                                            | NONE =>
                                                 valOf (#1 (D.lookup terminals symbol)))
                                    in
-                                      write "VVV";
+                                      write "Value";
                                       write (Symbol.toValue tp);
                                       write "(arg";
                                       write (Int.toString n);
@@ -569,9 +577,11 @@ structure CodegenHs
 
                       val permutation = Array.array (len, ~1)
                    in
-                      write "rest) -> VVV";
+                      write "rest) -> Value";
                       write (Symbol.toValue (#2 (D.lookup nonterminals lhs)));
-                      write "(Test.";
+                      write "(";
+                      write moduleName;
+                      write ".";
                       write (Symbol.toValue action);
                       write " arg";
 
@@ -604,14 +614,21 @@ structure CodegenHs
                true
                rules;
 
-            write "],\n(\\ (VVV";
+            write "],\n(\\ (Value";
             write (Symbol.toValue (#2 (D.lookup nonterminals start)));
             write " x) -> x), ";
 
             if monadic then
-               write "Test.error arg"
+               (
+               write moduleName;
+               write ".error arg"
+               )
             else
-               write "return . Test.error arg";
+               (
+               write "return . ";
+               write moduleName;
+               write ".error arg"
+               );
             write ") s;\n";
 
             write "}\n";

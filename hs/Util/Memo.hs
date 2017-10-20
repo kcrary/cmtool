@@ -6,13 +6,14 @@ module Util.Memo
    ) where
 
 import Control.Monad
-import Control.Monad.Cont
+import Control.Monad.Trans.Cont
 import Control.Monad.Fix
+import Control.Monad.IO.Class
 import Control.Monad.ST
 import Data.Functor.Identity
 import Data.IORef
 import Data.STRef
-import IO
+import System.IO
 
 class Monad m => MonadMemo m where
    memo :: m a -> m (m a)
