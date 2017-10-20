@@ -1,0 +1,73 @@
+
+The CM tools are implemented in Standard ML (including the Haskell
+versions of the tools.)  For Unix platforms, there are build scripts
+usng the MLton and Standard ML of New Jersey compilers.  For Windows
+platforms, there are build scripts using Standard ML of New Jersey
+compiler.
+
+0. Install either MLton or Standard ML of New Jersey.
+
+1. Build CM-Lex for Standard ML
+
+   cd lex
+   make                  # this will just display the build options
+
+   make mlton            # build using MLton on Unix platforms
+   OR
+   make smlnj            # build using SML/NJ on Unix platforms
+   OR
+   make win+smlnj        # build using SML/NJ on Windows+Cygwin
+
+   bin/cmlex             # check to make sure it built
+   mv bin/cmlex <location where you want cmlex installed>
+   cd ..
+
+2. Build CM-Lex for Haskell
+
+   cd lex
+   make                  # this will just display the build options
+
+   make mlton+hs         # build using MLton on Unix platforms
+   OR
+   make smlnj+hs         # build using SML/NJ on Unix platforms
+   OR
+   make win+smlnj+hs     # build using SML/NJ on Windows+Cygwin
+
+   bin/cmlex-hs          # check to make sure it built
+   mv bin/cmlex-hs <location where you want cmlex-hs installed>
+   cd ..
+
+3. Build CM-Yacc for Standard ML
+
+   cd yacc
+   make                  # this will just display the build options
+
+   make mlton            # build using MLton on Unix platforms
+   OR
+   make smlnj            # build using SML/NJ on Unix platforms
+   OR
+   make win+smlnj        # build using SML/NJ on Windows+Cygwin
+
+   bin/cmyacc            # check to make sure it built
+   mv bin/cmyacc <location where you want cmyacc installed>
+   cd ..
+
+4. Build CM-Yacc for Haskell
+
+   cd yacc
+   make                  # this will just display the build options
+
+   make mlton+hs         # build using MLton on Unix platforms
+   OR
+   make smlnj+hs         # build using SML/NJ on Unix platforms
+   OR
+   make win+smlnj+hs     # build using SML/NJ on Windows+Cygwin
+
+   bin/cmyacc-hs         # check to make sure it built
+   mv bin/cmyacc-hs <location where you want cmyacc-hs installed>
+   cd ..
+
+
+Note: When using the SML/NJ compiler, the file you moved was a script
+that loads a binary image using an absolute path name.  If you delete
+or move the cmtool directory, that script will no longer work.

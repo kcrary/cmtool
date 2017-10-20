@@ -1529,96 +1529,17 @@ calc s =
 \appendix
 \section{Installation}
 
+To install CM-Lex and CM-Yacc, obtain the source code either from the
+distribution at:
 
-\begin{enumerate}
-\setcounter{enumi}{-1}
-\item
-Install either MLton or Standard ML of New Jersey.
+\begin{center}
+\url{www.cs.cmu.edu/~crary/cmtool/}
+\end{center}
 
-\item
-Download the distribution:
-
-\url{http://www.cs.cmu.edu/~crary/cmtool/cmtools.tgz}
-
-\item
-Unpack the distribution.
-
-\begin{code}
-tar xzf cmtools.tgz
-cd cmtools
-\end{code}
-
-\item
-Build CM-Lex for Standard ML.
-
-\begin{code}
-cd lex
-make                  # this will just display the build options
-
-make mlton            # build using MLton on Unix platforms
-\OR
-make smlnj            # build using SML/NJ on Unix platforms
-\OR
-make win+smlnj        # build using SML/NJ on Windows+Cygwin
-
-bin/cmlex
-mv bin/cmlex \nonterm{location where you want cmlex installed}
-cd ..
-\end{code}
-
-\item
-Build CM-Lex for Haskell.
-
-\begin{code}
-cd lex
-make                  # this will just display the build options
-
-make mlton+hs         # build using MLton on Unix platforms
-\OR
-make smlnj+hs         # build using SML/NJ on Unix platforms
-\OR
-make win+smlnj+hs     # build using SML/NJ on Windows+Cygwin
-
-bin/cmlex-hs
-mv bin/cmlex-hs \nonterm{location where you want cmlex-hs installed}
-cd ..
-\end{code}
-
-\item
-Build CM-Yacc for Standard ML.
-
-\begin{code}
-cd yacc
-make                  # this will just display the build options
-
-make mlton            # build using MLton on Unix platforms
-\OR
-make smlnj            # build using SML/NJ on Unix platforms
-\OR
-make win+smlnj        # build using SML/NJ on Windows+Cygwin
-
-bin/cmyacc
-mv bin/cmyacc \nonterm{location where you want cmyacc installed}
-cd ..
-\end{code}
-
-\item
-Build CM-Yacc for Haskell
-
-\begin{code}
-cd yacc
-make                  # this will just display the build options
-
-make mlton+hs         # build using MLton on Unix platforms
-\OR
-make smlnj+hs         # build using SML/NJ on Unix platforms
-\OR
-make win+smlnj+hs     # build using SML/NJ on Windows+Cygwin
-
-bin/cmyacc-hs
-mv bin/cmyacc-hs \nonterm{location where you want cmyacc-hs installed}
-cd ..
-\end{code}
-\end{enumerate}
+\noindent
+or from Github at \url{kcrary/cmtool}.  Then follow the instructions
+in the INSTALL file.  On Unix platforms you will need either MLton or
+Standard ML of New Jersey.  On Windows platforms you will need
+Standard ML of New Jersey.  This manual is included as \url{manual.pdf}.
 
 \end{document}
