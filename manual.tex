@@ -1,0 +1,1624 @@
+\documentclass[10pt]{article}
+\usepackage{code,url}
+
+\topmargin=0in
+\headheight=0in
+\headsep=0in
+\textheight=9in
+\oddsidemargin=0in
+\evensidemargin=0in
+\textwidth=6.5in
+
+\parindent=0in
+\parskip=10pt
+
+\title{CM-Lex and CM-Yacc User's Manual \\ \Large Version 0}
+\author{Karl Crary \\ Carnegie Mellon University}
+\date{}
+
+\newcommand{\nonterm}[1]{\mbox{$\langle${\it{}#1}$\rangle$}}
+\newcommand{\lb}{$[$}
+\newcommand{\rb}{$]$}
+\newcommand{\OR}{{\it{}or}}
+
+
+\begin{document}
+\maketitle
+
+\section{CM-Lex}
+
+CM-Lex is a lexer generator for Standard ML and Haskell.  It converts
+a specification file into an SML or Haskell source-code file that
+implements a lexer functor.  The programmer may then instantiate that
+functor with appropriate code for lexing actions to obtain a lexer.
+
+\subsection{The specification file}
+
+A CM-Lex specification consists of a series of directives:
+
+\begin{itemize}
+
+
+\item
+\cd{name \nonterm{identifier}}
+
+Specifies the name of the generated functor for SML lexers,
+and the name of the generated module for Haskell lexers.  This is
+a required directive.
+
+In Haskell specifications, the name must be a valid module
+identifier, so it must begin with a capital letter.  In SML
+specifications the name is not required to be capitalized, but it
+is standard practice in SML code to capitalize functor names
+nonetheless.
+
+\item
+\cd{alphabet \nonterm{alphabet size}}
+
+Specifies the size of the input alphabet, which must be a positive
+integer.  The generated lexer will not recognize any symbols whose
+ordinal is greater or equal to the given value.  This is a
+required directive and it must appear before any {\tt set}, {\tt regexp},
+or {\tt function} directives.
+
+\item
+\cd{set \nonterm{name} = \nonterm{charset}}
+
+Declares a character set \nonterm{name} with the definition \nonterm{charset}.
+
+\item
+\cd{regexp \nonterm{name} = \nonterm{regexp}}
+
+Declares a regular expression \nonterm{name} with the definition \nonterm{regexp}.
+
+\item
+\cd{function \nonterm{function name} : \nonterm{type name} = \nonterm{clauses}}
+
+Specifies a lexing function \nonterm{function name} that has type
+\nonterm{type name} and is defined by \nonterm{clauses}, where each
+clause has the form:
+
+\begin{code}
+\nonterm{regexp} => \nonterm{action name}
+\end{code}
+
+\item
+{\tt monadic}
+
+{\em Haskell specifications only:}
+Specifies that CM-Lex should generate a monadic lexer.
+\end{itemize}
+
+Comments are written ``\cd{/* {\it{}comment text} */}'' and may appear
+anywhere in the specification.  Comments may be nested.
+
+\subsubsection{Character sets and regular expressions}
+
+For the purposes of CM-Lex, symbols are identified with nonnegative
+integers.  Typically the number is the ASCII code of a character, but
+establishing the correspondence is left to the programmer.
+
+\begin{tabbing}
+\quad \= \cd{(range \nonterm{range-spec} \dots)} \quad\= \kill
+\nonterm{symbol} ::=
+\\ \>
+\nonterm{number}  \>
+the indicated number
+\\ \>
+\cd{'} \nonterm{printable character} \>
+the ASCII code of the indicated character
+\end{tabbing}
+
+Character sets and regular expressions are specified using the Scheme
+Shell's SRE notation:
+
+\begin{tabbing}
+\quad \= \cd{(range \nonterm{range-spec} \dots)} \quad\= \kill
+\nonterm{charset} ::=
+\\[1ex] \>
+\nonterm{identifier} \>
+the indicated character set
+\\[1ex] \>
+\nonterm{symbol} \>
+the singleton set containing \nonterm{symbol}
+\\[1ex] \>
+\cd{empty} \>
+the empty set
+\\[1ex] \>
+\cd{any} \>
+the universal set (all symbols up to $N-1$, where $N$ is the alphabet size)
+\\[1ex] \>
+\cd{(or \nonterm{charset} \dots)} \>
+set union
+\\ \>
+\cd{(| \nonterm{charset} \dots)}
+\\[1ex] \>
+\cd{(and \nonterm{charset} \dots)} \>
+set intersection
+\\ \>
+\cd{(& \nonterm{charset} \dots)}
+\\[1ex] \>
+\cd{(- \nonterm{charset} \dots)} \>
+set difference: the first set minus all the following sets
+\\[1ex] \>
+\cd{(\char"7E{} \nonterm{charset} \dots)} \>
+set complement: equivalent to (- any (or \nonterm{charset} \dots))
+\\[1ex] \>
+\cd{(range \nonterm{range-spec} \dots)} \>
+union of the specified ranges
+\\ \>
+\cd{(/ \nonterm{range-spec} \dots)}
+\end{tabbing}
+
+\begin{tabbing}
+\quad \= \cd{(range \nonterm{range-spec} \dots)} \quad\= \kill
+\nonterm{range-spec} ::=
+\\ \>
+\nonterm{symbol1} \nonterm{symbol2} \>
+the range of symbols from \nonterm{symbol1} to \nonterm{symbol2} (inclusive)
+\end{tabbing}
+
+\begin{tabbing}
+\quad \= \cd{(** \nonterm{number1} \nonterm{number2} \nonterm{regexp})} \quad\= \kill
+\nonterm{regexp} ::=
+\\[1ex] \>
+\nonterm{identifier} \>
+the indicated character set or regular expression
+\\[1ex] \>
+\nonterm{symbol} \>
+match the indicated symbol
+\\[1ex] \>
+\cd{any} \>
+match any character
+\\[1ex] \>
+\cd{epsilon} \>
+match the empty string
+\\[1ex] \>
+\cd{empty} \>
+match nothing
+\\[1ex] \>
+\cd{eos} \>
+match end-of-stream
+\\[1ex] \>
+\cd{" \nonterm{string} "} \>
+
+\parbox[t]{4in}{match the indicated string: that is, the sequence of symbols given by
+the ASCII codes of the characters of \nonterm{string} (the string can \\
+contain any printable character other than a quotation mark)}
+\\[1ex] \>
+\cd{(seq \nonterm{regexp} \dots)} \>
+concatenation
+\\ \>
+\cd{(: \nonterm{regexp} \dots)}
+\\[1ex] \>
+\cd{(or \nonterm{regexp} \dots)} \>
+choice
+\\ \>
+\cd{(| \nonterm{regexp} \dots)}
+\\[1ex] \>
+\cd{(? \nonterm{regexp})} \>
+zero or one matches
+\\[1ex] \>
+\cd{(* \nonterm{regexp})} \>
+zero or more matches
+\\[1ex] \>
+\cd{(+ \nonterm{regexp})} \>
+one or more matches
+\\[1ex] \>
+\cd{(= \nonterm{number} \nonterm{regexp})} \>
+exactly \nonterm{number} matches
+\\[1ex] \>
+\cd{(>= \nonterm{number} \nonterm{regexp})} \>
+at least \nonterm{number} matches
+\\[1ex] \>
+\cd{(** \nonterm{number1} \nonterm{number2} \nonterm{regexp})} \>
+between \nonterm{number1} and \nonterm{number2} matches (inclusive)
+\end{tabbing}
+
+
+\subsubsection{Function specifications}
+
+A lexing function is specified by the directive:
+
+\begin{code}
+function \nonterm{function name} : \nonterm{type name} =
+   \nonterm{regexp} => \nonterm{action}
+   \dots
+\end{code}
+
+This generates a function named \nonterm{function name} with return type
+\nonterm{type name}.  That function finds the longest prefix of its input
+stream that matches any of the given regular expressions and activates
+the corresponding action.  If the longest possible match matches two
+different regular expressions, CM-Lex prefers the one that appears
+earlier.
+
+If a function is inexhaustive ({\em i.e.,} if it is possible for an input
+stream to satisfy none of the regular expressions), CM-Lex adds a
+default action that raises an exception.  The programmer can add an
+explicit default action by adding a clause \cd{epsilon => my_default}
+to the end of the clause list.  This ensures that the function is
+exhaustive, because it always can at least match the empty prefix.
+
+An action name can be used more than once, either in the same function
+specification, or even in different function specifications, provided
+that the functions have the same return type.
+
+
+\subsection{Invocation}
+
+CM-Lex is invoked from the command line with the specification file's
+name as its argument.  The desired output file name can be specified
+with the \cd{-o} flag.  Otherwise, the output file name is derived from from
+the input file name by appending the appropriate suffix.
+
+\begin{code}
+cmlex foo.cmlex               # generates foo.cmlex.sml
+cmlex foo.cmlex -o bar.sml    # generates bar.sml
+
+cmlex-hs foo.cmlex            # generates foo.cmlex.hs
+cmlex-hs foo.cmlex -o bar.hs  # generates bar.hs
+\end{code}
+
+
+\subsection{Streams (Standard ML)}
+
+The generated lexer takes its input in the form of a lazy stream,
+which is a possibly-infinite list in which each element is computed
+the first time it is needed, and then memoized for future uses.
+
+A stream type is included in CM-Lib, a library packaged with CM-Lex
+and CM-Yacc.  The module Stream implements the signature {\tt STREAM}, an
+abbreviated version of which appears below:
+
+\begin{code}
+signature STREAM =
+   sig
+      type 'a stream
+      datatype 'a front = Nil | Cons of 'a * 'a stream
+
+      val front : 'a stream -> 'a front
+      val lazy : (unit -> 'a front) -> 'a stream
+   end
+\end{code}
+
+
+The {\tt front} function forces the computation of the next element of the
+stream, if any.  It returns a front, which exposes whether the stream
+is empty, and, if not, gives its next element and the remainder of the
+stream.  The {\tt lazy} function builds a stream from a thunk returning
+the stream's front.  A thunk is used so that the front need not be
+computed until the stream is forced.
+
+The {\tt STREAM} signature also includes a variety of other functions for
+building and manipulating streams.  For example, {\tt fromString} and
+{\tt fromTextInstream} build character streams that read input from a string
+and from an SML IO stream, respectively:
+
+\begin{code}
+val fromString : string -> char stream
+val fromTextInstream : TextIO.instream -> char stream
+\end{code}
+
+A lexer need not use streams, it may use any type that implements the
+type class {\tt STREAMABLE}, which specifies types that are compatible with
+the stream forcing operation, {\tt front}:
+
+\begin{code}
+signature STREAMABLE =
+   sig
+      type 'a t
+
+      datatype 'a front = Nil | Cons of 'a * 'a t
+      val front : 'a t -> 'a front
+   end
+\end{code}
+
+The canonical implementation of {\tt STREAMABLE} is {\tt
+StreamStreamable}, which implements {\tt t} as simply {\tt
+Stream.stream}.  However, the programmer may also use {\tt
+ListStreamable}, which implements {\tt t} as {\tt list}, or any other
+way he or she chooses.
+
+
+\subsection{The generated functor (Standard ML)}
+\label{sec:lex-functor-sml}
+
+CM-Lex generates a functor from the given specification file.  For example,
+consider the specification:
+
+\begin{code}
+name LexerFun
+alphabet 128
+
+function foo : t =
+  (* 'a) => astar
+
+function bar : u =
+  (* 'b) => bstar
+\end{code}
+
+
+CM-Lex generates the functor:
+
+
+\begin{strictcode}
+functor LexerFun
+   (structure Streamable : STREAMABLE
+    structure Arg :
+       sig
+          type symbol
+          val ord : symbol -> int
+
+          type t
+          type u
+
+          type self = { bar : symbol Streamable.t -> u,
+                        foo : symbol Streamable.t -> t }
+          type info = { match : symbol list,
+                        len : int,
+                        start : symbol Streamable.t,
+                        follow : symbol Streamable.t,
+                        self : self }
+
+          val astar : info -> t
+          val bstar : info -> u
+       end)
+   :>
+   sig
+      val bar : Arg.symbol Streamable.t -> Arg.u
+      val foo : Arg.symbol Streamable.t -> Arg.t
+   end
+= itdots implementation dots
+endstrictcode
+
+
+The functor takes in two arguments.  The first structure argument is
+an implementation of of the {\tt STREAMABLE} type class for the lexer to
+use.  This is typically {\tt StreamStreamable} (so {\tt Streamable.t} =
+{\tt Stream.stream}), but need not be.
+
+The second structure argument, {\tt Arg}, implements the lexer's
+actions.  First, the programmer defines the type of the symbols that
+the lexer processes.  This is typically {\tt char}, but need not be.
+Whatever symbol type is chosen, {\tt ord} gives the coercion from
+symbols to the numbers that CM-Lex uses to identify them.
+
+Next, the programmer implements the types used for the functions'
+result types.  The specification uses two type names, {\tt t} and {\tt u}, so
+the functor demands {\tt t} and {\tt u} as type arguments.
+
+Next are two type definitions we will return to in a moment, and
+finally the programmer implements the lexing actions.  The
+specification uses two action names, {\tt astar} and {\tt bstar}, so the 
+functor demands {\tt astar} and {\tt bstar} as value arguments.
+
+Since {\tt astar} was used as an action for {\tt foo}, which was declared to
+return type {\tt t}, the {\tt astar} action must return type {\tt t}.  Similarly,
+{\tt bstar} must return type {\tt u}.
+
+Once given the two structure arguments, the generated functor returns
+a structure containing the two lexing functions, {\tt foo} and {\tt bar}.
+Each one takes in an {\tt Arg.symbol Streamable.t} (typically a {\tt char
+stream}), and returns the appropriate type.
+
+\subsubsection{The match info}
+\label{sec:match-info}
+
+When a lexing action is invoked by the lexer, it is passed a record
+containing various matching information:
+
+\begin{itemize}
+\item
+{\tt match}:
+the actual symbols that were matched.
+
+\item
+{\tt len}:
+the length of match.
+
+\item
+{\tt follow}:
+the remaining stream after the matched symbols.
+
+\item
+{\tt start}:
+the stream on which the lexer was called ({\em i.e.,} beginning with the
+matched symbols).  This is useful for re-lexing some or all of the
+stream, as in Lex's {\tt yyless} directive.
+
+\item
+{\tt self}:
+a record containing the lexing functions being defined, so that
+actions can reinvoke the lexer.
+\end{itemize}
+
+Note that the lexing functor is {\em stateless}.  Nowhere does it maintain
+the current input stream.  Rather, it is the job of the programmer,
+through the lexing actions, to manage the input stream.
+
+Typically, an action calls the lexer (through the {\tt self} argument) on
+the remaining stream ({\em i.e.,} the {\tt follow} argument).  However, the
+programmer may manipulate the stream as he or she desires.  For
+example, one may push additional symbols onto the stream (as in Lex's
+{\tt yymore} directive), simply by doing so before calling the lexer.
+
+
+\subsection{Streams (Haskell)}
+
+As in Standard ML, Haskell lexers use a type class {\tt Streamable} that
+specifies types compatible with the stream forcing operation {\tt front}:
+
+\begin{code}
+data Front a b =
+   Nil 
+ | Cons a b
+
+class Monad m => Streamable s m where
+   front :: s a -> m (Front a (s a))
+\end{code}
+
+
+A type constructor {\tt s} is streamable (with an associated monad
+{\tt m}) if it provides a {\tt front} operation that takes an {\tt s
+a} and then --- in the monad {\tt m} --- returns a stream front with head {\tt
+a} and tail {\tt s a}.  This differs from the {\tt STREAMABLE} class
+in Standard ML, which makes no explicit mention of a monad since SML
+permits side-effects.
+
+One important instance is lists.  Lists are purely functional
+streamables, and thus belong to {\tt Streamable} with any monad (but
+particularly with {\tt Identity}).
+
+For effectful streams, the canonical instance is the {\tt Stream} type:
+
+\begin{code}
+newtype Stream m a =
+   Stream (m (Front a (Stream m a)))
+\end{code}
+
+For example, streams that result from reading input from a file will
+typically have the type \cd{Stream Char IO}.  Forcing such a stream
+will result in an IO effect and return a \cd{Front} containing a
+character and the rest of the stream.  The effect occurs because it
+might be necessary to read the file to obtain the next character.
+
+A {\tt Stream} can be formed from a {\tt Front} in two ways:
+
+\begin{code}
+eager :: Monad m => Front a (Stream m a) -> Stream m a
+lazy  :: MonadMemo m => m (Front a (Stream m a)) -> m (Stream m a)
+\end{code}
+
+When a front is held outright, \cd{eager} coerces it to a stream.
+However, when one has a front under a monad (the typical case for
+monadic lexers), one uses \cd{lazy}, which memoizes the monadic front
+before coercing it to a stream.  The memoization means that if the
+stream is forced more than once, the monadic operation is not
+repeated; instead the prior result is recalled.  This requires that
+the monad belong to the \cd{MonadMemo} class, which includes
+\cd{Identity}, \cd{IO}, and \cd{ST}, as well as every monad belonging
+to \cd{MonadIO}.
+
+The \cd{Stream} module contains a variety of other functions for
+building and manipulating streams.  For example, fromList and
+fromHandle build character streams that read input from a list (or
+string) and from an IO handle, respectively:
+
+\begin{code}
+fromList :: Monad m => [a] -> Stream m a
+fromHandle :: Handle -> IO (Stream IO Char)
+\end{code}
+
+
+
+\subsection{The generated functor (Haskell)}
+\label{sec:lex-functor-hs}
+
+Instantiating the generated code for Haskell is conceptually similar
+to the process for Standard ML.  However, Haskell, unlike Standard ML,
+does not support functors.  Instead, the tool generates an ersatz
+functor using polymorphic functions.  For example, again consider the
+specification from Section~\ref{sec:lex-functor-sml}:
+
+\begin{code}
+name LexerFun
+alphabet 128
+
+function foo : t =
+  (* 'a) => astar
+
+function bar : u =
+  (* 'b) => bstar
+\end{code}
+
+
+CM-Lex generates the functor:\footnote{For readability, we have
+used unqualified names, but the tool actually uses fully qualified names.}
+
+
+\begin{strictcode}
+data Arg stream symbol t u =
+   Arg { ord :: symbol -> Int,
+
+         {- type arguments -}
+         t :: t,
+         u :: u,
+
+         {- action arguments -}
+         astar :: LexInfo stream symbol -> t,
+         bstar :: LexInfo stream symbol -> u }
+
+foo :: Streamable stream Identity
+       => Arg stream symbol t u -> stream symbol -> t
+bar :: Streamable stream Identity
+       => Arg stream symbol t u -> stream symbol -> u
+endstrictcode
+
+
+To use the functor, one constructs an inhabitant of the {\tt Arg}
+type.  As in the Standard ML version, an argument contains an {\tt
+ord} function that converts symbols to integers, implementations of
+the type arguments ({\tt t} and {\tt u}) in this example, and
+implementations of the actions ({\tt astar} and {\tt bstar} in this
+example).  One then calls the functions ({\tt foo} and {\tt
+bar}) with the argument to obtain the lexing functions.
+
+The type arguments are given by dummy fields.  The terms put into the
+dummy fields are not used; their purpose is solely to specify the
+types.  Thus, they can be filled in with \cd{undefined :: T} for
+some {\tt T}.
+
+Each action is passed a {\tt LexInfo}, which is defined as follows:
+
+\begin{strictcode}
+data LexInfo stream symbol =
+   LexInfo
+   { match :: [symbol],
+     len :: Int,
+     start :: stream symbol,
+     follow :: stream symbol }
+endstrictcode
+
+The information in the {\tt LexInfo} is similar to that from
+Section~\ref{sec:match-info}.  However, note that {\tt LexInfo} does
+not include a {\tt self} field.  In Haskell a {\tt self} field is not
+necessary: since anything can call anything else, no special mechanism
+is necessary for an action to reinvoke the lexer.
+
+
+\subsubsection{Monadic lexers}
+
+If the {\tt monadic} directive is added to the specification, CM-Lex
+generates a monadic lexer.  In a monadic lexer, functor takes the
+following form:
+
+\begin{strictcode}
+data Arg stream monad symbol t u =
+   Arg { ord :: symbol -> Int,
+
+         {- type arguments -}
+         t :: monad t,
+         u :: monad u,
+
+         {- action arguments -}
+         astar :: LexInfo stream symbol -> monad t,
+         bstar :: LexInfo stream symbol -> monad u }
+
+foo :: Streamable stream monad
+       => Arg stream monad symbol t u -> stream symbol -> monad t
+bar :: Streamable stream monad
+       => Arg stream monad symbol t u -> stream symbol -> monad u
+endstrictcode
+
+Observe that the types of the actions {\tt astar} and {\tt bstar}, and
+the lexing functions {\tt foo} and {\tt bar}, now end in \cd{monad
+t} and \cd{monad u}, intead of {\tt t} and {\tt u}.
+
+A worked example of how to use this appears in Section~\ref{sec:example-hs}.
+
+
+
+\subsection{The automaton listing}
+
+In the generated file, embedded as a comment immediately after the
+functor's interface specification, is a listing of each lexing
+function's state machine.  For each lexing function, the listing gives
+the initial state and the total number of states, and for each state,
+it gives the state that results from each possible input symbol.
+Symbols that are not listed, implicitly transition to the error
+state.
+
+
+
+\section{CM-Yacc}
+
+CM-Yacc is an LALR(1) parser generator for Standard ML and Haskell.
+It converts a specification file into an SML or Haskell source-code
+file that implements a parser functor.  The programmer may then
+instantiate that functor with appropriate code for lexing actions to
+obtain a parser.
+
+
+\subsection{The specification file}
+
+A CM-Yacc specification consists of a series of directives:
+
+\begin{itemize}
+\item
+\cd{name \nonterm{identifier}}
+
+Specifies the name of the generated functor for SML parsers,
+and the name of the generated module for Haskell parsers.  This is
+a required directive.
+
+In Haskell specifications, the name must be a valid module
+identifier, so it must begin with a capital letter.  In SML
+specifications the name is not required to be capitalized, but it
+is standard practice in SML code to capitalize functor names
+nonetheless.
+
+\item
+\cd{terminal \nonterm{name} \lb of \nonterm{type name} \rb \lb \nonterm{precedence} \rb}
+
+Declares a terminal.  If the ``\cd{of \nonterm{type name}}'' form is
+used, then the terminal carries a value of type \nonterm{type name}.
+Otherwise it carries no value.  If the \nonterm{precedence} form is
+used, the terminal is marked with a precedence, which is used to
+resolve shift-reduce conflicts.
+
+\item
+\cd{nonterminal \nonterm{name} : \nonterm{type name} =
+\nonterm{production} \dots{} \nonterm{production}}
+
+Declares a nonterminal carrying a value of type \nonterm{type name}.
+The nonterminal expands using the productions in \nonterm{production
+list}.
+
+\item
+\cd{start \nonterm{name}}
+
+Indicates that the nonterminal \nonterm{name} is the start symbol.
+This is a required directive.
+
+\item
+\cd{follower \nonterm{name}}
+
+Indicates that the terminal \nonterm{name} is permitted to follow
+the start symbol.  (In other words, it is permitted to be the first
+symbol after a complete parse.)  If no followers are given, only the
+end of the stream is permitted to follow the start symbol.
+
+\item
+\cd{data \nonterm{identifier}}
+
+{\em Haskell specifications only:}
+Specifies the name that the tool should give to the datatype of
+terminals.  This is a required directive.  (In Standard ML, the
+datatype of terminals is always named \cd{terminal}.)
+
+\item
+{\tt monadic}
+
+{\em Haskell specifications only:}
+Specifies that CM-Lex should generate a monadic parser.
+\end{itemize}
+
+Comments are written ``\cd{/* {\it{}comment text} */}'' and may appear
+anywhere in the specification.  Comments may be nested.
+
+
+\subsubsection{Productions}
+
+Each production has the form:
+
+\begin{tabbing}
+\quad \= \kill
+\nonterm{production} ::=
+\\ \>
+\cd{\nonterm{right-hand-side} \cd{=>} \nonterm{action} \lb \nonterm{precedence} \rb}
+\end{tabbing}
+
+\begin{tabbing}
+\quad \= \kill
+\nonterm{right-hand-side} ::=
+\\ \>
+\cd{\nonterm{constituent} \ldots \nonterm{constituent}}
+\end{tabbing}
+
+\begin{tabbing}
+\quad \= \kill
+\nonterm{constituent} ::=
+\\ \>
+\nonterm{terminal-or-nonterminal}
+\\ \>
+\cd{\nonterm{label} : \nonterm{terminal-or-nonterminal}}
+\\ \>
+\cd{( \nonterm{constituent} )}
+\end{tabbing}
+
+\begin{tabbing}
+\quad \= \kill
+\nonterm{label} ::=
+\\ \>
+\nonterm{positive integer}
+\\ \>
+\nonterm{identifier}
+\end{tabbing}
+
+Each production gives a right-hand-side (made up of terminals and
+nonterminals) into which the nonterminal being defined can expand.
+The right-hand-side may be empty.  When a production is used, the
+action is called to convert the data carried by the right-hand-side's
+constituents into the data carried by the nonterminal.
+
+The labels on constituents determine which constituents' data are
+passed to the action.  If a constituent omits the label, it passes no
+data to the action.  If no constituents pass data to the action, the
+domain type of the action function will be {\tt unit} ({\tt ()} in
+Haskell).  Otherwise, the labels determine the action's domain type.
+
+A label is either a positive integer or an identifier.  In a single
+production, all the labels must be of the same sort ({\em i.e.,} all
+numbers or all identifiers).  If the labels are identifiers, the
+constituents' data are passed in a record, and the labels are used as
+the names of the record's fields.  If the labels are numbers, all the
+numbers from $1$ to $n$ must be used, and the action's domain is an
+$n$-tuple.  The numbers indicate the order in which the constituents'
+data appear in the tuple.  {\em Except:} If only the label $1$ is
+used, the datum is passed bare, not in a $1$-tuple.
+
+For example, with the directive:
+
+\begin{code}
+nonterminal Production : production =
+   2:Constituents ARROW 1:Ident 3:Precedence => single_production
+\end{code}
+
+\noindent
+the action \cd{single_production} has type \cd{ident * constitutents *
+precedence -> production} (assuming that \cd{Ident}, \cd{Constituents}, and
+\cd{Precedence} are declared to carry types \cd{ident},
+\cd{constitutents}, and \cd{precedence}, respectively).
+
+
+
+\subsubsection{Precedence}
+
+If precedences are used, the tool consults them to resolve
+shift-reduce conflicts.  They have the form:
+
+\begin{tabbing}
+\nonterm{precedence} ::=
+\\
+\quad \=
+{\tt precl} \nonterm{number} \quad
+\= left associative with precedence \nonterm{number}
+\\ \>
+{\tt precr} \nonterm{number} \>
+right associative with precedence \nonterm{number}
+\\ \>
+{\tt noprec} \>
+no precedence
+\end{tabbing}
+
+Precedences range from 0 to 100, with higher numbers indicating higher
+precedence ({\em i.e.,} binding more tightly).  For a terminal, a {\tt
+noprec} precedence is equivalent to omitting the precedence.  For a
+production, if no precedence is given, the production's precedence is
+inferred from the precedence of its last terminal.  A production has no precedence
+if it is given precedence {\tt noprec}, if it contains no terminals,
+or if its last terminal does not have a precedence.
+
+
+
+\subsection{Invocation}
+
+CM-Yacc is invoked from the command line with the specification file's
+name as its argument.  The desired output file name can be specified
+with the \cd{-o} flag.  Otherwise, the output file name is derived from from
+the input file name by appending the appropriate suffix.
+
+\begin{code}
+cmyacc foo.cmyacc               # generates foo.cmyacc.sml
+cmyacc foo.cmyacc -o bar.sml    # generates bar.sml
+
+cmyacc-hs foo.cmyacc            # generates foo.cmyacc.hs
+cmyacc-hs foo.cmyacc -o bar.hs  # generates bar.hs
+\end{code}
+
+
+
+\subsection{The generated functor (Standard ML)}
+\label{sec:yacc-functor-sml}
+
+CM-Yacc generates a functor from the given specification file.  For example,
+consider the specification:
+
+\begin{code}
+name ParserFun
+
+terminal NUMBER of t
+terminal PLUS
+terminal TIMES
+
+nonterminal Factor : t =
+  1:NUMBER => number_factor
+  1:NUMBER TIMES 2:Factor => times_factor
+
+nonterminal Term : t =
+  1:Factor => factor_term
+  1:Factor PLUS 2:Term => plus_term
+
+start Term
+\end{code}
+
+CM-Yacc generates the functor:
+
+\begin{strictcode}
+functor ParserFun
+   (structure Streamable : STREAMABLE
+    structure Arg :
+       sig
+          type t
+
+          val plus_term : t * t -> t
+          val factor_term : t -> t
+          val times_factor : t * t -> t
+          val number_factor : t -> t
+
+          datatype terminal =
+             NUMBER of t
+           | PLUS
+           | TIMES
+
+          val error : terminal Streamable.t -> exn
+       end)
+   :>
+   sig
+      val parse : Arg.terminal Streamable.t -> Arg.t * Arg.terminal Streamable.t
+   end
+= itdots implementation dots
+endstrictcode
+
+As with CM-Lex, the functor takes two arguments, a {\tt STREAMABLE}
+and an argument that implements the parser's actions.  The {\tt Arg}
+structure also must supply the datatype that implements terminals, and
+it must supply an error function.  The error function is called when
+the parser detects a syntax error.  It is passed the stream of
+terminals beginning with the terminal that generated the error, and it
+should return an {\tt exn}, which the parser then raises.
+
+The result of the functor is a function {\tt parse}.  It takes in a
+stream of terminals, and it returns a pair: the data carried by the
+start symbol, and the stream of terminals that follows the complete
+parse.  (If no followers are specified, the stream that follows the
+parse is always empty.)
+
+
+\subsection{The generated functor (Haskell)}
+
+The generated code is an ersatz functor, similar to the one generated
+by CM-Lex (Section~\ref{sec:lex-functor-hs}).  For example, consider
+the specification:
+
+\begin{code}
+name ParserFun
+
+terminal NUMBER of t
+terminal PLUS
+terminal TIMES
+
+nonterminal Factor : t =
+  1:NUMBER => number_factor
+  1:NUMBER TIMES 2:Factor => times_factor
+
+nonterminal Term : t =
+  1:Factor => factor_term
+  1:Factor PLUS 2:Term => plus_term
+
+start Term
+
+data Terminal
+\end{code}
+
+CM-Yacc generates the functor:\footnote{For readability, we have
+used unqualified names, but the tool actually uses fully qualified names.}
+
+\begin{strictcode}
+data Terminal t =
+   NUMBER t
+ | PLUS
+ | TIMES
+
+data Arg stream t =
+   Arg { error :: stream (Terminal t) -> SomeException,
+
+         {- type arguments -}
+         t :: t
+
+         {- action arguments -}
+         plus_term :: t -> t -> t,
+         factor_term :: t -> t,
+         times_factor :: t -> t -> t,
+         number_factor :: t -> t }
+
+parse :: Streamable stream Identity 
+         => Arg stream t -> stream (Terminal t) -> (t, stream (Terminal t))
+endstrictcode
+
+If the \cd{monadic} directive is added to the specification, CM-Yacc
+instead generates:
+
+\begin{strictcode}
+data Terminal t =
+   NUMBER t
+ | PLUS
+ | TIMES
+
+data Arg stream monad t =
+   Arg { error :: stream (Terminal t) -> monad SomeException,
+
+         {- type arguments -}
+         t :: monad t
+
+         {- action arguments -}
+         plus_term :: t -> t -> t,
+         factor_term :: t -> t,
+         times_factor :: t -> t -> t,
+         number_factor :: t -> t }
+
+parse :: Streamable stream monad 
+         => Arg stream monad t 
+               -> stream (Terminal t) -> monad (t, stream (Terminal t))
+endstrictcode
+
+A worked example of how to use this appears in
+Section~\ref{sec:example-hs}.
+
+
+
+\subsection{The automaton listing}
+
+In the generated file, embedded as a comment immediately after the
+functor's interface specification, is a listing of the parsing
+function's state machine.  Its form should be familiar to users of
+Yacc's automaton listings.
+
+The bulk of the listing is a list of the automaton's states.  For
+example:
+
+\begin{code}
+State 4:
+
+0 : Factor -> . NUMBER  / 1
+1 : Factor -> . NUMBER TIMES Factor  / 1
+2 : Term -> . Factor  / 0
+3 : Term -> . Factor PLUS Term  / 0
+3 : Term -> Factor PLUS . Term  / 0
+
+NUMBER => shift 2
+Factor => goto 1
+Term => goto 6
+\end{code}
+
+The state begins with a list of LR(1) items, each of which gives one
+scenario in which the parser could be in the state.  For example, the
+item
+
+\begin{code}
+3 : Term -> Factor PLUS . Term  / 0
+\end{code}
+
+\noindent
+means that the parser could be in the process of recognizing
+\cd{Factor PLUS Term} which it would then reduce to \cd{Term} using
+the 3rd production (counting from zero).  The dot is a cursor,
+indicating that so far it has seen
+\cd{Factor PLUS}.  The ``\cd{/ 0}'' gives the production's lookahead
+set: the set of terminals that can follow this production.
+
+The lookahead sets are given after the state listings, such as:
+
+\begin{code}
+lookahead 0 = $ 
+lookahead 1 = $ PLUS 
+\end{code}
+
+The \cd{$} is a special terminal representing the end of the stream.
+In lookahead set 0, only the end of the stream can follow the
+production.  In lookahead set 1, the \cd{PLUS} terminal can also
+follow it.
+
+The LR(1) items are given to help the user understand the parser the
+tool has constructed.  Following the LR(1) is the state's action table.
+For each terminal, the action table indicates shift, reduce, or error.
+(Error transitions are omitted from the listing.)  In a \cd{shift}~$n$
+transition, the parser consumes the terminal and transitions to state
+$n$.  In a \cd{reduce}~$n$ transition, the parser leaves the terminal on the
+stream, reduces using production $n$, and retrieves an old state from
+its stack.
+
+For example, in the state
+
+\begin{code}
+State 2:
+
+0 : Factor -> NUMBER .  / 1
+1 : Factor -> NUMBER . TIMES Factor  / 1
+
+$ => reduce 0
+PLUS => reduce 0
+TIMES => shift 5
+\end{code}
+
+\noindent
+the parser will reduce using production 0 if it sees either
+end-of-stream or \cd{PLUS}.  If it sees \cd{TIMES} it will shift it
+and transition to a state that includes the item:
+
+\begin{code}
+1 : Factor -> NUMBER TIMES . Factor  / 1
+\end{code}
+
+Following the action table is the state's goto table.  When a state is
+re-entered after a reduce, the goto table tells which state the parser
+should enter, depending on which nonterminal was just reduced.
+
+
+\subsection{Shift-reduce conflicts}
+
+When a grammar is ambiguous, an action table may list multiple
+possible actions.  For example, consider:
+
+\begin{code}
+name ParserFun
+
+terminal NUMBER of t
+terminal PLUS
+terminal TIMES precl 0
+
+nonterminal Term : t =
+  1:NUMBER => number_term
+  1:Term PLUS 2:Term => plus_term
+  1:Term TIMES 2:Term => times_factor
+
+start Term
+\end{code}
+
+The grammar is ambiguous, and it declares that \cd{TIMES} is left
+associative, but it gives no precedence for \cd{PLUS}.  Its automaton
+contains the state:
+
+\begin{code}
+State 5:
+
+1 : Term -> Term . PLUS Term  / 1
+2 : Term -> Term . TIMES Term  / 1
+2 : Term -> Term TIMES Term .  / 1
+
+$ => reduce 2
+PLUS => shift 4, reduce 2  CONFLICT
+TIMES => reduce 2, shift 3  PRECEDENCE
+\end{code}
+
+In this state, only the end-of-stream action is unambiguous.  When
+\cd{PLUS} is seen, the parser could either shift, or reduce using
+production 2.  The actual generated functor uses the first action
+listed.  When \cd{TIMES} is seen, the parser could either shift or
+reduce, but the left associativity of TIMES indicates that the parser
+should resolve the conflict in favor of the reduce.
+
+Thus, the {\tt CONFLICT} notation marks an unresolved ambiguity, while
+the {\tt PRECEDENCE} notation marks an ambiguity resolved by
+precedence.
+
+Whenever there is an unresolved shift-reduce conflict, the tool
+prefers the shift.  When there is a reduce-reduce conflict, the tool
+chooses an arbitrary production.  Reduce-reduce conflicts usually
+indicate a serious problem with the grammar, so once one has been
+detected, the tool no longer uses precedence to resolve shift-reduce
+conflicts.
+
+
+\section{A Standard ML example}
+\label{sec:example-sml}
+
+As a more realistic example, we implement a calculator that processes
+an input stream and returns its value.  For simplicity, the calculator
+stops at the first illegal character (which might be the end of the
+stream).  The lexer specification is:
+
+\begin{code}
+name CalcLexFun
+alphabet 128
+
+set digit = (range '0 '9)
+set whitechar = (or 32 9 10)  /* space, tab, lf */
+
+function lex : t =
+  (+ digit) => number
+  '+ => plus
+  '* => times
+  '( => lparen
+  ') => rparen
+  (+ whitechar) => whitespace
+
+  /* Stop at the first illegal character */
+  epsilon => eof
+\end{code}
+
+\noindent
+which generates the functor:
+
+\begin{strictcode}
+functor CalcLexFun
+   (structure Streamable : STREAMABLE
+    structure Arg :
+       sig
+          type symbol
+          val ord : symbol -> int
+
+          type t
+
+          type self = { lex : symbol Streamable.t -> t }
+          type info = { match : symbol list,
+                        len : int,
+                        start : symbol Streamable.t,
+                        follow : symbol Streamable.t,
+                        self : self }
+
+          val eof : info -> t
+          val lparen : info -> t
+          val number : info -> t
+          val plus : info -> t
+          val rparen : info -> t
+          val times : info -> t
+          val whitespace : info -> t
+       end)
+   :>
+   sig
+      val lex : Arg.symbol Streamable.t -> Arg.t
+   end
+= itdots implementation dots
+endstrictcode
+
+The parser specification is:
+
+\begin{code}
+name CalcParseFun
+
+terminal NUMBER of t
+terminal PLUS
+terminal TIMES
+terminal LPAREN
+terminal RPAREN
+
+nonterminal Atom : t =
+  1:NUMBER => number_atom
+  LPAREN 1:Term RPAREN => paren_atom
+
+nonterminal Factor : t =
+  1:Atom => atom_factor
+  1:Atom TIMES 2:Factor => times_factor
+
+nonterminal Term : t =
+  1:Factor => factor_term
+  1:Factor PLUS 2:Term => plus_term
+
+start Term
+\end{code}
+
+\noindent
+which generates the functor:
+
+\begin{strictcode}
+functor CalcParseFun
+   (structure Streamable : STREAMABLE
+    structure Arg :
+       sig
+          type t
+
+          val plus_term : t * t -> t
+          val factor_term : t -> t
+          val times_factor : t * t -> t
+          val atom_factor : t -> t
+          val paren_atom : t -> t
+          val number_atom : t -> t
+
+          datatype terminal =
+             NUMBER of t
+           | PLUS
+           | TIMES
+           | LPAREN
+           | RPAREN
+
+          val error : terminal Streamable.t -> exn
+       end)
+   :>
+   sig
+      val parse : Arg.terminal Streamable.t -> Arg.t * Arg.terminal Streamable.t
+   end
+= itdots implementation dots
+endstrictcode
+
+We then assemble the calculator as follows:
+
+\begin{bigstrictcode}
+
+structure Calculator
+  :>
+  sig
+    val calc : char Stream.stream -> int
+  end
+  =
+  struct
+     open Stream
+
+     datatype terminal =
+        NUMBER of int
+      | PLUS
+      | TIMES
+      | LPAREN
+      | RPAREN
+
+     structure Lexer =
+        CalcLexFun
+        (structure Streamable = StreamStreamable
+         structure Arg =
+            struct
+               type symbol = char
+               val ord = Char.ord
+
+               type t = terminal front
+    
+               type self = { lex : char stream -> t }
+               type info = { match : char list,
+                             follow : char stream,
+                             self : self,
+                             len : int,
+                             start : char stream }
+    
+               fun number ({ match, follow, self, ... }:info) =
+                 Cons (NUMBER (Option.valOf (Int.fromString (String.implode match))),
+                       lazy (fn () => #lex self follow))
+    
+               fun simple terminal ({ follow, self, ... }:info) =
+                 Cons (terminal, lazy (fn () => #lex self follow))
+    
+               val plus = simple PLUS
+               val times = simple TIMES
+               val lparen = simple LPAREN
+               val rparen = simple RPAREN
+    
+               fun whitespace ({ follow, self, ...}:info) =
+                 #lex self follow
+    
+               fun eof _ = Nil
+             end)
+     
+      structure Parser =
+         CalcParseFun
+         (structure Streamable = StreamStreamable
+          structure Arg =
+             struct
+               type t = int
+    
+               fun id x = x
+    
+               val number_atom = id
+               val paren_atom = id
+               val atom_factor = id
+               fun times_factor (x, y) = x * y
+               val factor_term = id
+               fun plus_term (x, y) = x + y
+    
+               datatype terminal = datatype terminal
+    
+               fun error _ = Fail "syntax error"
+             end)
+    
+      fun calc strm = #1 (Parser.parse (lazy (fn () => Lexer.lex strm)))
+  end
+endbigstrictcode
+
+
+
+\section{A Haskell example}
+\label{sec:example-hs}
+
+Here we show how to build the calculator example in Haskell.  The
+lexer specification is:
+
+\begin{code}
+name CalcLexFun
+alphabet 128
+
+set digit = (range '0 '9)
+set whitechar = (or 32 9 10)  /* space, tab, lf */
+
+function lex : t =
+  (+ digit) => number
+  '+ => plus
+  '* => times
+  '( => lparen
+  ') => rparen
+  (+ whitechar) => whitespace
+
+  /* Stop at the first illegal character */
+  epsilon => eof
+
+monadic
+\end{code}
+
+\noindent
+which generates a module exporting:
+
+\begin{strictcode}
+data Arg stream monad symbol t =
+   Arg { ord :: symbol -> Int,
+
+         {- type arguments -}
+         t :: monad t,
+
+         {- action arguments -}
+         eof :: LexEngine.LexInfo stream symbol -> monad t,
+         lparen :: LexEngine.LexInfo stream symbol -> monad t,
+         number :: LexEngine.LexInfo stream symbol -> monad t,
+         plus :: LexEngine.LexInfo stream symbol -> monad t,
+         rparen :: LexEngine.LexInfo stream symbol -> monad t,
+         times :: LexEngine.LexInfo stream symbol -> monad t,
+         whitespace :: LexEngine.LexInfo stream symbol -> monad t }
+
+lex :: LexEngine.Streamable stream monad
+       => CalcLexFun.Arg stream monad symbol t -> stream symbol -> monad t
+endstrictcode
+
+The parser specification is:
+
+\begin{code}
+name CalcParseFun
+
+terminal NUMBER of t
+terminal PLUS
+terminal TIMES
+terminal LPAREN
+terminal RPAREN
+
+nonterminal Atom : t =
+  1:NUMBER => number_atom
+  LPAREN 1:Term RPAREN => paren_atom
+
+nonterminal Factor : t =
+  1:Atom => atom_factor
+  1:Atom TIMES 2:Factor => times_factor
+
+nonterminal Term : t =
+  1:Factor => factor_term
+  1:Factor PLUS 2:Term => plus_term
+
+start Term
+
+data Terminal
+
+monadic
+\end{code}
+
+\noindent
+which generates a module exporting:
+
+\begin{strictcode}
+data Terminal t =
+   NUMBER t
+ | PLUS
+ | TIMES
+ | LPAREN
+ | RPAREN
+
+data Arg stream monad t =
+   Arg { error :: stream (Terminal t) -> monad Control.Exception.SomeException,
+
+         {- type arguments -}
+         t :: monad t
+
+         {- action arguments -}
+         plus_term :: t -> t -> t,
+         factor_term :: t -> t,
+         times_factor :: t -> t -> t,
+         atom_factor :: t -> t,
+         paren_atom :: t -> t,
+         number_atom :: t -> t }
+
+parse :: ParseEngine.Streamable stream monad 
+         => CalcParseFun.Arg stream monad t -> stream (Terminal t)
+               -> monad (t, stream (Terminal t))
+endstrictcode
+
+We then assemble the calculator as follows:
+
+\begin{bigstrictcode}
+module Calc where
+
+import Data.Char as Char
+import Control.Exception
+import Util.Stream
+import Util.LexEngine
+import CalcLexFun as Lex
+import CalcParseFun as Parse
+
+type Term = Terminal Int
+
+
+{- The lexer -}
+
+simple :: Term -> LexInfo (Stream IO) Char -> IO (Front Term (Stream IO Term))
+simple terminal info =
+   do {
+      t <- lazy (Calc.lex (follow info));
+      return (Cons terminal t)
+      }
+
+
+lexarg =
+   Lex.Arg
+      {
+      Lex.ord = Char.ord,
+
+      Lex.t = undefined :: IO (Front Term (Stream IO Term)),
+
+      Lex.number =
+         (\ info ->
+             do {
+                t <- lazy (Calc.lex (follow info));
+                return (Cons (NUMBER (read (match info))) t)
+                }),
+
+      Lex.lparen = simple LPAREN,
+      Lex.rparen = simple RPAREN,
+      Lex.plus = simple PLUS,
+      Lex.times = simple TIMES,
+
+      Lex.whitespace =
+         (\ info -> Calc.lex (follow info)),
+
+      Lex.eof =
+         (\ info -> return Nil )
+      }
+
+
+lex :: Stream IO Char -> IO (Front Term (Stream IO Term))
+lex s = Lex.lex lexarg s
+
+
+{- The parser -}
+
+newtype SyntaxError = SyntaxError (Stream IO Term)
+instance Show SyntaxError where
+   show _ = "syntax error"
+instance Exception SyntaxError
+
+
+parsearg =
+   Parse.Arg
+      {
+      Parse.error =
+         (\ s -> return (toException (SyntaxError s))),
+
+      Parse.t = undefined :: IO Int,
+
+      Parse.plus_term = (+),
+      Parse.times_factor = (*),
+
+      Parse.number_atom = id,
+      Parse.paren_atom = id,
+      Parse.atom_factor = id,
+      Parse.factor_term = id
+      }
+
+
+calc :: Stream IO Char -> IO Int
+calc s =
+   do {
+      s <- lazy (Calc.lex s);
+      (x, _) <- Parse.parse parsearg s;
+      return x
+      }
+endbigstrictcode
+
+
+\appendix
+\section{Installation}
+
+
+\begin{enumerate}
+\setcounter{enumi}{-1}
+\item
+Install either MLton or Standard ML of New Jersey.
+
+\item
+Download the distribution:
+
+\url{http://www.cs.cmu.edu/~crary/cmtool/cmtools.tgz}
+
+\item
+Unpack the distribution.
+
+\begin{code}
+tar xzf cmtools.tgz
+cd cmtools
+\end{code}
+
+\item
+Build CM-Lex for Standard ML.
+
+\begin{code}
+cd lex
+make                  # this will just display the build options
+
+make mlton            # build using MLton on Unix platforms
+\OR
+make smlnj            # build using SML/NJ on Unix platforms
+\OR
+make win+smlnj        # build using SML/NJ on Windows+Cygwin
+
+bin/cmlex
+mv bin/cmlex \nonterm{location where you want cmlex installed}
+cd ..
+\end{code}
+
+\item
+Build CM-Lex for Haskell.
+
+\begin{code}
+cd lex
+make                  # this will just display the build options
+
+make mlton+hs         # build using MLton on Unix platforms
+\OR
+make smlnj+hs         # build using SML/NJ on Unix platforms
+\OR
+make win+smlnj+hs     # build using SML/NJ on Windows+Cygwin
+
+bin/cmlex-hs
+mv bin/cmlex-hs \nonterm{location where you want cmlex-hs installed}
+cd ..
+\end{code}
+
+\item
+Build CM-Yacc for Standard ML.
+
+\begin{code}
+cd yacc
+make                  # this will just display the build options
+
+make mlton            # build using MLton on Unix platforms
+\OR
+make smlnj            # build using SML/NJ on Unix platforms
+\OR
+make win+smlnj        # build using SML/NJ on Windows+Cygwin
+
+bin/cmyacc
+mv bin/cmyacc \nonterm{location where you want cmyacc installed}
+cd ..
+\end{code}
+
+\item
+Build CM-Yacc for Haskell
+
+\begin{code}
+cd yacc
+make                  # this will just display the build options
+
+make mlton+hs         # build using MLton on Unix platforms
+\OR
+make smlnj+hs         # build using SML/NJ on Unix platforms
+\OR
+make win+smlnj+hs     # build using SML/NJ on Windows+Cygwin
+
+bin/cmyacc-hs
+mv bin/cmyacc-hs \nonterm{location where you want cmyacc-hs installed}
+cd ..
+\end{code}
+\end{enumerate}
+
+\end{document}
