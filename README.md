@@ -11,9 +11,8 @@ localizing errors correctly.
 
 CM-Lex and CM-Yacc are implemented for both Standard ML and Haskell.
 However, both versions are implemented *in* Standard ML.  Installation
-instructions appear in the INSTALL file.  On Linux platforms you will
-need either MLton or Standard ML of New Jersey.  On Windows platforms
-you will need Standard ML of New Jersey.
+instructions for Unix and Windows appear in the INSTALL file.  You
+will need either MLton or Standard ML of New Jersey.
 
 The user's manual is included here as manual.pdf.
 

@@ -1,9 +1,7 @@
 
 The CM tools are implemented in Standard ML (including the Haskell
-versions of the tools.)  For Unix platforms, there are build scripts
-usng the MLton and Standard ML of New Jersey compilers.  For Windows
-platforms, there are build scripts using Standard ML of New Jersey
-compiler.
+versions of the tools.)  For Unix and Windows platforms, there are
+build scripts using the MLton and Standard ML of New Jersey compilers.
 
 0. Install either MLton or Standard ML of New Jersey.
 
@@ -12,7 +10,7 @@ compiler.
    cd lex
    make                  # this will just display the build options
 
-   make mlton            # build using MLton on Unix platforms
+   make mlton            # build using MLton
    OR
    make smlnj            # build using SML/NJ on Unix platforms
    OR
@@ -27,7 +25,7 @@ compiler.
    cd lex
    make                  # this will just display the build options
 
-   make mlton+hs         # build using MLton on Unix platforms
+   make mlton+hs         # build using MLton
    OR
    make smlnj+hs         # build using SML/NJ on Unix platforms
    OR
@@ -42,7 +40,7 @@ compiler.
    cd yacc
    make                  # this will just display the build options
 
-   make mlton            # build using MLton on Unix platforms
+   make mlton            # build using MLton
    OR
    make smlnj            # build using SML/NJ on Unix platforms
    OR
@@ -57,7 +55,7 @@ compiler.
    cd yacc
    make                  # this will just display the build options
 
-   make mlton+hs         # build using MLton on Unix platforms
+   make mlton+hs         # build using MLton
    OR
    make smlnj+hs         # build using SML/NJ on Unix platforms
    OR
