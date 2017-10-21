@@ -25,7 +25,11 @@ functor MainFun (structure Parser : PARSER
 
       exception Quit of string
       fun mainCmd name (_, args) =
-          let 
+          let
+             val () = print "CM-Lex version "
+             val () = print Version.version
+             val () = print "\n"
+
              (* Parse arguments *)
              val infile: string option ref = ref NONE
              val outfile: string option ref = ref NONE

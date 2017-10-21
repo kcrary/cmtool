@@ -16,5 +16,6 @@ is
         syntax.sml
         write-automaton.sig
         write-automaton.sml
+        ../version.sml
 
         ../cmlib/cmlib.cm

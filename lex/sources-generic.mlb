@@ -22,4 +22,5 @@ make-automaton.sml
 process.sig
 process.sml
 
+../version.sml
 main.sml

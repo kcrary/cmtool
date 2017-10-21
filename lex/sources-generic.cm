@@ -23,5 +23,6 @@ is
         syntax.sml
         write-automata.sig
         write-automata.sml
+        ../version.sml
         
         ../cmlib/cmlib.cm

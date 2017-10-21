@@ -14,4 +14,5 @@ process.sml
 write-automaton.sig
 write-automaton.sml
 
+../version.sml
 main.sml
