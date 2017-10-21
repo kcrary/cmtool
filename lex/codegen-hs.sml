@@ -339,16 +339,17 @@ structure CodegenHs :> CODEGEN =
 
             write "=\n   Arg { ord :: symbol -> Int,\n\n         {- type arguments -}\n";
 
+            if monadic then
+               write "         monad :: Proxy.Proxy monad,\n"
+            else
+               ();
+
             app
                (fn typeName =>
                    (
                    write "         ";
                    write typeName;
-                   write " :: ";
-                   if monadic then
-                      write "monad "
-                   else
-                      ();
+                   write " :: Proxy.Proxy ";
                    write typeName;
                    write ",\n"
                    ))
@@ -392,7 +393,7 @@ structure CodegenHs :> CODEGEN =
                    ))
                functions;
 
-            write ") where {\nimport qualified Data.Array as Array;\nimport qualified Data.Char as Char;\n";
+            write ") where {\nimport qualified Data.Proxy as Proxy;\nimport qualified Data.Array as Array;\nimport qualified Data.Char as Char;\n";
             if monadic then
                ()
             else
@@ -414,16 +415,17 @@ structure CodegenHs :> CODEGEN =
 
             write "= Arg { ord :: symbol -> Int";
 
+            if monadic then
+               write ",\nmonad :: Proxy.Proxy monad"
+            else
+               ();
+
             app
             (fn typeName =>
                 (
                 write ",\n";
                 write typeName;
-                write " :: ";
-                if monadic then
-                   write "monad "
-                else
-                   ();
+                write " :: Proxy.Proxy ";
                 write typeName
                 ))
             types;

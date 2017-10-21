@@ -1,5 +1,6 @@
 module Calc where
 
+import Data.Proxy
 import Data.Char as Char
 import Control.Exception
 import Util.Stream
@@ -25,7 +26,8 @@ lexarg =
       {
       Lex.ord = Char.ord,
 
-      Lex.t = undefined :: IO (Front Term (Stream IO Term)),
+      Lex.monad = Proxy :: Proxy IO,
+      Lex.t = Proxy :: Proxy (Front Term (Stream IO Term)),
 
       Lex.number =
          (\ info ->
@@ -65,7 +67,8 @@ parsearg =
       Parse.error =
          (\ s -> return (toException (SyntaxError s))),
 
-      Parse.t = undefined :: IO Int,
+      Parse.monad = Proxy :: Proxy IO,
+      Parse.t = Proxy :: Proxy Int,
 
       Parse.plus_term = (+),
       Parse.times_factor = (*),

@@ -13,8 +13,9 @@
 \parskip=10pt
 
 \title{CM-Lex and CM-Yacc User's Manual \\ \Large
-(Tools version 1.2, Manual revision 0)}
+(Version 2.0)}
 \author{Karl Crary \\ Carnegie Mellon University}
+\date{\today}
 
 \newcommand{\nonterm}[1]{\mbox{$\langle${\it{}#1}$\rangle$}}
 \newcommand{\lb}{$[$}
@@ -533,8 +534,8 @@ function bar : u =
 \end{code}
 
 
-CM-Lex generates the functor:\footnote{For readability, we have
-used unqualified names, but the tool actually uses fully qualified names.}
+CM-Lex generates a module exporting:\footnote{For readability, we
+use unqualified names here.}
 
 
 \begin{strictcode}
@@ -542,8 +543,8 @@ data Arg stream symbol t u =
    Arg { ord :: symbol -> Int,
 
          {- type arguments -}
-         t :: t,
-         u :: u,
+         t :: Proxy t,
+         u :: Proxy u,
 
          {- action arguments -}
          astar :: LexInfo stream symbol -> t,
@@ -564,10 +565,11 @@ implementations of the actions ({\tt astar} and {\tt bstar} in this
 example).  One then calls the functions ({\tt foo} and {\tt
 bar}) with the argument to obtain the lexing functions.
 
-The type arguments are given by dummy fields.  The terms put into the
-dummy fields are not used; their purpose is solely to specify the
-types.  Thus, they can be filled in with \cd{undefined :: T} for
-some {\tt T}.
+The type arguments are given by proxy fields using the
+\cd{Data.Proxy} module in the Haskell standard library.  The terms put into the
+proxy fields are not used; their purpose is solely to specify the
+types.  They are filled in with \cd{Proxy :: Proxy T} for
+the desired {\tt T}.
 
 Each action is passed a {\tt LexInfo}, which is defined as follows:
 
@@ -590,16 +592,16 @@ is necessary for an action to reinvoke the lexer.
 \subsubsection{Monadic lexers}
 
 If the {\tt monadic} directive is added to the specification, CM-Lex
-generates a monadic lexer.  In a monadic lexer, functor takes the
-following form:
+generates a monadic lexer.  In a monadic lexer, the module contains:
 
 \begin{strictcode}
 data Arg stream monad symbol t u =
    Arg { ord :: symbol -> Int,
 
          {- type arguments -}
-         t :: monad t,
-         u :: monad u,
+         monad :: Proxy monad,
+         t :: Proxy t,
+         u :: Proxy u,
 
          {- action arguments -}
          astar :: LexInfo stream symbol -> monad t,
@@ -922,8 +924,8 @@ start Term
 data Terminal
 \end{code}
 
-CM-Yacc generates the functor:\footnote{For readability, we have
-used unqualified names, but the tool actually uses fully qualified names.}
+CM-Yacc generates a module exporting:\footnote{For readability, we
+use unqualified names here.}
 
 \begin{strictcode}
 data Terminal t =
@@ -935,7 +937,7 @@ data Arg stream t =
    Arg { error :: stream (Terminal t) -> SomeException,
 
          {- type arguments -}
-         t :: t
+         t :: Proxy t,
 
          {- action arguments -}
          plus_term :: t -> t -> t,
@@ -960,7 +962,8 @@ data Arg stream monad t =
    Arg { error :: stream (Terminal t) -> monad SomeException,
 
          {- type arguments -}
-         t :: monad t
+         monad :: Proxy monad,
+         t :: Proxy t,
 
          {- action arguments -}
          plus_term :: t -> t -> t,
@@ -1359,7 +1362,8 @@ data Arg stream monad symbol t =
    Arg { ord :: symbol -> Int,
 
          {- type arguments -}
-         t :: monad t,
+         monad :: Proxy.Proxy monad,
+         t :: Proxy.Proxy t,
 
          {- action arguments -}
          eof :: LexEngine.LexInfo stream symbol -> monad t,
@@ -1419,7 +1423,8 @@ data Arg stream monad t =
    Arg { error :: stream (Terminal t) -> monad Control.Exception.SomeException,
 
          {- type arguments -}
-         t :: monad t
+         monad :: Proxy.Proxy monad,
+         t :: Proxy.Proxy t,
 
          {- action arguments -}
          plus_term :: t -> t -> t,
@@ -1439,6 +1444,7 @@ We then assemble the calculator as follows:
 \begin{bigstrictcode}
 module Calc where
 
+import Data.Proxy
 import Data.Char as Char
 import Control.Exception
 import Util.Stream
@@ -1464,7 +1470,8 @@ lexarg =
       {
       Lex.ord = Char.ord,
 
-      Lex.t = undefined :: IO (Front Term (Stream IO Term)),
+      Lex.monad = Proxy :: Proxy IO,
+      Lex.t = Proxy :: Proxy (Front Term (Stream IO Term)),
 
       Lex.number =
          (\ info ->
@@ -1504,7 +1511,8 @@ parsearg =
       Parse.error =
          (\ s -> return (toException (SyntaxError s))),
 
-      Parse.t = undefined :: IO Int,
+      Parse.monad = Proxy :: Proxy IO,
+      Parse.t = Proxy :: Proxy Int,
 
       Parse.plus_term = (+),
       Parse.times_factor = (*),

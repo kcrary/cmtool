@@ -221,23 +221,24 @@ structure CodegenHs
             else
                ();
             write " Control.Exception.SomeException,\n\n         {- type arguments -}\n";
-            
-            appSeparated
+
+            if monadic then
+               write "         monad :: Proxy.Proxy monad,\n"
+            else
+               ();
+
+            app
                (fn typeName =>
                    (
                    write "         ";
                    write typeName;
-                   write " :: ";
-                   if monadic then
-                      write "monad "
-                   else
-                      ();
-                   write typeName
+                   write " :: Proxy.Proxy ";
+                   write typeName;
+                   write ",\n"
                    ))
-               (fn () => write ",\n")
                allTypes;
 
-            write "\n\n         {- action arguments -}\n";
+            write "\n         {- action arguments -}\n";
 
             appSeparated
                (fn (actionName, dom, cod) =>
@@ -307,7 +308,7 @@ structure CodegenHs
             write moduleName;
             write ".";
             write terminalName;
-            write "(..), Arg(..), parse) where {\nimport qualified Data.Array as Array;\nimport qualified Control.Exception;\n";
+            write "(..), Arg(..), parse) where {\nimport qualified Data.Proxy as Proxy;\nimport qualified Data.Array as Array;\nimport qualified Control.Exception;\n";
             if monadic then
                ()
             else
@@ -355,16 +356,17 @@ structure CodegenHs
                ();
             write " Control.Exception.SomeException";
             
+            if monadic then
+               write ",\nmonad :: Proxy.Proxy monad"
+            else
+               ();
+
             app
             (fn typeName =>
                 (
                 write ",\n";
                 write typeName;
-                write " :: ";
-                if monadic then
-                   write "monad "
-                else
-                   ();
+                write " :: Proxy.Proxy ";
                 write typeName
                 ))
             allTypes;
