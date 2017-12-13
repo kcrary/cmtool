@@ -3,6 +3,7 @@ structure SymbolOrdered = SymbolOrderedFun (structure Symbol = Symbol)
 structure SymbolHashable = SymbolHashableFun (structure Symbol = Symbol)
 structure SymbolDict = SplayDict (structure Key = SymbolOrdered)
 structure SymbolSet = SplaySet (structure Elem = SymbolOrdered)
+structure StringDict = SplayDict (structure Key = StringOrdered)
 
 structure Automaton =
    struct
@@ -66,7 +67,7 @@ structure Automaton =
          Symbol.symbol       (* start symbol *)
 
       type parser =
-         string SymbolDict.dict                                             (* options *)
+         string StringDict.dict                                             (* options *)
          *
          SymbolSet.set                                                      (* type arguments *)
          *

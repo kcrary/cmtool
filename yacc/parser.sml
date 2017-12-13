@@ -10,6 +10,7 @@ structure Parser =
 
       fun lift x () = x
       fun identity x = x
+      fun sing x = [x]
       fun null () = []
 
       structure Arg =
@@ -48,13 +49,19 @@ structure Parser =
             val nil_productions = null
             val cons_productions = op ::
   
+            type qident = string list
+            val sing_qident = sing
+            val cons_qident = op ::
+
             type directive = directive
-            fun name_directive str = Option (Symbol.fromValue "name", str)
+            val name_directive = Name
+            val data_directive = Data
             fun terminal_directive (ident, prec) = Terminal (ident, NONE, prec)
             fun terminal_of_directive (ident, tp, prec) = Terminal (ident, SOME tp, prec)
             val nonterminal_directive = Nonterminal
             val start_directive = Start
             val follower_directive = Follower
+            val option_directive = Option
   
             type directives = directive list
             val nil_directives = null

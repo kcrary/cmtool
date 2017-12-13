@@ -1,11 +1,31 @@
-sources-generic.mlb
+../cmlib/cmlib.mlb
 
-codegen.sml
-parsemain.cmyacc.sml
+../version.sml
+
+syntax.sml
 token.sml
-
+lexmain.cmlex.sml
+lexer.sig
 lexer.sml
+parsemain.cmyacc.sml
+parser.sig
 parser.sml
 
-glue.sml
+automaton.sml
+make-automaton.sig
+make-automaton.sml
+language.sig
+language.sml
+process.sig
+process.sml
+write-automaton.sig
+write-automaton.sml
+
+codegen-util.sig
+codegen-util.sml
+codegen.sig
+codegen-sml.sml
+codegen-hs.sml 
+
+main.sml
 go.sml

@@ -6,7 +6,9 @@ structure CodegenHs
 
       structure S = SymbolSet
       structure D = SymbolDict
+      structure SD = StringDict
 
+      open CodegenUtil
       open Automaton
 
       fun appSeparated f g l =
@@ -62,12 +64,10 @@ structure CodegenHs
             (intToChars stateSize (entry + adjust))
 
 
-      exception Error
-
       fun writeProgram outfile (options, types, terminals, nonterminals : (int list * Symbol.symbol * bool ref) D.dict, actions, automaton as (stateCount, states, rules, start)) =
          let
             val moduleName =
-                (case D.find options (Symbol.fromValue "name") of
+                (case SD.find options "name" of
                     SOME name => name
                   | NONE =>
                        (
@@ -76,7 +76,7 @@ structure CodegenHs
                        ))
 
             val terminalName =
-                (case D.find options (Symbol.fromValue "data") of
+                (case SD.find options "data" of
                     SOME name => name
                   | NONE =>
                        (
@@ -84,7 +84,7 @@ structure CodegenHs
                        raise Error
                        ))
 
-            val monadic = D.member options (Symbol.fromValue "monadic")
+            val monadic = SD.member options "monadic"
          
             val (terminalOrdinals, terminalCount) =
                D.foldl

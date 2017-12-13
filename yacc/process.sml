@@ -6,6 +6,9 @@ structure Process
 
       structure S = SymbolSet
       structure D = SymbolDict
+      structure SD = StringDict
+
+      structure L = Language
 
       open Syntax
       open Symbol
@@ -48,7 +51,7 @@ structure Process
       exception Error
 
 
-      val options      : string D.dict ref                          = ref D.empty
+      val options      : string SD.dict ref                         = ref SD.empty
       val types        : S.set ref                                  = ref S.empty
 
       (* (type carried (if any), precedence, whether it is used) *)
@@ -66,28 +69,88 @@ structure Process
       val ruleCount    : int ref                                    = ref 0
       val followers    : S.set ref                                  = ref S.empty
 
-      fun processMain l =
+
+      fun concatSeparated l separator =
+         let
+            fun loop l acc =
+               (case l of
+                   [] => rev acc
+                 | h :: t => loop t (h :: "." :: acc))
+         in
+            (case l of
+                [] => ""
+              | h :: t =>
+                   String.concat (loop t [h]))
+         end
+
+
+      fun processMain lang l =
          (case l of
              [] =>
                 ()
            | directive :: rest =>
                 (
                 (case directive of
-                    Option (name, value) =>
-                       (case D.find (!options) name of
-                           NONE =>
-                              options := D.insert (!options) name value
-                         | SOME _ =>
-                              if value = "" then
-                                 (* Nullary option, we'll allow it to be respecified. *)
-                                 ()
+                    Name longid =>
+                       if SD.member (!options) "name" then
+                          (
+                          print "Error: multiply specified functor name.\n";
+                          raise Error
+                          )
+                       else if Language.legalLongid lang longid then
+                          options := SD.insert (!options) "name" (concatSeparated longid ".")
+                       else
+                          (
+                          print "Error: illegal ";
+                          print (L.toString lang);
+                          print " functor name.\n";
+                          raise Error
+                          )
+
+                  | Data ident =>
+                       (case lang of
+                           L.HASKELL =>
+                              if SD.member (!options) "data" then
+                                 (
+                                 print "Error: multiply specified terminal type name.\n";
+                                 raise Error
+                                 )
+                              else if not (L.reserved lang ident) then
+                                 options := SD.insert (!options) "data" ident
                               else
                                  (
-                                 print "Error: multiple specification of ";
-                                 print (Symbol.toValue name);
+                                 print "Error: reserved ";
+                                 print (L.toString lang);
+                                 print " identifier ";
+                                 print ident;
                                  print ".\n";
                                  raise Error
-                                 ))
+                                 )
+
+                         | _ =>
+                              (
+                              print "Error: data specification only recognized for Haskell parsers.\n";
+                              raise Error
+                              ))
+
+                  | Option "monadic" =>
+                       (case lang of
+                           L.HASKELL =>
+                              options := SD.insert (!options) "monadic" ""
+
+                         | _ =>
+                              (
+                              print "Error: monadic specification only recognized for Haskell parsers.\n";
+                              raise Error
+                              ))
+
+                  | Option str =>
+                       (
+                       print "Error: ";
+                       print str;
+                       print " specification not recognized.\n";
+                       raise Error
+                       )
 
                   | Start name =>
                        (case !start of
@@ -112,6 +175,17 @@ structure Process
 
                   | Terminal (name, tpo, prec) =>
                        if
+                          L.reserved lang (Symbol.toValue name)
+                       then
+                          (
+                          print "Error: reserved ";
+                          print (L.toString lang);
+                          print " identifier ";
+                          print (Symbol.toValue name);
+                          print ".\n";
+                          raise Error
+                          )
+                       else if
                           D.member (!terminals) name
                           orelse
                           D.member (!nonterminals) name
@@ -139,7 +213,16 @@ structure Process
                                 (case tpo of
                                     NONE => ()
                                   | SOME tp =>
-                                       if D.member (!actions) tp then
+                                       if L.reserved lang (Symbol.toValue tp) then
+                                          (
+                                          print "Error: reserved ";
+                                          print (L.toString lang);
+                                          print " identifier ";
+                                          print (Symbol.toValue tp);
+                                          print ".\n";
+                                          raise Error
+                                          )
+                                       else if D.member (!actions) tp then
                                           (
                                           print "Error: type identifier ";
                                           print (Symbol.toValue tp);
@@ -201,7 +284,16 @@ structure Process
                             | _ =>
                                  let
                                     val () =
-                                       if D.member (!actions) tp then
+                                       if L.reserved lang (Symbol.toValue tp) then
+                                          (
+                                          print "Error: reserved ";
+                                          print (L.toString lang);
+                                          print " identifier ";
+                                          print (Symbol.toValue tp);
+                                          print ".\n";
+                                          raise Error
+                                          )
+                                       else if D.member (!actions) tp then
                                           (
                                           print "Error: type identifier ";
                                           print (Symbol.toValue tp);
@@ -229,6 +321,30 @@ structure Process
                                                              actionargs)
                                                        | Labeled (label, symbol) =>
                                                             let
+                                                               val () =
+                                                                  (case label of
+                                                                      NumericLabel _ => ()
+                                                                    | IdentLabel ident =>
+                                                                         (case lang of
+                                                                             L.SML =>
+                                                                                if L.reserved lang (Symbol.toValue ident) then
+                                                                                   (
+                                                                                   print "Error: reserved ";
+                                                                                   print (L.toString lang);
+                                                                                   print " identifier ";
+                                                                                   print (Symbol.toValue ident);
+                                                                                   print ".\n";
+                                                                                   raise Error
+                                                                                   )
+                                                                                else
+                                                                                   ()
+
+                                                                           | L.HASKELL =>
+                                                                                (
+                                                                                print "Error: named labels not permitted in Haskell parsers.\n";
+                                                                                raise Error
+                                                                                )))
+
                                                                val labelset' =
                                                                   (case (label, labelset) of
                                                                       (IdentLabel ident, Empty) =>
@@ -326,7 +442,16 @@ structure Process
                                                         false)
 
                                               val actions'' =
-                                                 if S.member (!types) action then
+                                                 if L.reserved lang (Symbol.toValue action) then
+                                                    (
+                                                    print "Error: reserved ";
+                                                    print (L.toString lang);
+                                                    print " identifier ";
+                                                    print (Symbol.toValue action);
+                                                    print ".\n";
+                                                    raise Error
+                                                    )
+                                                 else if S.member (!types) action then
                                                     (
                                                     print "Error: action identifier ";
                                                     print (Symbol.toValue action);
@@ -432,7 +557,7 @@ structure Process
                                     nonterminals := D.insert (!nonterminals) name (rev next, tp, ref false)
                                  end));
 
-                processMain rest
+                processMain lang rest
                 ))
 
 
@@ -459,7 +584,7 @@ structure Process
          let
             val () =
                (
-               options := D.empty;
+               options := SD.empty;
                types := S.empty;
                terminals := D.empty;
                nonterminals := D.empty;
@@ -470,7 +595,24 @@ structure Process
                followers := S.empty
                )
 
-            val () = processMain l
+             val (lang, l) =
+                (case l of
+                    Option "sml" :: l' => (L.SML, l')
+                  | Option "haskell" :: l' => (L.HASKELL, l')
+
+                  | [] =>
+                       (
+                       print "Error: empty specification.\n";
+                       raise Error
+                       )
+                    
+                  | _ =>
+                       (
+                       print "Error: language must be specified first.\n";
+                       raise Error
+                       ))
+
+            val () = processMain lang l
 
             val nonterminals' = !nonterminals
             val terminals' = !terminals
@@ -610,8 +752,9 @@ structure Process
                (!actions)                          
 
          in
-            (!options, !types, terminals', nonterminals', actions',
-             MakeAutomaton.makeAutomaton start' terminals' nonterminals' (!followers) (Vector.fromList rules'))
+            (lang,
+             (!options, !types, terminals', nonterminals', actions',
+              MakeAutomaton.makeAutomaton start' terminals' nonterminals' (!followers) (Vector.fromList rules')))
          end
 
    end

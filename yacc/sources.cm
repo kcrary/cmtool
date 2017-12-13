@@ -1,10 +1,30 @@
-Group is
-        (* SML specific *)
-        codegen.sml
-        glue.sml
+Group
+        source(-)
+        library(../cmlib/cmlib.cm)
+is
+        automaton.sml
+        codegen.sig
+        codegen-hs.sml
+        codegen-sml.sml
+        codegen-util.sig
+        codegen-util.sml
+        language.sig
+        language.sml
+        lexer.sig
         lexer.sml
+        lexmain.cmlex.sml
+        main.sml
+        make-automaton.sig
+        make-automaton.sml
         parsemain.cmyacc.sml
+        parser.sig
         parser.sml
+        process.sig
+        process.sml
+        syntax.sml
         token.sml
+        write-automaton.sig
+        write-automaton.sml
+        ../version.sml
 
-        sources-generic.cm
+        ../cmlib/cmlib.cm

@@ -7,8 +7,11 @@ structure Token =
       datatype token =
          IDENT of string
        | NUMBER of int
+       | OPTION of string
        | ARROW 
-       | COLON 
+       | COLON
+       | DATA
+       | DOT
        | EQUAL 
        | FOLLOWER 
        | NAME

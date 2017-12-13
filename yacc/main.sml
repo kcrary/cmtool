@@ -1,10 +1,8 @@
 
-functor MainFun (structure Parser : PARSER
-                 structure Codegen : CODEGEN
-                 val extension : string) =
+structure Main =
    struct
 
-      fun main infile outfile =
+      fun main infile outfileopt =
           let 
              val ins = TextIO.openIn infile
 
@@ -18,9 +16,21 @@ functor MainFun (structure Parser : PARSER
 
              val () = TextIO.closeIn ins
 
-             val parser = Process.process program
+             val (lang, parser) = Process.process program
+
+             val outfile =
+                (case outfileopt of
+                    SOME file => file
+                  | NONE =>
+                       OS.Path.joinBaseExt {base = infile, ext = SOME (Language.extension lang)})
           in
-             Codegen.writeProgram outfile parser
+             (case lang of
+                 Language.SML =>
+                    CodegenSml.writeProgram outfile parser
+               | Language.HASKELL =>
+                    CodegenHs.writeProgram outfile parser);
+             print outfile;
+             print " written\n"
           end
 
       exception Quit of string
@@ -47,19 +57,16 @@ functor MainFun (structure Parser : PARSER
                 case (!infile) of 
                    NONE => raise Quit "not enough input files"
                  | SOME file => file
-             val outfile = 
-                case (!outfile) of
-                   NONE => OS.Path.joinBaseExt {base = infile, ext = SOME extension}
-                 | SOME file => file
+             val outfileopt = !outfile
           in  
-             main infile outfile; OS.Process.success
+             main infile outfileopt; OS.Process.success
           end handle Process.Error => OS.Process.failure
                    | Parser.Error => OS.Process.failure
-                   | Codegen.Error => OS.Process.failure
+                   | CodegenUtil.Error => OS.Process.failure
                    | Quit msg => 
                      (print ("Error: " ^ msg ^ "\n\
-                             \Usage: " ^ name ^ " file.cmyacc [-o file." ^ extension ^ "]\n\
-                             \(Default output file is file.cmyacc." ^ extension ^ ")\n")
+                             \Usage: " ^ name ^ " <input-file> [-o <output-file>]\n\
+                             \(Default output file is <input-file>.[sml/hs])")
                      ; OS.Process.failure) 
                    | exn =>  
                      (print ("Failed with exception: " ^ exnName exn ^ "\n")

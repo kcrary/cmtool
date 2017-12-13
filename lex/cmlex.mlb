@@ -10,10 +10,10 @@ language.sml
 regexp.sml
 reverse-dfa.sig
 reverse-dfa.sml
-syntax.sml
 write-automata.sig
 write-automata.sml
 
+syntax.sml
 token.sml
 lexmain.cmlex.sml
 lexer.sig

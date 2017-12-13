@@ -1,5 +1,5 @@
 
-structure Codegen
+structure CodegenSml
    :> CODEGEN
    =
    struct
@@ -7,9 +7,9 @@ structure Codegen
       structure S = SymbolSet
       structure D = SymbolDict
 
+      open CodegenUtil
       open Automaton
 
-      exception Error
 
 
 
@@ -80,7 +80,7 @@ structure Codegen
       fun writeProgram outfile (options, types, terminals, nonterminals, actions, automaton as (stateCount, states, rules, start)) =
          let
             val functorName =
-               (case D.find options (Symbol.fromValue "name") of
+               (case StringDict.find options "name" of
                    SOME name => name
                  | NONE =>
                       (

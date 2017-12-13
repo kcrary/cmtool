@@ -12,68 +12,12 @@ structure Lexer
          
       val keywords : token option Table.table = Table.table 60
 
-      (* Illegal identifiers (most are SML reserved words). *)
-      val () =
-         List.app
-         (fn str => Table.insert keywords str NONE)
-         [
-         "abstype",
-         "andalso",
-         "as",
-         "case",
-         "datatype",
-         "do",
-         "else",
-         "end",
-         "exception",
-         "fn",
-         "fun",
-         "functor",
-         "handle",
-         "if",
-         "in",
-         "infix",
-         "infixr",
-         "include",
-         "let",
-         "local",
-         "nonfix",
-         "op",
-         "open",
-         "orelse",
-         "raise",
-         "sharing",
-         "sig",
-         "signature",
-         "struct",
-         "structure",
-         "then",
-         "val",
-         "where",
-         "while",
-         "withtype",
-         "type",
-
-         "before",
-         "div",
-         "mod",
-         "o",
-
-         "true",
-         "false",
-         "nil",
-         "ref",
-
-         "error",
-         "exn"
-         ]
-
-
       (* Reserved words in cmyacc. *)
       val () =
          List.app
          (fn (str, token) => Table.insert keywords str (SOME token))
          [
+         ("data", DATA),
          ("follower", FOLLOWER),
          ("name", NAME),
          ("nonterminal", NONTERMINAL),
@@ -82,7 +26,11 @@ structure Lexer
          ("precl", PRECL),
          ("precr", PRECR),
          ("start", START),
-         ("terminal", TERMINAL)
+         ("terminal", TERMINAL),
+
+         ("monadic", OPTION "monadic"),
+         ("sml", OPTION "sml"),
+         ("haskell", OPTION "haskell")
          ]
 
         
@@ -178,7 +126,7 @@ structure Lexer
                    
             val arrow = simple ARROW
             val colon = simple COLON
-            val dot = error
+            val dot = simple DOT
             val equal = simple EQUAL
             val lparen = simple LPAREN
             val rparen = simple RPAREN

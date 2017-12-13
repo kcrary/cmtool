@@ -1,9 +1,13 @@
+sml
 name ParseMainFun
 
 terminal IDENT of string
 terminal NUMBER of int
+terminal OPTION of string
 terminal ARROW
 terminal COLON
+terminal DATA
+terminal DOT
 terminal EQUAL
 terminal FOLLOWER
 terminal NAME
@@ -49,13 +53,19 @@ nonterminal Productions : productions =
    => nil_productions
    1:Production 2:Productions => cons_productions
 
+nonterminal QIdent : qident =
+   1:IDENT => sing_qident
+   1:IDENT DOT 2:QIdent => cons_qident
+
 nonterminal Directive : directive =
-   NAME 1:IDENT => name_directive
+   NAME 1:QIdent => name_directive
+   DATA 1:IDENT => data_directive
    TERMINAL 1:Ident 2:Precedence => terminal_directive
    TERMINAL 1:Ident OF 2:Ident 3:Precedence => terminal_of_directive
    NONTERMINAL 1:Ident COLON 2:Ident EQUAL 3:Productions => nonterminal_directive
    START 1:Ident => start_directive
    FOLLOWER 1:Ident => follower_directive
+   1:OPTION => option_directive
 
 nonterminal Directives : directives =
    => nil_directives
