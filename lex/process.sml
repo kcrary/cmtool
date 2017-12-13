@@ -559,7 +559,7 @@ structure Process
                     
                   | _ =>
                        (
-                       print "Error: language must be specified first.\n";
+                       print "Error: language must be specified first.\nBegin your specification with \"sml\" or \"haskell\".\n";
                        raise Error
                        ))
 

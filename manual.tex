@@ -39,6 +39,11 @@ A CM-Lex specification consists of a series of directives:
 
 \begin{itemize}
 
+\item
+\cd{sml} {\it or\/} \cd{haskell}
+
+Specifies the language in which the generated lexer should be
+implemented.  This is a required directive, and it must appear first.
 
 \item
 \cd{name \nonterm{identifier}}
@@ -47,11 +52,11 @@ Specifies the name of the generated functor for SML lexers,
 and the name of the generated module for Haskell lexers.  This is
 a required directive.
 
-In Haskell specifications, the name must be a valid module
-identifier, so it must begin with a capital letter.  In SML
-specifications the name is not required to be capitalized, but it
-is standard practice in SML code to capitalize functor names
-nonetheless.
+In Haskell specifications, the name must be a valid module identifier,
+so it must begin with a capital letter.  A hierarchical name is
+permitted.  In SML specifications the name is not required to be
+capitalized, but it is standard practice in SML code to capitalize
+functor names nonetheless.
 
 \item
 \cd{alphabet \nonterm{alphabet size}}
@@ -254,11 +259,9 @@ with the \cd{-o} flag.  Otherwise, the output file name is derived from from
 the input file name by appending the appropriate suffix.
 
 \begin{code}
-cmlex foo.cmlex               # generates foo.cmlex.sml
+cmlex foo.cmlex               # generates foo.cmlex.sml or foo.cmlex.hs
 cmlex foo.cmlex -o bar.sml    # generates bar.sml
-
-cmlex-hs foo.cmlex            # generates foo.cmlex.hs
-cmlex-hs foo.cmlex -o bar.hs  # generates bar.hs
+cmlex foo.cmlex -o bar.hs     # generates bar.hs
 \end{code}
 
 
@@ -329,6 +332,7 @@ CM-Lex generates a functor from the given specification file.  For example,
 consider the specification:
 
 \begin{code}
+sml
 name LexerFun
 alphabet 128
 
@@ -520,9 +524,11 @@ Instantiating the generated code for Haskell is conceptually similar
 to the process for Standard ML.  However, Haskell, unlike Standard ML,
 does not support functors.  Instead, the tool generates an ersatz
 functor using polymorphic functions.  For example, again consider the
-specification from Section~\ref{sec:lex-functor-sml}:
+specification from Section~\ref{sec:lex-functor-sml} (now as a Haskell
+specification):
 
 \begin{code}
+haskell
 name LexerFun
 alphabet 128
 
@@ -647,6 +653,13 @@ obtain a parser.
 A CM-Yacc specification consists of a series of directives:
 
 \begin{itemize}
+\item
+\cd{sml} {\it or\/} \cd{haskell}
+
+Specifies the language in which the generated parser should be
+implemented.  This is a required directive, and it must appear first.
+
+
 \item
 \cd{name \nonterm{identifier}}
 
@@ -822,11 +835,9 @@ with the \cd{-o} flag.  Otherwise, the output file name is derived from from
 the input file name by appending the appropriate suffix.
 
 \begin{code}
-cmyacc foo.cmyacc               # generates foo.cmyacc.sml
+cmyacc foo.cmyacc               # generates foo.cmyacc.sml or foo.cmyacc.hs
 cmyacc foo.cmyacc -o bar.sml    # generates bar.sml
-
-cmyacc-hs foo.cmyacc            # generates foo.cmyacc.hs
-cmyacc-hs foo.cmyacc -o bar.hs  # generates bar.hs
+cmyacc foo.cmyacc -o bar.hs     # generates bar.hs
 \end{code}
 
 
@@ -838,6 +849,7 @@ CM-Yacc generates a functor from the given specification file.  For example,
 consider the specification:
 
 \begin{code}
+sml
 name ParserFun
 
 terminal NUMBER of t
@@ -905,6 +917,7 @@ by CM-Lex (Section~\ref{sec:lex-functor-hs}).  For example, consider
 the specification:
 
 \begin{code}
+haskell
 name ParserFun
 
 terminal NUMBER of t
@@ -1133,6 +1146,7 @@ stops at the first illegal character (which might be the end of the
 stream).  The lexer specification is:
 
 \begin{code}
+sml
 name CalcLexFun
 alphabet 128
 
@@ -1189,6 +1203,7 @@ functor CalcLexFun
 The parser specification is:
 
 \begin{code}
+sml
 name CalcParseFun
 
 terminal NUMBER of t
@@ -1334,6 +1349,7 @@ Here we show how to build the calculator example in Haskell.  The
 lexer specification is:
 
 \begin{code}
+haskell
 name CalcLexFun
 alphabet 128
 
@@ -1381,6 +1397,7 @@ lex :: LexEngine.Streamable stream monad
 The parser specification is:
 
 \begin{code}
+haskell
 name CalcParseFun
 
 terminal NUMBER of t
