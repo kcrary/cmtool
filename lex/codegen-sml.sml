@@ -1,8 +1,10 @@
 
-structure Codegen :> CODEGEN =
+structure CodegenSml :> CODEGEN =
    struct
 
-      exception Error
+      open CodegenUtil
+
+      (* Ought to move common code from CodegenSml and CodegenHs into CodegenUtil. *)
 
       val () =
          if Word.wordSize < 16 then
@@ -236,16 +238,9 @@ structure Codegen :> CODEGEN =
           end
 
 
-      fun writeProgram filename (options, symbolLimit, types, actions, functions) =
+      fun writeProgram filename (parameters, symbolLimit, types, actions, functions) =
           let
-             val functorName =
-                (case StringDict.find options "name" of
-                    SOME name => name
-                  | NONE =>
-                       (
-                       print "Error: no functor name specified.\n";
-                       raise Error
-                       ))
+             val {name=functorName, options=options} = parameters
 
              val outs = TextIO.openOut filename
              fun write str = TextIO.output (outs, str)

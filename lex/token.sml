@@ -6,11 +6,13 @@ structure Token =
          IDENT of string
        | NUMBER of int
        | STRING of int list
+       | OPTION of string
        | ALPHABET
        | AND
        | ANY
        | ARROW
        | COLON
+       | DOT
        | EOS
        | EMPT
        | EPSILON

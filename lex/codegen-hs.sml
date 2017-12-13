@@ -295,18 +295,11 @@ structure CodegenHs :> CODEGEN =
          end
             
 
-      fun writeProgram filename (options, symbolLimit, types, actions, functions) =
+      fun writeProgram filename (parameters, symbolLimit, types, actions, functions) =
          let
-            val moduleName =
-                (case StringDict.find options "name" of
-                    SOME name => name
-                  | NONE =>
-                       (
-                       print "Error: no module name specified.\n";
-                       raise Error
-                       ))
+            val {name=moduleName, options=options} = parameters
 
-            val monadic = StringDict.member options "monadic"
+            val monadic = StringSet.member options "monadic"
          
             val outs = TextIO.openOut filename
             fun write str = TextIO.output (outs, str)

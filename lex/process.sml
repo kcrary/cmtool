@@ -15,6 +15,8 @@ structure Process
       structure D = StringDict
       structure SS = SymbolSet
 
+      structure L = Language
+
       open Syntax
 
       exception Error
@@ -25,7 +27,8 @@ structure Process
 
 
 
-      val options      : string D.dict ref               = ref D.empty
+      val theName      : string option ref               = ref NONE
+      val options      : S.set ref                       = ref S.empty
       val types        : S.set ref                       = ref S.empty
       val actions      : string D.dict ref               = ref D.empty
       val functions    : (string * int * (Regexp.regexp * (int * string)) list) D.dict ref = ref D.empty
@@ -274,28 +277,64 @@ structure Process
                  Regexp.String [~1])
 
 
-      fun processMain l =
+      fun concatSeparated l separator =
+         let
+            fun loop l acc =
+               (case l of
+                   [] => rev acc
+                 | h :: t => loop t (h :: "." :: acc))
+         in
+            (case l of
+                [] => ""
+              | h :: t =>
+                   String.concat (loop t [h]))
+         end
+
+
+      fun processMain lang l =
          (case l of
              [] =>
                 ()
            | directive :: rest =>
                 (
                 (case directive of
-                    Option (name, value) =>
-                       (case D.find (!options) name of
+                    Name longid =>
+                       (case !theName of
                            NONE =>
-                              options := D.insert (!options) name value
-                         | SOME _ =>
-                              if value = "" then
-                                 (* Nullary option, we'll allow it to be respecified. *)
-                                 ()
+                              if Language.legalLongid lang longid then
+                                 theName := SOME (concatSeparated longid ".")
                               else
                                  (
-                                 print "Error: multiple specification of ";
-                                 print name;
-                                 print ".\n";
+                                 print "Error: illegal ";
+                                 print (L.toString lang);
+                                 print " functor name.\n";
                                  raise Error
-                                 ))
+                                 )
+
+                         | SOME _ =>
+                              (
+                              print "Error: multiply specified functor name.\n";
+                              raise Error
+                              ))
+
+                  | Option "monadic" =>
+                       (case lang of
+                           L.HASKELL =>
+                              options := S.insert (!options) "monadic"
+
+                         | _ =>
+                              (
+                              print "Error: monadic specification only recognized for Haskell lexers.\n";
+                              raise Error
+                              ))
+
+                  | Option str =>
+                       (
+                       print "Error: ";
+                       print str;
+                       print " specification not recognized.\n";
+                       raise Error
+                       )
 
                   | Alphabet n =>
                        (case !alphabet of
@@ -329,7 +368,25 @@ structure Process
                                  end)
 
                   | Function (name, tp, arms) =>
-                       if D.member (!functions) name then
+                       if Language.reserved lang name then
+                          (
+                          print "Error: reserved ";
+                          print (L.toString lang);
+                          print " identifier ";
+                          print name;
+                          print ".\n";
+                          raise Error
+                          )
+                       else if Language.reserved lang tp then
+                          (
+                          print "Error: reserved ";
+                          print (L.toString lang);
+                          print " identifier ";
+                          print tp;
+                          print ".\n";
+                          raise Error
+                          )
+                       else if D.member (!functions) name then
                           (
                           print "Error: multiply specified function ";
                           print name;
@@ -369,6 +426,19 @@ structure Process
                                        foldl
                                        (fn ((re, action), (n, acc)) =>
                                               let
+                                                 val () =
+                                                    if Language.reserved lang action then
+                                                       (
+                                                       print "Error: reserved ";
+                                                       print (L.toString lang);
+                                                       print " identifier ";
+                                                       print action;
+                                                       print ".\n";
+                                                       raise Error
+                                                       )
+                                                    else
+                                                       ()
+
                                                  val () =
                                                     (case D.find (!actions) action of
                                                         NONE =>
@@ -464,7 +534,7 @@ structure Process
                           raise Error
                           ));
 
-                processMain rest
+                processMain lang rest
                 ))
 
 
@@ -472,7 +542,8 @@ structure Process
           let 
              val () =
                 (
-                options := D.empty;
+                theName := NONE;
+                options := S.empty;
                 types := S.empty;
                 actions := D.empty;
                 functions := D.empty;
@@ -480,9 +551,35 @@ structure Process
                 alphabet := NONE
                 )
 
-             val () = processMain l
+             val (lang, l) =
+                (case l of
+                    Option "sml" :: l' => (L.SML, l')
+                  | Option "haskell" :: l' => (L.HASKELL, l')
+
+                  | [] =>
+                       (
+                       print "Error: empty specification.\n";
+                       raise Error
+                       )
+                    
+                  | _ =>
+                       (
+                       print "Error: language must be specified first.\n";
+                       raise Error
+                       ))
+
+             val () = processMain lang l
 
              (* Post-processing *)
+
+             val name =
+                (case !theName of
+                    SOME name => name
+                  | NONE =>
+                       (
+                       print "Error: no functor name specified.\n";
+                       raise Error
+                       ))
 
              val () =
                 if D.isEmpty (!functions) then
@@ -550,8 +647,10 @@ structure Process
                 (* S.toList produces these in sorted order. *)
                 S.toList (!types)
 
+             val params = { name = name,
+                            options = !options }
           in
-             (!options, symbolLimit, types', D.toList (!actions), functions')
+             (lang, (params, symbolLimit, types', D.toList (!actions), functions'))
           end
 
    end

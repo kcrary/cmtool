@@ -12,6 +12,7 @@ structure Parser
 
       fun identity x = x
       fun lift x () = x
+      fun sing x = [x]
       fun null () = []
 
       structure Arg =
@@ -70,15 +71,20 @@ structure Parser
             val sole_arm = identity
 
             type arms = arm list
-            fun sing_arms arm = [arm]
+            val sing_arms = sing
             val cons_arms = op ::
 
+            type qident = string list
+            val sing_qident = sing
+            val cons_qident = op ::
+
             type directive = directive
-            fun name_directive str = Option ("name", str)
+            val name_directive = Name
             val alphabet_directive = Alphabet
             val regexp_directive = Regexp
             val set_directive = Set
             val function_directive = Function
+            val option_directive = Option
 
             type directives = directive list
             val nil_directives = null

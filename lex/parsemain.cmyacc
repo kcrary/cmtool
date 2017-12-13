@@ -3,11 +3,13 @@ name ParseMainFun
 terminal IDENT of string
 terminal NUMBER of int
 terminal STRING of intlist
+terminal OPTION of string
 terminal ALPHABET
 terminal AND
 terminal ANY
 terminal ARROW
 terminal COLON
+terminal DOT
 terminal EOS
 terminal EMPT
 terminal EPSILON
@@ -84,12 +86,17 @@ nonterminal Arms : arms =
    1:Arm => sing_arms
    1:Arm 2:Arms => cons_arms
 
+nonterminal QIdent : qident =
+   1:IDENT => sing_qident
+   1:IDENT DOT 2:QIdent => cons_qident
+
 nonterminal Directive : directive =
-   NAME 1:Ident => name_directive
+   NAME 1:QIdent => name_directive
    ALPHABET 1:Number => alphabet_directive
    REGEXP 1:Ident EQUAL 2:Regexp => regexp_directive
    SET 1:Ident EQUAL 2:Charset => set_directive
    FUNCTION 1:Ident COLON 2:Ident EQUAL 3:Arms => function_directive
+   1:OPTION => option_directive
 
 nonterminal Directives : directives =
    => nil_directives

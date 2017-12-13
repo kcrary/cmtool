@@ -4,6 +4,6 @@ signature PROCESS =
 
       exception Error
 
-      val process : Syntax.directive list -> Automata.lexer
+      val process : Syntax.directive list -> Language.language * Automata.lexer
 
    end

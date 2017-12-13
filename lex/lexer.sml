@@ -12,68 +12,6 @@ structure Lexer
          
       val keywords : token option Table.table = Table.table 60
 
-      (* Illegal identifiers (most are SML reserved words). *)
-      val () =
-         List.app
-         (fn str => Table.insert keywords str NONE)
-         [
-         "abstype",
-         "andalso",
-         "as",
-         "case",
-         "datatype",
-         "do",
-         "else",
-         "end",
-         "exception",
-         "fn",
-         "fun",
-         "functor",
-         "handle",
-         "if",
-         "in",
-         "infix",
-         "infixr",
-         "include",
-         "let",
-         "local",
-         "nonfix",
-         "of",
-         "op",
-         "open",
-         "orelse",
-         "raise",
-         "sharing",
-         "sig",
-         "signature",
-         "struct",
-         "structure",
-         "then",
-         "type",
-         "val",
-         "where",
-         "while",
-         "withtype",
-
-         "before",
-         "div",
-         "mod",
-         "o",
-
-         "true",
-         "false",
-         "nil",
-         "ref",
-
-         "int",
-         "list",
-         "ord",
-         "symbol",
-         "self",
-         "info"
-         ]
-
-
       (* Reserved words in cmlex. *)
       val () =
          List.app
@@ -91,7 +29,11 @@ structure Lexer
          ("range", RANGE),
          ("regexp", REGEXP),
          ("seq", SEQ),
-         ("set", SET)
+         ("set", SET),
+
+         ("monadic", OPTION "monadic"),
+         ("sml", OPTION "sml"),
+         ("haskell", OPTION "haskell")
          ]
 
         
@@ -103,8 +45,8 @@ structure Lexer
       type t = int -> (token * pos) front
       type u = int -> char stream * int
   
-      type self = { lexmain : char stream -> int -> (token * pos) front,
-                    skipcomment : char stream -> int -> char stream * int }
+      type self = { lexmain : char stream -> t,
+                    skipcomment : char stream -> u }
 
       type info = { match : char list,
                     len : int, 
@@ -205,7 +147,7 @@ structure Lexer
             val arrow = simple ARROW
             val bar = simple OR
             val colon = simple COLON
-            val dot = error
+            val dot = simple DOT
             val equal = simple EQUAL
             val lparen = simple LPAREN
             val minus = simple MINUS

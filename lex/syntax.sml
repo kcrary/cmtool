@@ -31,10 +31,11 @@ structure Syntax =
        | Eos
 
       datatype directive =
-         Option of string * string
+         Name of string list
        | Alphabet of int
        | Function of string * string * (regexp * string) list
        | Regexp of string * regexp
        | Set of string * charset
+       | Option of string
 
    end
