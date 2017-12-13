@@ -1,4 +1,0 @@
-description: CM-Yacc, a parser generator
-maintainer: Karl Crary
-keywords: parser, parser generator
-requires: cmlib v1
