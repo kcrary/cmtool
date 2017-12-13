@@ -27,8 +27,7 @@ structure Process
 
 
 
-      val theName      : string option ref               = ref NONE
-      val options      : S.set ref                       = ref S.empty
+      val options      : string D.dict ref               = ref D.empty
       val types        : S.set ref                       = ref S.empty
       val actions      : string D.dict ref               = ref D.empty
       val functions    : (string * int * (Regexp.regexp * (int * string)) list) D.dict ref = ref D.empty
@@ -299,28 +298,25 @@ structure Process
                 (
                 (case directive of
                     Name longid =>
-                       (case !theName of
-                           NONE =>
-                              if Language.legalLongid lang longid then
-                                 theName := SOME (concatSeparated longid ".")
-                              else
-                                 (
-                                 print "Error: illegal ";
-                                 print (L.toString lang);
-                                 print " functor name.\n";
-                                 raise Error
-                                 )
-
-                         | SOME _ =>
-                              (
-                              print "Error: multiply specified functor name.\n";
-                              raise Error
-                              ))
+                       if D.member (!options) "name" then
+                          (
+                          print "Error: multiply specified functor name.\n";
+                          raise Error
+                          )
+                       else if Language.legalLongid lang longid then
+                          options := D.insert (!options) "name" (concatSeparated longid ".")
+                       else
+                          (
+                          print "Error: illegal ";
+                          print (L.toString lang);
+                          print " functor name.\n";
+                          raise Error
+                          )
 
                   | Option "monadic" =>
                        (case lang of
                            L.HASKELL =>
-                              options := S.insert (!options) "monadic"
+                              options := D.insert (!options) "monadic" ""
 
                          | _ =>
                               (
@@ -542,8 +538,7 @@ structure Process
           let 
              val () =
                 (
-                theName := NONE;
-                options := S.empty;
+                options := D.empty;
                 types := S.empty;
                 actions := D.empty;
                 functions := D.empty;
@@ -571,15 +566,6 @@ structure Process
              val () = processMain lang l
 
              (* Post-processing *)
-
-             val name =
-                (case !theName of
-                    SOME name => name
-                  | NONE =>
-                       (
-                       print "Error: no functor name specified.\n";
-                       raise Error
-                       ))
 
              val () =
                 if D.isEmpty (!functions) then
@@ -647,10 +633,8 @@ structure Process
                 (* S.toList produces these in sorted order. *)
                 S.toList (!types)
 
-             val params = { name = name,
-                            options = !options }
           in
-             (lang, (params, symbolLimit, types', D.toList (!actions), functions'))
+             (lang, (!options, symbolLimit, types', D.toList (!actions), functions'))
           end
 
    end

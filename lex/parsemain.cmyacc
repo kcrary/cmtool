@@ -1,3 +1,4 @@
+sml
 name ParseMainFun
 
 terminal IDENT of string

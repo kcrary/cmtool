@@ -42,12 +42,8 @@ structure Automata =
          *
          int array          (* end-of-stream transition function *)
 
-      type parameters =
-         { name : string,
-           options : StringSet.set }
-
       type lexer =
-         parameters
+         string StringDict.dict                         (* options *)
          *
          int                                            (* alphabet size *)
          *
