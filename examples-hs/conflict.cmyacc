@@ -1,4 +1,4 @@
-
+haskell
 name ParserFun
 
 terminal NUMBER of t
@@ -11,3 +11,4 @@ nonterminal Term : t =
   1:Term TIMES 2:Term => times_factor
 
 start Term
+data Terminal

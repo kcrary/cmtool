@@ -1,6 +1,7 @@
 
 /* set output file CalcParseFun.hs */
 
+haskell
 name CalcParseFun
 
 terminal NUMBER of t

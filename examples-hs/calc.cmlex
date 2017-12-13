@@ -1,6 +1,7 @@
 
 /* set output file CalcLexFun.hs */
 
+haskell
 name CalcLexFun
 alphabet 128
 
