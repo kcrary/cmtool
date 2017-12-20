@@ -196,6 +196,17 @@ structure Process
                           print ".\n";
                           raise Error
                           )
+                       else if
+                          not (Language.legalConstructor lang (Symbol.toValue name))
+                       then
+                          (
+                          print "Error: ";
+                          print (Symbol.toValue name);
+                          print " is not a legal ";
+                          print (Language.toString lang);
+                          print " constructor.\n";
+                          raise Error
+                          )
                        else
                           let
                              val () =
@@ -338,6 +349,12 @@ structure Process
                                                                                    )
                                                                                 else
                                                                                    ()
+
+                                                                           | L.OCAML =>
+                                                                                (
+                                                                                print "Error: named labels not permitted in OCaml parsers.\n";
+                                                                                raise Error
+                                                                                )
 
                                                                            | L.HASKELL =>
                                                                                 (
@@ -599,6 +616,7 @@ structure Process
                 (case l of
                     Option "sml" :: l' => (L.SML, l')
                   | Option "haskell" :: l' => (L.HASKELL, l')
+                  | Option "ocaml" :: l' => (L.OCAML, l')
 
                   | [] =>
                        (

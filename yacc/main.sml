@@ -28,7 +28,9 @@ structure Main =
                  Language.SML =>
                     CodegenSml.writeProgram outfile parser
                | Language.HASKELL =>
-                    CodegenHs.writeProgram outfile parser);
+                    CodegenHs.writeProgram outfile parser
+               | Language.OCAML =>
+                    CodegenOcaml.writeProgram outfile parser);
              print outfile;
              print " written\n"
           end

@@ -1,8 +1,9 @@
+*.cmo
+*.cmi
+*.a
 *.aux
 *.log
 *~
 .cm
 lex/bin/cmlex-heapimg*
-lex/bin/cmlex-hs-heapimg*
 yacc/bin/cmyacc-heapimg*
-yacc/bin/cmyacc-hs-heapimg*

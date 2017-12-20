@@ -1,0 +1,9 @@
+ocaml
+name LexerFun
+alphabet 128
+
+function foo : t =
+  (* 'a) => astar
+
+function bar : u =
+  (* 'b) => bstar

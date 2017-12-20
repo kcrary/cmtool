@@ -2,7 +2,7 @@
 signature LANGUAGE =
    sig
 
-      datatype language = SML | HASKELL
+      datatype language = SML | HASKELL | OCAML
 
       val toString : language -> string
       val extension : language -> string

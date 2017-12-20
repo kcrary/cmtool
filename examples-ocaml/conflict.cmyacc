@@ -1,0 +1,13 @@
+ocaml
+name ParserFun
+
+terminal NUMBER of t
+terminal PLUS
+terminal TIMES precl 1
+
+nonterminal Term : t =
+  1:NUMBER => number_term
+  1:Term PLUS 2:Term => plus_term
+  1:Term TIMES 2:Term => times_factor
+
+start Term

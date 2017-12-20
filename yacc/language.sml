@@ -2,17 +2,19 @@
 structure Language :> LANGUAGE =
    struct
 
-      datatype language = SML | HASKELL
+      datatype language = SML | HASKELL | OCAML
 
       fun toString l =
          (case l of
              SML => "SML"
-           | HASKELL => "Haskell")
+           | HASKELL => "Haskell"
+           | OCAML => "OCaml")
 
       fun extension l =
          (case l of
              SML => "sml"
-           | HASKELL => "hs")
+           | HASKELL => "hs"
+           | OCAML => "ml")
 
 
       structure Table =
@@ -20,6 +22,7 @@ structure Language :> LANGUAGE =
 
       val reservedSmlTable : unit Table.table = Table.table 60
       val reservedHaskellTable : unit Table.table = Table.table 60
+      val reservedOcamlTable : unit Table.table = Table.table 60
 
       (* In principle we ought to fill these tables lazily, since we'll never need both,
          but it doesn't seem worth the trouble.
@@ -116,15 +119,87 @@ structure Language :> LANGUAGE =
          "Arg"
          ]
 
+      val () =
+         List.app
+         (fn str => Table.insert reservedOcamlTable str ())
+         [
+         "and",
+         "as",
+         "assert",
+         "asr",
+         "begin",
+         "class",
+         "constraint",
+         "do",
+         "done",
+         "downto",
+         "else",
+         "end",
+         "exception",
+         "external",
+         "false",
+         "for",
+         "fun",
+         "function",
+         "functor",
+         "if",
+         "in",
+         "include",
+         "inherit",
+         "initializer",
+         "land",
+         "lazy",
+         "let",
+         "lor",
+         "lsl",
+         "lsr",
+         "lxor",
+         "match",
+         "method",
+         "mod",
+         "module",
+         "mutable",
+         "new",
+         "nonrec",
+         "object",
+         "of",
+         "open",
+         "or",
+         "private",
+         "rec",
+         "sig",
+         "struct",
+         "then",
+         "to",
+         "true",
+         "try",
+         "type",
+         "val",
+         "virtual",
+         "when",
+         "while",
+         "with",
+
+         "true",
+         "false",
+         "nil",
+         "ref",
+
+         "error",
+         "exn"
+         ]
+
+
 
       fun reservedSml str = Table.member reservedSmlTable str
       fun reservedHaskell str = Table.member reservedHaskellTable str
+      fun reservedOcaml str = Table.member reservedOcamlTable str
 
       fun reserved lang str =
          (case lang of
              SML => reservedSml str
-           | HASKELL => reservedHaskell str)
-      
+           | HASKELL => reservedHaskell str
+           | OCAML => reservedOcaml str)      
 
       fun legalLongid lang longid =
          (case lang of
@@ -144,6 +219,30 @@ structure Language :> LANGUAGE =
                        Char.isUpper (String.sub (str, 0))
                        andalso
                        not (reservedHaskell str))
-                   longid)
+                   longid
+
+           | OCAML =>
+                (case longid of
+                    [str] =>
+                       size str >= 1
+                       andalso
+                       Char.isUpper (String.sub (str, 0))
+                       andalso
+                       not (reservedOcaml str)
+                  | _ => false))
+
+      fun legalConstructor lang id =
+         (case lang of
+             SML => true
+
+           | HASKELL =>
+                size id >= 1
+                andalso
+                Char.isUpper (String.sub (id, 0))
+
+           | OCAML =>
+                size id >= 1
+                andalso
+                Char.isUpper (String.sub (id, 0)))
 
    end

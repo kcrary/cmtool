@@ -1,0 +1,23 @@
+/* set output file CalcLex.ml */
+ocaml
+name Fun
+
+terminal NUMBER of t
+terminal PLUS
+terminal TIMES
+terminal LPAREN
+terminal RPAREN
+
+nonterminal Atom : t =
+  1:NUMBER => number_atom
+  LPAREN 1:Term RPAREN => paren_atom
+
+nonterminal Factor : t =
+  1:Atom => atom_factor
+  1:Atom TIMES 2:Factor => times_factor
+
+nonterminal Term : t =
+  1:Factor => factor_term
+  1:Factor PLUS 2:Term => plus_term
+
+start Term

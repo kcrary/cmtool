@@ -550,6 +550,7 @@ structure Process
                 (case l of
                     Option "sml" :: l' => (L.SML, l')
                   | Option "haskell" :: l' => (L.HASKELL, l')
+                  | Option "ocaml" :: l' => (L.OCAML, l')
 
                   | [] =>
                        (

@@ -1,0 +1,18 @@
+/* set output file CalcLex.ml */
+ocaml
+name Fun
+alphabet 128
+
+set digit = (range '0 '9)
+set whitechar = (or 32 9 10)  /* space, tab, lf */
+
+function lex : t =
+  (+ digit) => number
+  '+ => plus
+  '* => times
+  '( => lparen
+  ') => rparen
+  (+ whitechar) => whitespace
+
+  /* Stop at the first illegal character */
+  epsilon => eof

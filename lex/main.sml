@@ -30,7 +30,9 @@ structure Main =
                  Language.SML =>
                     CodegenSml.writeProgram outfile auto
                | Language.HASKELL =>
-                    CodegenHs.writeProgram outfile auto);
+                    CodegenHs.writeProgram outfile auto
+               | Language.OCAML =>
+                    CodegenOcaml.writeProgram outfile auto);
              print outfile;
              print " written\n"
           end

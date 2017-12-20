@@ -5,6 +5,7 @@ is
         automata.sml
         codegen.sig
         codegen-hs.sml
+        codegen-ocaml.sml
         codegen-sml.sml
         codegen-util.sig
         codegen-util.sml
