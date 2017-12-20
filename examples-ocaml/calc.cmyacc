@@ -1,4 +1,4 @@
-/* set output file CalcLex.ml */
+/* set output file CalcParse.ml */
 ocaml
 name Fun
 

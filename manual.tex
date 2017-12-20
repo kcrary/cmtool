@@ -12,8 +12,10 @@
 \parindent=0in
 \parskip=10pt
 
+\tolerance=10000
+
 \title{CM-Lex and CM-Yacc User's Manual \\ \Large
-(Version 2.0)}
+(Version 2.1)}
 \author{Karl Crary \\ Carnegie Mellon University}
 \date{\today}
 
@@ -40,7 +42,7 @@ A CM-Lex specification consists of a series of directives:
 \begin{itemize}
 
 \item
-\cd{sml} {\it or\/} \cd{haskell}
+\cd{sml} {\it or\/} \cd{haskell} {\it or\/} \cd{ocaml}
 
 Specifies the language in which the generated lexer should be
 implemented.  This is a required directive, and it must appear first.
@@ -48,15 +50,15 @@ implemented.  This is a required directive, and it must appear first.
 \item
 \cd{name \nonterm{identifier}}
 
-Specifies the name of the generated functor for SML lexers,
+Specifies the name of the generated functor for SML/Ocaml lexers,
 and the name of the generated module for Haskell lexers.  This is
 a required directive.
 
-In Haskell specifications, the name must be a valid module identifier,
-so it must begin with a capital letter.  A hierarchical name is
-permitted.  In SML specifications the name is not required to be
-capitalized, but it is standard practice in SML code to capitalize
-functor names nonetheless.
+In Haskell and OCaml specifications, the name must be a valid module
+identifier, so it must begin with a capital letter.  In Haskell, a
+hierarchical name is permitted.  In SML specifications the name is not
+required to be capitalized, but it is standard practice in SML code to
+capitalize functor names nonetheless.
 
 \item
 \cd{alphabet \nonterm{alphabet size}}
@@ -260,19 +262,22 @@ the input file name by appending the appropriate suffix.
 
 \begin{code}
 cmlex foo.cmlex               # generates foo.cmlex.sml or foo.cmlex.hs
+                              #   or foo.cmlex.ml
 cmlex foo.cmlex -o bar.sml    # generates bar.sml
 cmlex foo.cmlex -o bar.hs     # generates bar.hs
+cmlex foo.cmlex -o bar.ml     # generates bar.ml
 \end{code}
 
 
 \subsection{Streams (Standard ML)}
+\label{sec:stream-sml}
 
 The generated lexer takes its input in the form of a lazy stream,
 which is a possibly-infinite list in which each element is computed
 the first time it is needed, and then memoized for future uses.
 
 A stream type is included in CM-Lib, a library packaged with CM-Lex
-and CM-Yacc.  The module Stream implements the signature {\tt STREAM}, an
+and CM-Yacc.  The module {\tt Stream} implements the signature {\tt STREAM}, an
 abbreviated version of which appears below:
 
 \begin{code}
@@ -447,6 +452,125 @@ the remaining stream ({\em i.e.,} the {\tt follow} argument).  However, the
 programmer may manipulate the stream as he or she desires.  For
 example, one may push additional symbols onto the stream (as in Lex's
 {\tt yymore} directive), simply by doing so before calling the lexer.
+
+
+\subsection{Streams (OCaml)}
+
+We do not use the stream type in the OCaml standard library, which is
+imperative.  Instead we employ a functional stream type similar to the
+streams we employ for Standard ML (Section~\ref{sec:stream-sml}).  The
+module {\tt FStream} implements streams; its interface is abbreviated
+below:
+
+\begin{code}
+type 'a stream
+type 'a front = Nil | Cons of 'a * 'a stream
+type 'a t = 'a stream
+
+val front : 'a stream -> 'a front
+val eager : 'a front -> 'a stream
+val laz : 'a front Lazy.t -> 'a stream
+\end{code}
+
+For lazy stream construction, we use OCaml's {\tt Lazy} module,
+instead of a thunk.  One can construct a lazy expression using the
+{\tt lazy} keyword.  Thus, a lazy {\tt Cons} can be written \cd{laz
+(lazy (Cons (...)))}.
+
+As in Standard ML, a lexer need not use a stream, it may use any type
+that implements the type class \cd{Streamable.S}:
+
+\begin{code}
+module type S =
+   sig
+      type 'a t
+
+      type 'a front = Nil | Cons of 'a * 'a t
+      val front : 'a t -> 'a front
+   end
+\end{code}
+
+The canonical implementation of \cd{Streamable.S} is
+\cd{Streamable.StreamStreamable}, which implements {\tt t} as simply
+{\tt FStream.stream}.  However, the programmer may also use
+\cd{Streamable.ListStreamable}, which implements {\tt t} as {\tt
+list}, or any other way he or she chooses.
+
+
+
+\subsection{The generated functor (OCaml)}
+
+Consider the specification:
+
+\begin{code}
+ocaml
+name LexerFun
+alphabet 128
+
+function foo : t =
+  (* 'a) => astar
+
+function bar : u =
+  (* 'b) => bstar
+\end{code}
+
+CM-Lex generates the functor:
+
+\begin{strictcode}
+module LexerFun
+   (Strm : Streamable.S)
+   (Arg :
+       sig
+          type symbol
+          val ord : symbol -> int
+
+          type t
+          type u
+
+          type self = { bar : symbol Strm.t -> u;
+                        foo : symbol Strm.t -> t }
+          type info = (symbol list, symbol Strm.t, self) LexInfo.t
+
+          val astar : info -> t
+          val bstar : info -> u
+       end)
+   :
+   sig
+      val bar : Arg.symbol Strm.t -> Arg.u
+      val foo : Arg.symbol Strm.t -> Arg.t
+   end
+= itdots implementation dots
+endstrictcode
+
+This works in a fashion identical to Standard ML lexers
+(Section~\ref{sec:lex-functor-sml}).  Each action is passed a 
+\cd{LexInfo.t}, which is defined as follows:
+
+\begin{strictcode}
+type ('a, 'b, 'c) t =
+   { matc : 'a;
+     len : int;
+     start : 'b;
+     follow : 'b;
+     self : 'c }
+endstrictcode
+
+In particular, \cd{(symbol list, symbol Strm.t, self) LexInfo.t} (as
+it is used in the functor) works out to:
+
+\begin{strictcode}
+   { matc : symbol list;
+     len : int;
+     start : symbol Strm.t;
+     follow : symbol Strm.t;
+     self : self }
+endstrictcode
+
+The information in the \cd{LexInfo.t} is identical to that in
+Section~\ref{sec:match-info}.  The first field is named {\tt matc}
+because {\tt match} is a reserved word in OCaml.
+
+
 
 
 \subsection{Streams (Haskell)}
@@ -626,7 +750,6 @@ t} and \cd{monad u}, intead of {\tt t} and {\tt u}.
 A worked example of how to use this appears in Section~\ref{sec:example-hs}.
 
 
-
 \subsection{The automaton listing}
 
 In the generated file, embedded as a comment immediately after the
@@ -654,7 +777,7 @@ A CM-Yacc specification consists of a series of directives:
 
 \begin{itemize}
 \item
-\cd{sml} {\it or\/} \cd{haskell}
+\cd{sml} {\it or\/} \cd{haskell} {\it or\/} \cd{ocaml}
 
 Specifies the language in which the generated parser should be
 implemented.  This is a required directive, and it must appear first.
@@ -663,15 +786,15 @@ implemented.  This is a required directive, and it must appear first.
 \item
 \cd{name \nonterm{identifier}}
 
-Specifies the name of the generated functor for SML parsers,
+Specifies the name of the generated functor for SML/Ocaml parser,
 and the name of the generated module for Haskell parsers.  This is
 a required directive.
 
-In Haskell specifications, the name must be a valid module
-identifier, so it must begin with a capital letter.  In SML
-specifications the name is not required to be capitalized, but it
-is standard practice in SML code to capitalize functor names
-nonetheless.
+In Haskell and OCaml specifications, the name must be a valid module
+identifier, so it must begin with a capital letter.  In Haskell, a
+hierarchical name is permitted.  In SML specifications the name is not
+required to be capitalized, but it is standard practice in SML code to
+capitalize functor names nonetheless.
 
 \item
 \cd{terminal \nonterm{name} \lb of \nonterm{type name} \rb \lb \nonterm{precedence} \rb}
@@ -836,8 +959,10 @@ the input file name by appending the appropriate suffix.
 
 \begin{code}
 cmyacc foo.cmyacc               # generates foo.cmyacc.sml or foo.cmyacc.hs
+                                #   or foo.cmyacc.ml
 cmyacc foo.cmyacc -o bar.sml    # generates bar.sml
 cmyacc foo.cmyacc -o bar.hs     # generates bar.hs
+cmyacc foo.cmyacc -o bar.ml     # generates bar.ml
 \end{code}
 
 
@@ -908,6 +1033,64 @@ stream of terminals, and it returns a pair: the data carried by the
 start symbol, and the stream of terminals that follows the complete
 parse.  (If no followers are specified, the stream that follows the
 parse is always empty.)
+
+
+
+\subsection{The generated functor (OCaml)}
+
+Consider the specification:
+
+\begin{code}
+ocaml
+name ParserFun
+
+terminal NUMBER of t
+terminal PLUS
+terminal TIMES
+
+nonterminal Factor : t =
+  1:NUMBER => number_factor
+  1:NUMBER TIMES 2:Factor => times_factor
+
+nonterminal Term : t =
+  1:Factor => factor_term
+  1:Factor PLUS 2:Term => plus_term
+
+start Term
+\end{code}
+
+CM-Yacc generates the functor:
+
+\begin{strictcode}
+module ParserFun
+   (Strm : Streamable.S)
+   (Arg :
+       sig
+          type t
+
+          val plus_term : t -> t -> t
+          val factor_term : t -> t
+          val times_factor : t -> t -> t
+          val number_factor : t -> t
+
+          type terminal =
+             NUMBER of t
+           | PLUS
+           | TIMES
+
+          val error : terminal Strm.t -> exn
+       end)
+   :
+   sig
+      val parse : Arg.terminal Strm.t -> Arg.t * Arg.terminal Strm.t
+   end
+= itdots implementation dots
+endstrictcode
+
+It works in a fashion identical to Standard ML parsers
+(Section~\ref{sec:yacc-functor-sml}).
+
+
 
 
 \subsection{The generated functor (Haskell)}
@@ -1342,6 +1525,203 @@ structure Calculator
 
 
 
+\section{An OCaml example}
+
+To build the calculator example in OCaml is similar to Standard ML.
+The lexer specification is:
+
+\begin{code}
+ocaml
+name Fun
+alphabet 128
+
+set digit = (range '0 '9)
+set whitechar = (or 32 9 10)  /* space, tab, lf */
+
+function lex : t =
+  (+ digit) => number
+  '+ => plus
+  '* => times
+  '( => lparen
+  ') => rparen
+  (+ whitechar) => whitespace
+
+  /* Stop at the first illegal character */
+  epsilon => eof
+\end{code}
+
+\noindent
+which generates the functor:
+
+\begin{strictcode}
+module Fun
+   (Strm : Streamable.S)
+   (Arg :
+       sig
+          type symbol
+          val ord : symbol -> int
+
+          type t
+
+          type self = { lex : symbol Strm.t -> t }
+          type info = (symbol list, symbol Strm.t, self) LexInfo.t
+
+          val eof : info -> t
+          val lparen : info -> t
+          val number : info -> t
+          val plus : info -> t
+          val rparen : info -> t
+          val times : info -> t
+          val whitespace : info -> t
+       end)
+   :
+   sig
+      val lex : Arg.symbol Strm.t -> Arg.t
+   end
+= itdots implementation dots
+endstrictcode
+
+The parser specification is:
+
+\begin{code}
+ocaml
+name Fun
+
+terminal NUMBER of t
+terminal PLUS
+terminal TIMES
+terminal LPAREN
+terminal RPAREN
+
+nonterminal Atom : t =
+  1:NUMBER => number_atom
+  LPAREN 1:Term RPAREN => paren_atom
+
+nonterminal Factor : t =
+  1:Atom => atom_factor
+  1:Atom TIMES 2:Factor => times_factor
+
+nonterminal Term : t =
+  1:Factor => factor_term
+  1:Factor PLUS 2:Term => plus_term
+
+start Term
+\end{code}
+
+\noindent
+which generates the functor:
+
+\begin{strictcode}
+module Fun
+   (Strm : Streamable.S)
+   (Arg :
+       sig
+          type t
+
+          val plus_term : t -> t -> t
+          val factor_term : t -> t
+          val times_factor : t -> t -> t
+          val atom_factor : t -> t
+          val paren_atom : t -> t
+          val number_atom : t -> t
+
+          type terminal =
+             NUMBER of t
+           | PLUS
+           | TIMES
+           | LPAREN
+           | RPAREN
+
+          val error : terminal Strm.t -> exn
+       end)
+   :
+   sig
+      val parse : Arg.terminal Strm.t -> Arg.t * Arg.terminal Strm.t
+   end
+= itdots implementation dots
+endstrictcode
+
+The calculator satisfies the interface:
+
+\begin{code}
+val calc : char FStream.stream -> int
+\end{code}
+
+We assume that the lexer and parser functors reside in files
+\cd{CalcLex.ml} and \cd{CalcParse.ml} and thus reside in modules named
+\cd{CalcLex} and \cd{CalcParse}.  We then assemble the calculator as
+follows:
+
+\begin{bigstrictcode}
+module Terminal =
+   struct
+      type terminal =
+         NUMBER of int
+       | PLUS
+       | TIMES
+       | LPAREN
+       | RPAREN
+   end
+
+module Lexer =
+   CalcLex.Fun
+   (Streamable.StreamStreamable)
+   (struct
+       open FStream
+       open LexInfo
+       open Terminal
+
+       type symbol = char
+       let ord = int_of_char
+
+       type t = terminal front
+
+       type self = { lex : char stream -> t }
+       type info = (symbol list, symbol FStream.stream, self) LexInfo.t
+
+       let number { matc; follow; self } =
+         Cons (NUMBER (int_of_string (StringUtil.implode matc)),
+               laz (lazy (self.lex follow)))
+
+       let simple terminal { follow; self } =
+         Cons (terminal, laz (lazy (self.lex follow)))
+
+       let plus = simple PLUS
+       let times = simple TIMES
+       let lparen = simple LPAREN
+       let rparen = simple RPAREN
+
+       let whitespace { follow; self } =
+         self.lex follow
+
+       let eof _ = Nil
+     end)
+
+module Parser =
+   CalcParse.Fun
+   (Streamable.StreamStreamable)
+   (struct
+       type t = int
+
+       let id x = x
+
+       let number_atom = id
+       let paren_atom = id
+       let atom_factor = id
+       let times_factor x y = x * y
+       let factor_term = id
+       let plus_term x y = x + y
+
+       include Terminal
+
+       let error _ = Failure "syntax error"
+     end)
+
+let calc strm = fst (Parser.parse (FStream.laz (lazy (Lexer.lex strm))))
+endbigstrictcode
+
+
+
 \section{A Haskell example}
 \label{sec:example-hs}
 
@@ -1456,7 +1836,10 @@ parse :: ParseEngine.Streamable stream monad
                -> monad (t, stream (Terminal t))
 endstrictcode
 
-We then assemble the calculator as follows:
+We assume that the lexer and parser functors reside in files
+\cd{CalcLexFun.hs} and \cd{CalcParseFun.hs} and thus reside in modules
+named \cd{CalcLexFun} and \cd{CalcParseFun}.  We then assemble the
+calculator as follows:
 
 \begin{bigstrictcode}
 module Calc where
