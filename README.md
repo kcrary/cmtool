@@ -1,5 +1,5 @@
-CM-Lex and CM-Yacc: A lexer and parser generator for Standard ML and Haskell
-============================================================================
+CM-Lex and CM-Yacc: A lexer and parser generator for Standard ML, OCaml, and Haskell
+====================================================================================
 
 Existing lexer and parser generators such as Lex and Yacc suffer from
 practical inconveniences because they use disembodied code to
