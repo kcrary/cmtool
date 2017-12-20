@@ -30,8 +30,8 @@
 
 \section{CM-Lex}
 
-CM-Lex is a lexer generator for Standard ML and Haskell.  It converts
-a specification file into an SML or Haskell source-code file that
+CM-Lex is a lexer generator for Standard ML, OCaml, and Haskell.  It converts
+a specification file into an SML, OCaml, or Haskell source-code file that
 implements a lexer functor.  The programmer may then instantiate that
 functor with appropriate code for lexing actions to obtain a lexer.
 
@@ -42,7 +42,7 @@ A CM-Lex specification consists of a series of directives:
 \begin{itemize}
 
 \item
-\cd{sml} {\it or\/} \cd{haskell} {\it or\/} \cd{ocaml}
+\cd{sml} {\it or\/} \cd{ocaml} {\it or\/} \cd{haskell} 
 
 Specifies the language in which the generated lexer should be
 implemented.  This is a required directive, and it must appear first.
@@ -764,8 +764,8 @@ state.
 
 \section{CM-Yacc}
 
-CM-Yacc is an LALR(1) parser generator for Standard ML and Haskell.
-It converts a specification file into an SML or Haskell source-code
+CM-Yacc is an LALR(1) parser generator for Standard ML, OCaml, and Haskell.
+It converts a specification file into an SML, OCaml, or Haskell source-code
 file that implements a parser functor.  The programmer may then
 instantiate that functor with appropriate code for lexing actions to
 obtain a parser.
@@ -777,7 +777,7 @@ A CM-Yacc specification consists of a series of directives:
 
 \begin{itemize}
 \item
-\cd{sml} {\it or\/} \cd{haskell} {\it or\/} \cd{ocaml}
+\cd{sml} {\it or\/} \cd{ocaml} {\it or\/} \cd{haskell}
 
 Specifies the language in which the generated parser should be
 implemented.  This is a required directive, and it must appear first.
