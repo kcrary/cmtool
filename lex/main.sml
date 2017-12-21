@@ -70,7 +70,7 @@ structure Main =
                    | Quit msg => 
                      (print ("Error: " ^ msg ^ "\n\
                              \Usage: " ^ name ^ " <input-file> [-o <output-file>]\n\
-                             \(Default output file is <input-file>.[sml/hs])")
+                             \(Default output file is <input-file>.[sml/hs])\n")
                      ; OS.Process.failure) 
                    | exn =>  
                      (print ("Failed with exception: " ^ exnName exn ^ "\n")
