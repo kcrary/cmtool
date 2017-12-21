@@ -9,7 +9,7 @@ with appropriate action code.  This results in all code being type
 checked in its appropriate context, and it assists the type checker in
 localizing errors correctly.
 
-CM-Lex and CM-Yacc are implemented for both Standard ML, OCaml, and Haskell.
+CM-Lex and CM-Yacc are implemented for Standard ML, OCaml, and Haskell.
 However, all three versions are implemented *in* Standard ML.  Installation
 instructions for Unix and Windows appear in the INSTALL file.  You
 will need either MLton or Standard ML of New Jersey.
