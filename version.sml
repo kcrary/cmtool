@@ -1,4 +1,4 @@
 structure Version =
    struct
-      val version = "2.1rc1"
+      val version = "2.1"
    end
