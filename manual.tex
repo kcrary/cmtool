@@ -264,8 +264,8 @@ the input file name by appending the appropriate suffix.
 cmlex foo.cmlex               # generates foo.cmlex.sml or foo.cmlex.hs
                               #   or foo.cmlex.ml
 cmlex foo.cmlex -o bar.sml    # generates bar.sml
-cmlex foo.cmlex -o bar.hs     # generates bar.hs
 cmlex foo.cmlex -o bar.ml     # generates bar.ml
+cmlex foo.cmlex -o bar.hs     # generates bar.hs
 \end{code}
 
 
@@ -567,8 +567,10 @@ it is used in the functor) works out to:
 endstrictcode
 
 The information in the \cd{LexInfo.t} is identical to that in
-Section~\ref{sec:match-info}.  The first field is named {\tt matc}
-because {\tt match} is a reserved word in OCaml.
+Section~\ref{sec:match-info}.  (The first field is named {\tt matc}
+because {\tt match} is a reserved word in OCaml.)  Lexing functions
+may reinvoke the lexer using the {\tt self} argument or (with a bit
+more effort) they can use a recursive module.
 
 
 
@@ -961,8 +963,8 @@ the input file name by appending the appropriate suffix.
 cmyacc foo.cmyacc               # generates foo.cmyacc.sml or foo.cmyacc.hs
                                 #   or foo.cmyacc.ml
 cmyacc foo.cmyacc -o bar.sml    # generates bar.sml
-cmyacc foo.cmyacc -o bar.hs     # generates bar.hs
 cmyacc foo.cmyacc -o bar.ml     # generates bar.ml
+cmyacc foo.cmyacc -o bar.hs     # generates bar.hs
 \end{code}
 
 
