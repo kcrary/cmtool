@@ -6,6 +6,8 @@ BINARIES= $(foreach mod, $(MODULES), $(mod).cmo)
 
 all: $(INTERFACES) $(BINARIES) util.a
 
+LexEngine.mli: Streamable.cmi LexInfo.cmi
+
 %.cmi : %.mli
 	ocamlc -c $<
 
