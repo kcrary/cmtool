@@ -34,7 +34,8 @@ structure Lexer
          ("monadic", OPTION "monadic"),
          ("sml", OPTION "sml"),
          ("haskell", OPTION "haskell"),
-         ("ocaml", OPTION "ocaml")
+         ("ocaml", OPTION "ocaml"),
+         ("raw", OPTION "raw")
          ]
 
         

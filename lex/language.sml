@@ -2,19 +2,21 @@
 structure Language :> LANGUAGE =
    struct
 
-      datatype language = SML | HASKELL | OCAML
+      datatype language = SML | HASKELL | OCAML | RAW
 
       fun toString l =
          (case l of
              SML => "SML"
            | HASKELL => "Haskell"
-           | OCAML => "OCaml")
+           | OCAML => "OCaml"
+           | RAW => "Raw")
 
       fun extension l =
          (case l of
              SML => "sml"
            | HASKELL => "hs"
-           | OCAML => "ml")
+           | OCAML => "ml"
+           | RAW => "txt")
 
 
       structure Table =
@@ -206,7 +208,8 @@ structure Language :> LANGUAGE =
          (case lang of
              SML => reservedSml str
            | HASKELL => reservedHaskell str
-           | OCAML => reservedOcaml str)
+           | OCAML => reservedOcaml str
+           | RAW => false)
       
 
       fun legalLongid lang longid =
@@ -237,6 +240,8 @@ structure Language :> LANGUAGE =
                        Char.isUpper (String.sub (str, 0))
                        andalso
                        not (reservedOcaml str)
-                  | _ => false))
+                  | _ => false)
+
+           | RAW => true)
 
    end

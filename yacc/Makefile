@@ -9,14 +9,16 @@ all:
 mlton: 
 	mlton -output bin/cmyacc cmyacc.mlb
 
+SMLNJ=`which sml`
+
 # SML/NJ
 .PHONY : smlnj
 smlnj:
 	sml export-smlnj.sml
-	bin/mknjexec-unixey `which sml` `pwd`/bin cmyacc-heapimg cmyacc 
+	bin/mknjexec-unixey $(SMLNJ) `pwd`/bin cmyacc-heapimg cmyacc 
 
 # Windows + SML/NJ 
 .PHONY : win+smlnj
 win+smlnj:
 	sml export-smlnj.sml
-	bin/mknjexec-win `which sml` `pwd`/bin cmyacc-heapimg.x86-win32 cmyacc
+	bin/mknjexec-win $(SMLNJ) `pwd`/bin cmyacc-heapimg.x86-win32 cmyacc

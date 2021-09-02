@@ -32,7 +32,9 @@ structure Main =
                | Language.HASKELL =>
                     CodegenHs.writeProgram outfile auto
                | Language.OCAML =>
-                    CodegenOcaml.writeProgram outfile auto);
+                    CodegenOcaml.writeProgram outfile auto
+               | Language.RAW =>
+                    CodegenRaw.writeProgram outfile auto);
              print outfile;
              print " written\n"
           end
@@ -70,7 +72,7 @@ structure Main =
                    | Quit msg => 
                      (print ("Error: " ^ msg ^ "\n\
                              \Usage: " ^ name ^ " <input-file> [-o <output-file>]\n\
-                             \(Default output file is <input-file>.[sml/hs])\n")
+                             \(Default output file is <input-file>.[sml/ml/hs])\n")
                      ; OS.Process.failure) 
                    | exn =>  
                      (print ("Failed with exception: " ^ exnName exn ^ "\n")

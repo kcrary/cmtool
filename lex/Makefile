@@ -9,14 +9,16 @@ all:
 mlton: 
 	mlton -output bin/cmlex cmlex.mlb
 
+SMLNJ=`which sml`
+
 # SML/NJ
 .PHONY : smlnj
 smlnj:
 	sml export-smlnj.sml
-	bin/mknjexec-unixey `which sml` `pwd`/bin cmlex-heapimg cmlex 
+	bin/mknjexec-unixey $(SMLNJ) `pwd`/bin cmlex-heapimg cmlex 
 
 # Windows + SML/NJ 
 .PHONY : win+smlnj
 win+smlnj:
 	sml export-smlnj.sml
-	bin/mknjexec-win `which sml` `pwd`/bin cmlex-heapimg.x86-win32 cmlex 
+	bin/mknjexec-win $(SMLNJ) `pwd`/bin cmlex-heapimg.x86-win32 cmlex 

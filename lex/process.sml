@@ -551,6 +551,7 @@ structure Process
                     Option "sml" :: l' => (L.SML, l')
                   | Option "haskell" :: l' => (L.HASKELL, l')
                   | Option "ocaml" :: l' => (L.OCAML, l')
+                  | Option "raw" :: l' => (L.RAW, l')
 
                   | [] =>
                        (
@@ -560,7 +561,7 @@ structure Process
                     
                   | _ =>
                        (
-                       print "Error: language must be specified first.\nBegin your specification with \"sml\" or \"haskell\".\n";
+                       print "Error: language must be specified first.\nBegin your specification with \"sml\", \"haskell\", \"ocaml\", or \"raw\".\n";
                        raise Error
                        ))
 
